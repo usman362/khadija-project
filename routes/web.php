@@ -1132,7 +1132,30 @@ Route::middleware('auth')->group(function () {
     });
 
     // ── Professional Panel ──────────────────────────────────────────
-    Route::prefix('professional')->middleware('permission:dashboard.view')->group(function () {
+    /*
+     * Behind the professional ROLE, not dashboard.view.
+     *
+     * Every one of these eighty routes sat behind permission:dashboard.view,
+     * which the client, professional, influencer and admin roles all hold. So
+     * a signed-in client could open any address in the professional portal.
+     *
+     * Nothing leaked: each page reads rows where the reader is the supplier,
+     * and a client is the supplier on none of them, so they saw empty
+     * screens. But "it happens to be empty" is not a boundary. It is eighty
+     * routes each keeping the door shut by itself, and the first query
+     * written without that in mind opens it.
+     *
+     * The ROLE, not the active MODE. A dual-role account defaults to client
+     * mode — User::activeRole prefers client deliberately, so nobody lands in
+     * the professional portal by accident — and gating on mode would lock a
+     * real professional out of their own pages until they switched.
+     *
+     * Admin is in because an administrator can already see everything.
+     * Influencer is not: that side has its own portal, no influencer is the
+     * supplier on any booking or agreement, and the day one is, the question
+     * of which portal they sign in is a decision rather than an oversight.
+     */
+    Route::prefix('professional')->middleware('role:professional|admin')->group(function () {
         Route::get('/dashboard', [ProfessionalDashboardController::class, 'index'])->name('professional.dashboard');
 
         /*

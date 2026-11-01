@@ -336,23 +336,22 @@ class TheProfessionalCanSeeWhoHiredThemTest extends TestCase
     // ── Who may open it ──────────────────────────────────────
 
     /**
-     * A client who reaches this address sees nobody.
+     * A client is refused at the door, and would see nobody even if not.
      *
-     * Not a redirect: every route in the professional group is behind
-     * dashboard.view, which a client also holds, and that is true of the
-     * Leads page and the rest of the side as well. Changing it belongs in its
-     * own piece of work. What matters here is that the page cannot leak:
-     * every row is read from bookings where the reader is the supplier, and a
-     * client is the supplier on none of them.
+     * Both halves matter. The whole professional group used to sit behind
+     * dashboard.view, which clients hold too, so every address in the portal
+     * was reachable by them; it is behind the professional role now. And
+     * underneath that, the rows are read from bookings where the reader is
+     * the supplier, which a client never is. One of those is a boundary and
+     * the other is why nothing leaked while it was missing.
      */
-    public function test_a_client_who_reaches_this_address_sees_nobody(): void
+    public function test_a_client_cannot_reach_this_address_and_would_see_nobody(): void
     {
         $this->booking($this->client, 'Rivera Wedding', now()->subMonth(), 'completed', 4000);
 
         $this->actingAs($this->client)
             ->get(route('professional.clients.index'))
-            ->assertSuccessful()
-            ->assertSee('Nobody has hired you yet', false);
+            ->assertForbidden();
 
         $this->assertCount(0, WhoHiredMe::rows($this->client));
     }

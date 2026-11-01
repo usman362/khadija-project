@@ -37,14 +37,24 @@ class TheProfessionalCanKeepACopyOfTheAgreementTest extends TestCase
         $this->seed(\Database\Seeders\PermissionSeeder::class);
         $this->seed(\Database\Seeders\RolePermissionSeeder::class);
 
-        $this->client       = $this->person('client');
+        /*
+         * Named rather than generated, because a test below asserts the name
+         * on a rendered page. A generated name with an apostrophe in it comes
+         * back as &#039; and an unescaped assertion then fails on a document
+         * that is perfectly correct — and only on the seeds that produce one,
+         * which is the worst way for a test to fail.
+         */
+        $this->client       = $this->person('client', 'Imogen Hartwell');
         $this->professional = $this->person('professional');
         $this->agreement    = $this->agreementBetween($this->client, $this->professional, 'Rivera Wedding');
     }
 
-    private function person(string $role): User
+    private function person(string $role, ?string $name = null): User
     {
-        $u = User::factory()->create(['primary_role' => $role]);
+        $u = User::factory()->create(array_filter([
+            'primary_role' => $role,
+            'name'         => $name,
+        ]));
         $u->assignRole($role);
         $u->getOrCreateProfile()->update([
             'country' => 'US', 'state' => 'MD', 'city' => 'Baltimore',
@@ -204,7 +214,8 @@ class TheProfessionalCanKeepACopyOfTheAgreementTest extends TestCase
     {
         $html = $this->renderedFor($this->agreement);
 
-        $this->assertStringContainsString($this->client->name, $html);
+        // Escaped, because the document escapes it.
+        $this->assertStringContainsString(e($this->client->name), $html);
     }
 
     /** Both sides are handed the same document, not two drawn separately. */
