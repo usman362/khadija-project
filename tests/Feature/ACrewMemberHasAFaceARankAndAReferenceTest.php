@@ -301,4 +301,44 @@ class ACrewMemberHasAFaceARankAndAReferenceTest extends TestCase
 
         $this->assertSame($boss->id, $this->booking->fresh()->supervisor_id);
     }
+
+    /**
+     * Every crew member, not only the ones added after the column existed.
+     *
+     * The model's own rule: "A reference that only some rows have is one more
+     * thing to check before it can be used for anything." The `creating` hook
+     * keeps that for new rows; the 29 October migration left every crew
+     * member already on the site without one, and the team page filtered the
+     * empty out of the line it prints, so nothing broke and nothing showed.
+     */
+    public function test_no_crew_member_is_left_without_a_reference(): void
+    {
+        $this->assertSame(
+            0,
+            StaffMember::whereNull('public_id')->count(),
+            'A crew member has no reference.'
+        );
+    }
+
+    /**
+     * A reference cannot be chosen through a form.
+     *
+     * public_id is left out of $fillable deliberately, so a posted field
+     * named public_id is dropped and the hook issues one instead. It is the
+     * reference the client is given for the person turning up, so it is the
+     * site's to grant, not an input.
+     */
+    public function test_a_reference_cannot_be_set_by_mass_assignment(): void
+    {
+        $staff = StaffMember::create([
+            'supplier_id' => $this->professional->id,
+            'name'        => 'Marguerite Vaskov',
+            'role'        => 'Second shooter',
+            'status'      => 'active',
+            'public_id'   => 'STF-404404',
+        ]);
+
+        $this->assertNotSame('STF-404404', $staff->fresh()->public_id);
+        $this->assertStringStartsWith('STF-', $staff->fresh()->public_id);
+    }
 }
