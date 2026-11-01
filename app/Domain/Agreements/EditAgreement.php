@@ -177,14 +177,14 @@ final class EditAgreement
         return self::CHOICES[$field] ?? null;
     }
 
-    /** One of the offered answers, whatever arrived. */
-    private static function answer(string $field, mixed $value): string
+    /** One of the offered answers, or null when it is not one of them. */
+    private static function answer(string $field, mixed $value): ?string
     {
         $options = self::CHOICES[$field];
 
         return is_string($value) && array_key_exists($value, $options)
             ? $value
-            : array_key_first($options);
+            : null;
     }
 
     /** Every version so far, newest first. */
@@ -343,8 +343,11 @@ final class EditAgreement
      */
     private static function same(string $field, mixed $a, mixed $b): bool
     {
-        // A choice always has an answer. Nothing submitted is the default
-        // rather than a change, which is what the ?? carries.
+        /*
+         * Two unrecognised values are the same non-answer, which is what the
+         * matching nulls say. clean() drops those before diff() ever asks, so
+         * in practice this compares two of the offered answers.
+         */
         if (array_key_exists($field, self::CHOICES)) {
             return self::answer($field, $a) === self::answer($field, $b);
         }
@@ -453,7 +456,10 @@ final class EditAgreement
     public static function readable(string $field, mixed $value): string
     {
         if (array_key_exists($field, self::CHOICES)) {
-            return self::CHOICES[$field][self::answer($field, $value)];
+            // A revision written before this term had its choices, or one
+            // carrying a value since retired, has no label to print. It is
+            // shown as unset rather than relabelled as one of today's answers.
+            return self::CHOICES[$field][self::answer($field, $value)] ?? 'not set';
         }
 
         if ($value === null || (is_string($value) && trim($value) === '')) {
@@ -488,10 +494,23 @@ final class EditAgreement
             }
 
             if (array_key_exists($field, self::CHOICES)) {
-                // An answer nobody offered is not an answer. It falls back to
-                // the first option rather than being written to the column,
-                // so a tampered form cannot put an unknown word in a term.
-                $out[$field] = self::answer($field, $terms[$field]);
+                /*
+                 * An answer nobody offered is not an answer, so the term is
+                 * left alone: diff() skips a field it was not given, which
+                 * means a tampered or empty form changes nothing, bumps no
+                 * version and resets no signature.
+                 *
+                 * It used to fall back to the first option. For "Who attends"
+                 * that is "I will attend personally", the one answer that
+                 * holds the professional to coming in person and stops them
+                 * sending a staff member. A fallback must not be the
+                 * strongest promise on the list.
+                 */
+                $answer = self::answer($field, $terms[$field]);
+
+                if ($answer !== null) {
+                    $out[$field] = $answer;
+                }
 
                 continue;
             }
