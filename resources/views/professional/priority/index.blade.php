@@ -2,21 +2,36 @@
 
 @section('title', 'Priority Actions')
 
-{{-- Priority Actions — explainer + a LIVE feed of real urgent items
-     (contracts to sign, new proposals, open shifts, secure payment) aggregated by
-     ProfessionalPriorityController. Example/spotlight uses the newest
-     requested booking, with a demo fallback. --}}
+{{-- Priority Actions: an explainer for the feature, plus the reader's own
+     counts (contracts to sign, new proposals, open shifts, secure payment)
+     from ProfessionalPriorityController.
+
+     The panels headed "Example:" are illustrations and hold no real data.
+     They used to be filled from the reader's newest requested booking, so a
+     real client's name appeared under an invented quote and a real address
+     beside a hardcoded guest count, and with no booking the page invented a
+     job outright. Keep them fixed. --}}
 
 @php
     $money = fn ($n) => '$' . number_format((float) $n, 0);
-    $ev = $spotlight?->event;
-    // Example values — real spotlight or representative demo.
-    $exDate   = $ev?->starts_at?->format('M jS, g:i A') ?? 'Oct 26th, 2:00 PM';
-    $exEnd    = $ev?->ends_at?->format('g:i A') ?? '4:00 PM';
-    $exLoc    = $ev?->location ?? '123 Maple St, Springfield';
-    $exBudget = $ev?->budget ? $money($ev->budget) : '$2,000 – $3,000';
-    $exClient = $spotlight?->client?->name ?? 'Sarah J.';
-    $exTitle  = $ev?->title ?? 'Birthday Performance';
+
+    /*
+        This page explains what a priority action is made of, so the panels
+        beside each part are illustrations and nothing else.
+
+        They used to be filled from the reader's newest requested booking,
+        which mixed the two: a real client's name sat under an invented quote
+        about a son's tenth birthday, a real venue address sat beside a
+        hardcoded guest count, and when there was no booking at all the page
+        invented one. Nobody reading it could tell which half was theirs.
+
+        Fixed values, and no name on the quote. The reader's own figures are
+        further down the page, under the headings that link to them.
+    */
+    $exDate   = 'Saturday, 2:00 PM';
+    $exEnd    = '4:00 PM';
+    $exLoc    = 'A venue in your service area';
+    $exBudget = '$2,000 – $3,000';
 @endphp
 
 @push('styles')
@@ -60,9 +75,6 @@
     .pa-ex-row svg { width: 14px; height: 14px; color: var(--pa-blue); flex-shrink: 0; }
     .pa-ex-row b { color: var(--text-primary); }
     .pa-ex-quote { font-size: 12.5px; font-style: italic; color: var(--text-secondary); line-height: 1.5; }
-    .pa-ex-client { font-size: 11.5px; font-weight: 700; color: var(--text-primary); margin-top: 8px; }
-    .pa-ex-timer { font-size: 11px; color: var(--bad-text); font-weight: 700; margin-top: 8px; }
-    .pa-ex-timer .big { font-size: 22px; font-weight: 800; display: block; }
     .pa-ex-action { font-size: 12.5px; color: var(--text-secondary); }
     .pa-ex-action b { color: var(--ok-text); }
 
@@ -218,7 +230,6 @@
                     <div class="pa-ex">
                         <div class="pa-ex-h">Example:</div>
                         <div class="pa-ex-quote">"My son's 10th birthday! He loves magic and we want a special performance for his friends."</div>
-                        <div class="pa-ex-client">Client: {{ $exClient }}</div>
                     </div>
                 </div>
 
@@ -233,9 +244,12 @@
                     </div>
                     <div class="pa-ex">
                         <div class="pa-ex-h">Example:</div>
-                        <div class="pa-ex-row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg><span><b>Offer:</b> {{ $spotlight?->price ? $money($spotlight->price) : '$300.00' }}</span></div>
-                        <div class="pa-ex-row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span><b>Urgency:</b> Offer expires in 4h 32m</span></div>
-                        <div class="pa-ex-timer">Time Remaining:<span class="big" id="pa-timer">04:32:15</span></div>
+                        <div class="pa-ex-row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg><span><b>Offer:</b> $300</span></div>
+                        {{-- A clock counted down from 04:32:15 here, on an offer
+                             that does not exist, next to the reader's own real
+                             price. Watching a timer run is not an illustration
+                             of a field: it is a deadline. --}}
+                        <div class="pa-ex-row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span><b>Urgency:</b> how long you have left to answer</span></div>
                     </div>
                 </div>
 
@@ -319,10 +333,14 @@
         {{-- ─── SIDEBAR ─── --}}
         <div class="pa-side">
             <div class="pa-card">
-                <div class="pa-side-h">LIVE EXAMPLE</div>
+                <div class="pa-side-h">EXAMPLE</div>
                 <p class="pa-side-sub">This is what Priority Actions looks like when you have new items.</p>
                 <div class="pa-live">
-                    <div class="pa-live-h"><b>PRIORITY ACTIONS</b><span class="pa-live-count">{{ $priorityCount ?: 3 }}</span></div>
+                    {{-- Three, because three rows are drawn below it. It read the
+                         reader's real count and then listed three invented items
+                         under it, so a professional with nothing waiting saw
+                         their own "0" above three jobs. --}}
+                    <div class="pa-live-h"><b>PRIORITY ACTIONS</b><span class="pa-live-count">3</span></div>
                     <div class="pa-li">
                         <span class="pa-li-ico" style="background:rgba(239,68,68,0.1);color:var(--bad-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>
                         <div class="pa-li-body"><div class="pa-li-t">The WHAT (Event Details)</div><div class="pa-li-d">{{ $exDate }} – {{ $exEnd }}<br>{{ \Illuminate\Support\Str::limit($exLoc, 24) }}</div></div>
@@ -330,12 +348,12 @@
                     </div>
                     <div class="pa-li">
                         <span class="pa-li-ico" style="background:rgba(37,99,235,0.1);color:var(--info-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
-                        <div class="pa-li-body"><div class="pa-li-t">The WHY (Client Message)</div><div class="pa-li-d">Special performance request. <b>Client: {{ $exClient }}</b></div></div>
+                        <div class="pa-li-body"><div class="pa-li-t">The WHY (Client Message)</div><div class="pa-li-d">Special performance request</div></div>
                         <span class="pa-li-btn b-counter">Counter</span>
                     </div>
                     <div class="pa-li">
                         <span class="pa-li-ico" style="background:rgba(249,115,22,0.1);color:var(--brand-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>
-                        <div class="pa-li-body"><div class="pa-li-t">The EXTRAS (Offer &amp; Urgency)</div><div class="pa-li-d">Offer: {{ $spotlight?->price ? $money($spotlight->price) : '$300.00' }} · Expires in 4h 32m</div></div>
+                        <div class="pa-li-body"><div class="pa-li-t">The EXTRAS (Offer &amp; Urgency)</div><div class="pa-li-d">Offer: $300 · with a time limit</div></div>
                         <span class="pa-li-btn b-decline">Decline</span>
                     </div>
                     <div class="pa-live-foot"><a href="{{ route('professional.proposals.index') }}">View All Actions →</a></div>
@@ -359,19 +377,4 @@
     </div>
 </div>
 
-<script>
-(function () {
-    let t = 4 * 3600 + 32 * 60 + 15;
-    const el = document.getElementById('pa-timer');
-    if (!el) return;
-    setInterval(function () {
-        if (t <= 0) return;
-        t--;
-        const h = String(Math.floor(t / 3600)).padStart(2, '0');
-        const m = String(Math.floor((t % 3600) / 60)).padStart(2, '0');
-        const s = String(t % 60).padStart(2, '0');
-        el.textContent = h + ':' + m + ':' + s;
-    }, 1000);
-})();
-</script>
 @endsection

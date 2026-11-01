@@ -669,7 +669,12 @@
                     </div>
                     <div class="ed-townadd">
                         <button type="button" class="ed-addbtn" data-bw-town-add>+ Add Another Location</button>
-                        <small data-bw-town-count>{{ count(array_filter($__towns)) ?: 1 }} of {{ $__maxTowns }} locations added</small>
+                        {{-- Filled boxes, and no floor under it. The ?: 1 here
+                             read "1 of 5 locations added" on a form where the
+                             one box was still empty, and the script beside it
+                             counted boxes rather than answers, so both agreed
+                             on a location nobody had given. --}}
+                        <small data-bw-town-count>{{ count(array_filter($__towns)) }} of {{ $__maxTowns }} locations added</small>
                     </div>
                 </div>
                 @error('preferred_locations')<p class="bw-err">{{ $message }}</p>@enderror
@@ -779,11 +784,17 @@
     const addTown = root.querySelector('[data-bw-town-add]');
     const townCount = root.querySelector('[data-bw-town-count]');
     function townsSync() {
-        const n = towns.querySelectorAll('[data-bw-town]').length;
-        if (townCount) townCount.textContent = n + ' of ' + towns.dataset.max + ' locations added';
-        addTown.hidden = n >= +towns.dataset.max;
-        towns.querySelectorAll('[data-bw-town-rm]').forEach(function (b) { b.hidden = n <= 1; });
+        const rows = towns.querySelectorAll('[data-bw-town]');
+        // Boxes decide the buttons; answers decide the count. An empty box is
+        // a place to type, not a location the client has given us.
+        const filled = Array.from(rows).filter(function (r) {
+            return r.querySelector('input').value.trim() !== '';
+        }).length;
+        if (townCount) townCount.textContent = filled + ' of ' + towns.dataset.max + ' locations added';
+        addTown.hidden = rows.length >= +towns.dataset.max;
+        rows.forEach(function (r) { r.querySelector('[data-bw-town-rm]').hidden = rows.length <= 1; });
     }
+    towns.addEventListener('input', townsSync);
     addTown.addEventListener('click', function () {
         const row = towns.querySelector('[data-bw-town]').cloneNode(true);
         row.querySelector('input').value = '';

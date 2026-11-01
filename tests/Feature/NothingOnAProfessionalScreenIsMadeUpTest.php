@@ -300,6 +300,77 @@ class NothingOnAProfessionalScreenIsMadeUpTest extends TestCase
         }
     }
 
+    // ── Priority Actions: an example that borrowed real people ──
+
+    /**
+     * The panels on this page are headed "Example:" and were filled from the
+     * reader's newest requested booking. So a real client's name sat under an
+     * invented quote about a son's tenth birthday, and a real venue address
+     * sat beside a hardcoded guest count of 120.
+     *
+     * The page is an explainer, which is fine. Lending it a real person to
+     * illustrate a story that person never told is not.
+     */
+    public function test_the_priority_example_does_not_borrow_a_real_client(): void
+    {
+        $job = $this->job('requested');
+        $html = $this->page('professional.priority.index');
+
+        $this->assertStringNotContainsString(e($this->client->name), $html);
+        $this->assertStringNotContainsString($job->event->location, $html);
+    }
+
+    /**
+     * And with no booking at all it invented one outright: a date, an address
+     * at 123 Maple St, a client called Sarah J. and a $300 offer.
+     */
+    public function test_the_priority_example_invents_no_job_when_there_is_none(): void
+    {
+        $html = $this->page('professional.priority.index');
+
+        foreach (['123 Maple St', 'Sarah J.', 'Oct 26th'] as $invented) {
+            $this->assertStringNotContainsString($invented, $html);
+        }
+    }
+
+    /**
+     * The worst single thing on it: a clock counting down from 04:32:15, on
+     * an offer that does not exist, beside the reader's own real price. A
+     * timer running is not an illustration of a deadline. It is one.
+     */
+    public function test_no_clock_counts_down_on_an_offer_nobody_made(): void
+    {
+        $html = $this->page('professional.priority.index');
+
+        // Not setInterval on its own: the layout uses it for its own
+        // reasons, so the needle is this page's clock, not every clock.
+        $this->assertStringNotContainsString('pa-timer', $html);
+        $this->assertStringNotContainsString('04:32:15', $html);
+        $this->assertStringNotContainsString('Time Remaining', $html);
+    }
+
+    /**
+     * The sidebar widget read the reader's real count and then listed three
+     * invented rows under it, so a professional with nothing waiting saw
+     * their own 0 above three jobs.
+     */
+    public function test_the_example_widget_counts_the_rows_it_actually_shows(): void
+    {
+        $html = $this->page('professional.priority.index');
+
+        $this->assertStringNotContainsString('LIVE EXAMPLE', $html);
+        $this->assertStringContainsString('>3</span>', $html);
+    }
+
+    /** The reader's own figures are still on the page, and still real. */
+    public function test_the_real_counts_are_untouched(): void
+    {
+        $this->job('requested');
+        $html = $this->page('professional.priority.index');
+
+        $this->assertStringContainsString('1 awaiting you', $html);
+    }
+
     // ── Claims ───────────────────────────────────────────────
 
     /**

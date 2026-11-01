@@ -303,7 +303,14 @@ class ProfessionalPackageController extends Controller
      */
     private function validated(Request $request): array
     {
-        $publishing = $request->boolean('is_active', true);
+        /*
+         * Which button was pressed: "Publish Package" sends 1, "Save as Draft"
+         * sends 0, so in a browser the answer always arrives. No default of
+         * true behind it all the same. A request that does not say publish
+         * must not publish: that one is visible to clients the moment it is
+         * written, and a draft is not.
+         */
+        $publishing = $request->boolean('is_active');
 
         $rules = [
             'title'           => ['required', 'string', 'max:60'],

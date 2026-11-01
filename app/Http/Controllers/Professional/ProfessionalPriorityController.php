@@ -40,8 +40,6 @@ class ProfessionalPriorityController extends Controller
             ->where('status', 'completed')
             ->sum('price');
 
-        $priorityCount = $contractsAwaiting + $newProposals + $openShifts;
-
         $cards = [
             'contracts' => $contractsAwaiting,
             'staffing'  => $openShifts,
@@ -49,13 +47,12 @@ class ProfessionalPriorityController extends Controller
             'escrow'    => $escrowReleased,
         ];
 
-        // Spotlight: the newest requested booking — drives the "Live Example".
-        $spotlight = Booking::where('supplier_id', $user->id)
-            ->where('status', 'requested')
-            ->with(['event:id,title,starts_at,ends_at,location,budget', 'client:id,name'])
-            ->latest()
-            ->first();
-
-        return view('professional.priority.index', compact('priorityCount', 'cards', 'spotlight'));
+        /*
+         * No spotlight booking any more. It fed the panels headed "Example:",
+         * which put a real client's name under an invented quote and a real
+         * venue beside a hardcoded guest count. The illustrations are fixed
+         * text now, so the query and the count that went with it are gone.
+         */
+        return view('professional.priority.index', compact('cards'));
     }
 }
