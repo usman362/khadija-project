@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html><head><meta charset="utf-8"><!--STYLE--></head><body>
+
+<h1>Professional Side: Pages Worked On</h1>
+<div class="sub">Prepared for Khadijah-tul-Zahra &middot; 2 November 2026 &middot; GigResource</div>
+
+<p>You asked which pages and which functionality on the Professional side have
+been worked on, so you can check them. Everything below is listed by the page
+address you would open to see it, and what to look for on that page.</p>
+
+<div class="warn">
+<b>Read this first: none of it is on the live site yet.</b>
+<p style="margin:5px 0 0;">All of the work below is built and tested, but it has
+not been deployed. If you open the live site today you will see the old
+versions of these pages. Please tell me when you would like it deployed and I
+will put it up, then you can check against the live site. Until then it can
+only be checked on the development copy.</p>
+</div>
+
+<h2>1. What you and Sir Peter asked for</h2>
+
+<h3>Who attends the event, and who the client will meet</h3>
+<p>This is Sir Peter's named-staff decision from 29 October, built without
+individual staff logins.</p>
+<table>
+<tr><th>Page</th><th>Address</th><th>What to look for</th></tr>
+<tr><td class="nm">My Gigs, a single gig</td><td class="fn">/professional/gigs/{gig}</td>
+<td>A "Who attends" question with three answers: attend personally, send a staff
+member, or decide nearer the time. Naming a crew member as the on-site contact,
+and naming a supervisor. A confirm button for a gig where the answer was left
+open.</td></tr>
+<tr><td class="nm">Team &amp; Staffing</td><td class="fn">/professional/team</td>
+<td>Each crew member now has a photo, a rank, and a reference number of their
+own. A supervisor can be marked as such.</td></tr>
+<tr><td class="nm">Client's Bookings<br>(client side)</td><td class="fn">/client/bookings</td>
+<td>The client sees the name, photo and phone number of the person who will
+actually turn up, once the professional has named them.</td></tr>
+</table>
+
+<div class="box">
+<b>Three rules inside this that are worth checking deliberately.</b>
+<ul>
+<li>A professional who promised in the agreement to attend personally
+<b>cannot</b> then send a staff member. They have to ask for that term to
+change first.</li>
+<li>A staff member's photo is <b>not</b> on the public internet. Opening the
+image address without being signed in shows nothing. Only the professional who
+owns it, an administrator, and the one client whose booking that person is
+attending can see it.</li>
+<li>The client loses access to a staff member's contact details <b>30 days</b>
+after the job finishes, unless a dispute is open. Sir Peter's own proposal.</li>
+</ul>
+</div>
+
+<h3>Reminders when nobody has said who is coming</h3>
+<p>Sir Peter asked for this to be automatic whenever "Decide Later" is chosen
+and no contact has been assigned. There are three reminders, the last of them
+24 hours before the service begins. Each one is recorded before it is sent, so
+the same reminder is never sent twice. A missed deadline is recorded.</p>
+<p><b>Still your decision:</b> the reminders go to the professional only. Whether
+the client should also be told that the deadline was missed has not been decided.
+The miss is recorded either way, so it can be turned on later.</p>
+
+<h3>Agreements, from the professional's side</h3>
+<p>This was the structural gap. Before this work, <b>a professional could not open
+an agreement at all.</b> Every agreement page belonged to the client.</p>
+<table>
+<tr><th>Page</th><th>Address</th><th>What to look for</th></tr>
+<tr><td class="nm">My Agreements</td><td class="fn">/professional/agreements</td>
+<td>A new section in the left menu. The list of agreements this professional is
+party to.</td></tr>
+<tr><td class="nm">One agreement</td><td class="fn">/professional/agreements/{id}</td>
+<td>What changed since they last approved, then approve, decline, request
+changes, or sign. A copy of the draft terms to download, which they had no way
+to keep before.</td></tr>
+</table>
+<div class="good">
+<b>This settles an open question.</b>
+<p style="margin:5px 0 0;">The deposit step used to be unblocked by a stand-in
+signature that the client's own signing action wrote on the professional's
+behalf. That is gone. <b>No deposit can now be taken on an agreement that one
+side has not signed.</b> So the answer to "may a client fund before the
+professional signs" is no.</p>
+</div>
+
+<h3>Who keeps hiring me</h3>
+<table>
+<tr><th>Page</th><th>Address</th><th>What to look for</th></tr>
+<tr><td class="nm">My Clients</td><td class="fn">/professional/clients</td>
+<td>A new page. The clients who have booked this professional, grouped by
+client rather than by event. Money is shown after commission, to match the
+Earnings page rather than contradict it.</td></tr>
+</table>
+
+<h2>2. What we found while building it</h2>
+<p>None of this was reported. It was found by opening the pages and checking what
+they were drawing.</p>
+
+<table>
+<tr><th>Page</th><th>Address</th><th>What was wrong</th></tr>
+<tr><td class="nm">Whole portal</td><td class="fn">/professional/*</td>
+<td>A signed-in <b>client</b> could open every one of the 80 professional pages.
+Nothing leaked, because each page only shows rows where the reader is the
+supplier, but that was luck rather than a boundary. Now refused.</td></tr>
+<tr><td class="nm">Leads</td><td class="fn">/professional/leads</td>
+<td>The conversion gauge showed <b>82% High</b> to professionals who had never
+had a single lead. 82 was a number somebody typed as a fallback. Also: two
+messages nobody wrote, timed 11:30 and 11:32, under the real name and initials
+of that professional's most recent lead. And the budget figure printed its own
+programming code on screen.</td></tr>
+<tr><td class="nm">Calendar</td><td class="fn">/professional/calendar</td>
+<td>A travel time of 35 minutes, the same for a venue down the road and one
+three hours away, with a "Leave By" time worked out from it. Someone believing
+that arrives late. Also availability switches that were always on and were
+connected to nothing, so a professional could believe they had marked
+themselves free.</td></tr>
+<tr><td class="nm">Priority Actions</td><td class="fn">/professional/priority-actions</td>
+<td>The panels headed "Example:" were filled from the reader's own newest
+booking, so a <b>real client's name</b> appeared under an invented quote about a
+child's birthday, and a real venue address beside a made-up guest count. With no
+booking the page invented one. Worst of it, a clock counted down from 4 hours
+32 minutes, once a second, on an offer that does not exist.</td></tr>
+<tr><td class="nm">Gig Hub</td><td class="fn">/professional/gig-hub</td>
+<td>A full worked example of somebody else's job: a drawn map, "1 hr 23 min
+(84.6 mi)", a team chat, a food inventory, and a 120 guest $4,000 booking
+belonging to nobody.</td></tr>
+<tr><td class="nm">Bidding Board</td><td class="fn">/professional/bidding-board</td>
+<td>A card that said Open and Closed at the same time. The Save button looked
+like it worked and saved nothing, so it was connected to the saving that already
+existed. A Share button and a market insights button did nothing and were
+removed.</td></tr>
+<tr><td class="nm">Bid Intelligence</td><td class="fn">/professional/bid-intelligence</td>
+<td>A recommendation the page had no figures to support.</td></tr>
+<tr><td class="nm">Profile, Verification tab</td><td class="fn">/professional/profile</td>
+<td>It asked professionals to send in documents in exchange for a badge that
+"appears on your public profile and in search results". Badges were switched off
+across the site on 23 September, so the badge does not appear anywhere. The same
+sentence also named a competitor by name.</td></tr>
+<tr><td class="nm">Messages</td><td class="fn">/professional/messages</td>
+<td>The message list filled up with finished jobs and never emptied. Threads for
+completed work now tidy themselves away, and a thread somebody deliberately
+brought back stays back.</td></tr>
+<tr><td class="nm">Agreements</td><td class="fn">/professional/agreements</td>
+<td>Every agreement recorded "the professional will attend personally" even when
+nobody had chosen it, because that was the stored default and no agreement is
+created with the question answered. That wording then <b>blocked</b> the
+professional from sending a staff member, and the contract showed it to the
+client as an agreed term.</td></tr>
+<tr><td class="nm">My Gigs</td><td class="fn">/professional/gigs/{gig}</td>
+<td>Reporting a problem existed as a page and a menu item, but there was no way
+into it from the job itself. You had to find your own booking in a dropdown.
+There are now links from the booking, the event and the gig.</td></tr>
+<tr><td class="nm">Six banners</td><td class="fn">various</td>
+<td>Promised outcomes: "Win More", "close more deals", "convert more leads",
+"profitable and stress-free". Removed, against Sir Peter's rule that the
+platform does not promise results.</td></tr>
+</table>
+
+<h2>3. Client-side pages in the same work</h2>
+<p>You asked about the Professional side. These three are the client's half of
+the same features, so they are worth checking together.</p>
+<table>
+<tr><th>Page</th><th>Address</th><th>What to look for</th></tr>
+<tr><td class="nm">My Bookings</td><td class="fn">/client/bookings</td>
+<td>Who will turn up on the day, and a way into reporting a problem from the
+booking itself.</td></tr>
+<tr><td class="nm">Generate an agreement</td><td class="fn">/app/bookings</td>
+<td>The box offering to leave your chat out of the AI agreement. Unchecking it
+used to do nothing at all: the whole conversation was still sent. It is now
+honoured, and nothing is sent unless it is asked for.</td></tr>
+<tr><td class="nm">Post a request, venue step</td><td class="fn">/client/bsr</td>
+<td>It said "1 of 5 locations added" while the box was still empty. It now
+counts answers given, and updates as you type.</td></tr>
+</table>
+
+<h2>4. Not done, and why</h2>
+<p>None of these are waiting on development. Each needs a decision or an outside
+account first.</p>
+<table>
+<tr><th>Item</th><th>What it is waiting for</th></tr>
+<tr><td class="nm">Dashboard map and weather</td><td>An account with a map and
+weather provider. The rest of the dashboard reads real figures.</td></tr>
+<tr><td class="nm">Package intro video</td><td>A decision on file size limits,
+where the videos are stored, and how long they are kept.</td></tr>
+<tr><td class="nm">Automatic payouts</td><td>A payments decision. Today the only
+payout anywhere is marked paid by hand by an administrator.</td></tr>
+<tr><td class="nm">Review disputes and peer mediation</td><td>Only a policy
+decision now: whether a professional may contest a review. The dispute system
+itself is built.</td></tr>
+<tr><td class="nm">Showing the client the other assigned workers</td><td>Not
+built. Only the main on-site contact is shown, which is how the requirement was
+written.</td></tr>
+<tr><td class="nm">Staff features by plan tier</td><td>Not built. Staff features
+are currently available to every professional.</td></tr>
+</table>
+
+<div class="box">
+<b>One number to be careful with.</b>
+<p style="margin:5px 0 0;">An earlier estimate of three to five weeks for the
+Professional side was reasoned from a count of screens believed to be running on
+placeholder data. That count was wrong. All twenty Professional controllers read
+real records. Please do not quote the old figure.</p>
+</div>
+
+<div class="foot">GigResource &middot; Professional side pages worked on, 26 October to 2 November 2026
+&middot; Not yet deployed to the live site.</div>
+
+</body></html>
