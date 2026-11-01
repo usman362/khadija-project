@@ -133,7 +133,6 @@
     .bb-ins .e { font-size: 17px; }
     .bb-ins-main span { font-size: 11px; color: var(--text-muted); }
     .bb-ins-main h6 { font-size: 12.5px; font-weight: 800; color: var(--text-primary); }
-    .bb-viewins { width: 100%; margin-top: 12px; border: 1px solid var(--border-color); border-radius: 10px; padding: 9px; font-size: 12.5px; font-weight: 800; color: var(--text-secondary); background: var(--bg-card); cursor: pointer; }
     .bb-frow { margin-bottom: 11px; }
     .bb-frow label { display: block; font-size: 11.5px; font-weight: 700; color: var(--text-secondary); margin-bottom: 5px; }
     .bb-frow select, .bb-frow input { width: 100%; border: 1px solid var(--border-color); border-radius: 9px; padding: 8px 10px; font-size: 12.5px; color: var(--text-primary); background: var(--bg-card); font-family: inherit; }
@@ -324,8 +323,22 @@
                                 {{ $g['my_bid'] ? 'Edit Bid' : 'Place Bid' }}
                             </button>
                         @endif
-                        <button class="bb-ob"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8z"/></svg>Save</button>
-                        <button class="bb-ob"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.6" y1="13.5" x2="15.4" y2="17.5"/><line x1="15.4" y1="6.5" x2="8.6" y2="10.5"/></svg>Share</button>
+                        {{-- Save did nothing, and the saving it was drawn
+                             for was already built: the Saved tab above reads
+                             savedEvents, and toggleSaved writes it. A button
+                             with the feature behind it and no wire to it is
+                             the one kind of dead control worth fixing rather
+                             than removing. --}}
+                        <form method="POST" action="{{ route('professional.bidding-board.save') }}" style="display:inline;">
+                            @csrf
+                            <input type="hidden" name="event_id" value="{{ $g['event_id'] }}">
+                            <button type="submit" class="bb-ob" aria-pressed="{{ ($g['saved'] ?? false) ? 'true' : 'false' }}">
+                                <svg viewBox="0 0 24 24" fill="{{ ($g['saved'] ?? false) ? 'currentColor' : 'none' }}" stroke="currentColor" stroke-width="2"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8z"/></svg>{{ ($g['saved'] ?? false) ? 'Saved' : 'Save' }}
+                            </button>
+                        </form>
+                        {{-- Share went with it. Nothing on the platform
+                             shares a gig, and a public link to somebody's
+                             event is a decision nobody has made. --}}
                     </div>
                 </article>
             @endforeach
@@ -372,7 +385,9 @@
                         <div class="bb-ins-main"><span>{{ $label }}</span><h6>{{ $val }}</h6></div>
                     </div>
                 @endforeach
-                <button class="bb-viewins">View Full Market Insights</button>
+                {{-- A "View Full Market Insights" button stood here. There
+                     is no fuller version: these four figures are the market
+                     insights, and the button went nowhere and did nothing. --}}
             </div>
 
             {{-- A second "Filters" card used to sit here. Every control in it was

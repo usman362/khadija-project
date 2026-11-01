@@ -167,28 +167,31 @@ class GigHubStatusTest extends TestCase
 
     /* ── Rows 131, 132 and 150: the sample cards ────────────── */
 
-    public function test_an_awarded_gig_shows_a_contract_value_not_a_pre_award_range(): void
+    /**
+     * Three tests stood here, and the thing they tested is gone.
+     *
+     * They checked the sample gig card: that it said "Contract: $4,000"
+     * rather than a pre-award range, that the crew counter said "2 to fill",
+     * and that chafing dishes were counted rather than weighed. Each was a
+     * real correction at the time.
+     *
+     * But the card was a mock-up. The $4,000, the 120 guests, the 3 of 5
+     * crew and the chafing dishes belonged to nobody: every professional saw
+     * the same catering job whatever they do. Checklist rows 131, 132 and
+     * 150 were asking for an invented card to be internally consistent,
+     * which it now is by not being there.
+     *
+     * What replaces them is the assertion that it is gone.
+     */
+    public function test_the_sample_gig_card_is_gone(): void
     {
         $page = $this->actingAs($this->pro)->get(route('professional.gig-hub.index'))->assertOk();
 
-        $page->assertSee('Contract: $4,000', false);
-        $page->assertDontSee('$2k–$4k', false);
-    }
-
-    /** Row 132 — the number a professional acts on, said out loud. */
-    public function test_the_crew_counter_states_what_is_left_to_fill(): void
-    {
-        $this->actingAs($this->pro)
-            ->get(route('professional.gig-hub.index'))
-            ->assertSee('2 to fill', false);
-    }
-
-    /** Row 150 — equipment is counted, food is weighed. */
-    public function test_inventory_is_counted_rather_than_weighed(): void
-    {
-        $page = $this->actingAs($this->pro)->get(route('professional.gig-hub.index'))->assertOk();
-
-        $page->assertSee('Chafing dishes &times; 6', false);
-        $page->assertDontSee('Chafing Dishes (6)', false);
+        $page->assertDontSee('Contract: $4,000', false);
+        $page->assertDontSee('2 to fill', false);
+        $page->assertDontSee('Chafing dishes', false);
+        // The invented route, which was the same distance for every gig on
+        // the platform because nothing measures one.
+        $page->assertDontSee('1 hr 23 min', false);
     }
 }

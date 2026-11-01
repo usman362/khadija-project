@@ -13,7 +13,11 @@
 
 @php
     $tabs = [
-        'overview'  => ['Overview',  'The gig itself, crew, kit, directions, signing.'],
+        // "kit" and "directions" named an inventory and a route that do not
+        // exist; the cards drawing them were removed on 2026-11-01. A Blade
+        // comment cannot go here: this is inside @php, and {{-- --}} is not
+        // PHP.
+        'overview'  => ['Overview',  'Where your gigs stand, and what needs doing.'],
         'gigs'      => ['My Gigs',   'Every gig, with the calendar and filters.'],
         'contracts' => ['Contracts', 'Paperwork, status and history.'],
     ];

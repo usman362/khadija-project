@@ -5,7 +5,8 @@
 {{-- My Calendar — explainer + a live snapshot of the pro's schedule.
      REAL data: agenda unifies assigned Shifts + booking Events; the month
      grid marks days that have items; the availability strip derives
-     busy/free per day. Phone-sync + travel-time cards are explainer UI. --}}
+     busy/free per day. The phone-sync panel was removed on 2026-08-05 and
+     the invented travel time on 2026-11-01; nothing drawn here is made up. --}}
 
 @php
     $dayNames = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
@@ -60,31 +61,6 @@
     .mc-sec-h b { font-size: 19px; font-weight: 800; color: var(--text-primary); }
     .mc-sec-sub { font-size: 12.5px; color: var(--text-muted); margin: 0 0 16px; padding-left: 40px; }
 
-    /* ── Detailed Section Breakdown (3 cols) ── */
-    .mc-bd { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 16px; }
-    .mc-bd-col { border: 1px solid var(--border-color); border-radius: 14px; padding: 18px; }
-    .mc-bd-h { font-size: 14.5px; font-weight: 800; text-align: center; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 2px solid; }
-    .mc-bd-art { display: flex; justify-content: center; padding: 6px 0 14px; }
-    .mc-bd-art svg { width: 130px; height: auto; }
-    .mc-bd-note { font-size: 12.5px; color: var(--text-secondary); line-height: 1.55; margin: 0 0 8px; }
-    .mc-bd-note b { color: var(--info-text); }
-    .mc-bd-row { display: flex; gap: 12px; padding: 11px 0; align-items: flex-start; }
-    .mc-bd-row .ic { width: 34px; height: 34px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-    .mc-bd-row .ic svg { width: 17px; height: 17px; }
-    .mc-bd-row b { font-size: 13px; color: var(--text-primary); display: block; }
-    .mc-bd-row .tm { font-size: 12px; font-weight: 700; margin: 1px 0; }
-    .mc-bd-row p { font-size: 11px; color: var(--text-muted); margin: 1px 0 0; line-height: 1.4; }
-    .mc-navmock { background: var(--bg-card-hover); border: 1px solid var(--border-color); border-radius: 12px; padding: 14px; display: flex; gap: 14px; align-items: center; margin-bottom: 14px; }
-    .mc-navmock .cal { width: 60px; height: 60px; border-radius: 12px; background: rgba(16,185,129,0.12); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-    .mc-navmock .cal svg { width: 30px; height: 30px; color: var(--ok-text); }
-    .mc-navmock .lines { flex: 1; }
-    .mc-navmock .lrow { display: flex; align-items: center; gap: 8px; margin-bottom: 9px; }
-    .mc-navmock .lrow:last-child { margin-bottom: 0; }
-    .mc-navmock .ln { flex: 1; height: 7px; border-radius: 4px; background: var(--border-color); }
-    .mc-navmock .chk { width: 18px; height: 18px; border-radius: 50%; background: #10b981; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-    .mc-navmock .chk svg { width: 11px; height: 11px; color: #fff; }
-    .mc-bd-cta { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 13px; background: rgba(37,99,235,0.06); border-radius: 11px; font-size: 13.5px; font-weight: 800; color: var(--mc-blue); text-decoration: none; }
-    .mc-bd-cta svg { width: 15px; height: 15px; }
 
     /* ── What happens (4 cols) ── */
     .mc-cc { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 16px; }
@@ -113,9 +89,6 @@
     .mc-av-row:first-child { border-top: none; }
     .mc-av-d { font-size: 12px; font-weight: 700; color: var(--text-primary); }
     .mc-av-s { font-size: 12px; font-weight: 700; }
-    .mc-tog { width: 34px; height: 19px; border-radius: 999px; position: relative; flex-shrink: 0; }
-    .mc-tog::after { content: ''; position: absolute; top: 2px; width: 15px; height: 15px; border-radius: 50%; background: #fff; transition: .2s; }
-    .mc-tog.on::after { left: 17px; } .mc-tog.off::after { left: 2px; }
 
     /* phone sync */
     .mc-sync { display: flex; align-items: center; justify-content: center; gap: 14px; padding: 6px 0 12px; }
@@ -147,7 +120,7 @@
     .mc-banner a { display: inline-flex; align-items: center; gap: 9px; background: #2563eb; color: #fff; font-size: 15px; font-weight: 800; padding: 14px 24px; border-radius: 12px; text-decoration: none; white-space: nowrap; }
     .mc-banner a svg { width: 17px; height: 17px; }
 
-    @media (max-width: 1200px) { .mc-hero, .mc-hero-top { grid-template-columns: 1fr; } .mc-bd { grid-template-columns: 1fr; } .mc-cc { grid-template-columns: repeat(2, minmax(0,1fr)); } }
+    @media (max-width: 1200px) { .mc-hero, .mc-hero-top { grid-template-columns: 1fr; } .mc-cc { grid-template-columns: repeat(2, minmax(0,1fr)); } }
     @media (max-width: 760px) { .mc-feats, .mc-cc { grid-template-columns: 1fr; } }
 </style>
 @endpush
@@ -209,54 +182,33 @@
         </div>
     </div>
 
-    {{-- ════════ Detailed Section Breakdown ════════ --}}
-    <div class="mc-card" style="margin-bottom:20px;">
-        <div class="mc-sec-h"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span><b>Detailed Section Breakdown</b></div>
-        <p class="mc-sec-sub">Understand how each part of your calendar keeps your day on track.</p>
-        <div class="mc-bd">
-            {{-- 1. Header --}}
-            <div class="mc-bd-col">
-                <div class="mc-bd-h" style="color:var(--info-text);border-color:#2563eb;">1. The Clock &amp; Calendar Header</div>
-                <div class="mc-bd-art">@include('professional.calendar._cal_clock', ['w' => 130])</div>
-                <p class="mc-bd-note"><b>The Visual:</b> The calendar and clock symbolize organized time.</p>
-                <p class="mc-bd-note"><b style="color:var(--accent-text);">The Mission:</b> This is your home base for tracking your daily routine, open hours, and deadlines.</p>
-            </div>
-            {{-- 2. Daily Agenda --}}
-            <div class="mc-bd-col">
-                <div class="mc-bd-h" style="color:var(--accent-text);border-color:#8b5cf6;">2. The Daily Agenda</div>
-                <div class="mc-bd-row"><span class="ic" style="background:rgba(37,99,235,0.12);color:var(--info-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><div><b>Date Indicator</b><div class="tm" style="color:var(--info-text);">Today • {{ $now->format('M d, Y') }}</div><p>Clear header showing the day you are viewing.</p></div></div>
-                @foreach($agenda as $idx => $it)
-                    <div class="mc-bd-row"><span class="ic" style="background:{{ $it['color'] }}1f;color:{{ $it['color'] }};"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><div><b>{{ \Illuminate\Support\Str::limit($it['title'], 24) }}</b><div class="tm" style="color:{{ $it['color'] }};">{{ $it['all_day'] ? $it['start']->format('M d') . ' • All Day' : $it['start']->format('g:i A') }}</div><p>{{ $it['all_day'] ? 'All-day event or date reminder.' : ($idx === 0 ? 'Your first scheduled event.' : 'Your next scheduled event.') }}</p></div></div>
-                @endforeach
-                @if($agenda->isEmpty())
-                    <div class="mc-empty">Your agenda is clear: no scheduled items yet.</div>
-                @endif
-            </div>
-            {{-- 3. Navigation Gate --}}
-            <div class="mc-bd-col">
-                <div class="mc-bd-h" style="color:var(--ok-text);border-color:#10b981;">3. The Navigation Gate</div>
-                <div class="mc-navmock">
-                    <span class="cal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>
-                    <div class="lines">
-                        <div class="lrow"><span class="ln"></span><span class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span></div>
-                        <div class="lrow"><span class="ln" style="width:80%;"></span><span class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span></div>
-                        <div class="lrow"><span class="ln" style="width:65%;"></span><span class="chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span></div>
-                    </div>
-                </div>
-                <p class="mc-bd-note">The <b>"View Calendar"</b> button takes you to the full monthly calendar and advanced tools.</p>
-                <a href="{{ route('professional.gig-hub.index', ['tab' => 'gigs']) }}" class="mc-bd-cta">View Calendar <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
-            </div>
-        </div>
-    </div>
+    {{-- A "Detailed Section Breakdown" stood here: three columns explaining
+         this page, on this page.
+
+         The first said "the calendar and clock symbolize organized time" and
+         nothing else. The second listed the agenda again, directly under the
+         agenda. The third drew grey bars with green ticks beside them — a
+         mock-up of a screen, on a screen — and promised "the full monthly
+         calendar and advanced tools" behind a link that goes to the Gig Hub.
+
+         A tour of a page belongs somewhere other than the page, and a
+         mock-up of an interface shown inside the interface is the clearest
+         case there is of something drawn rather than built. --}}
 
     {{-- ════════ What happens if you click ════════ --}}
-    <div class="mc-sec-h"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91 0z"/><path d="M12 15l-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></svg></span><b>What Happens if You Click?</b></div>
-    <p class="mc-sec-sub">Unlock powerful scheduling tools to manage your time like a pro.</p>
+    {{-- This was headed "What Happens if You Click?" over "Unlock powerful
+         scheduling tools to manage your time like a pro", which framed three
+         cards of real data as a preview of something you would get later.
+         They are not a preview. They are your month. --}}
+    <div class="mc-sec-h"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><b>Your month at a glance</b></div>
+    <p class="mc-sec-sub">Where your days stand, and where you are needed next.</p>
     <div class="mc-cc">
         {{-- Monthly Grid View --}}
         <div class="mc-cc-card">
             <div class="mc-cc-h"><span class="ic" style="background:rgba(37,99,235,0.12);color:var(--info-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><b>Monthly Grid View</b></div>
-            <p>See your entire month. Drag and drop events to change dates.</p>
+            {{-- "Drag and drop events to change dates" went with the rest:
+                 nothing here is draggable and no handler exists. --}}
+            <p>Every day this month, with a mark on the ones that have something on.</p>
             <div class="mc-mini">
                 <div class="mc-mini-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="15 18 9 12 15 6"/></svg><b>{{ $monthLabel }}</b><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg></div>
                 <div class="mc-mini-grid">
@@ -274,18 +226,24 @@
         </div>
         {{-- Availability Toggles --}}
         <div class="mc-cc-card">
-            <div class="mc-cc-h"><span class="ic" style="background:rgba(139,92,246,0.12);color:var(--accent-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="1" y="5" width="22" height="14" rx="7"/><circle cx="16" cy="12" r="3"/></svg></span><b>Availability Toggles</b></div>
-            <p>Block off days so new clients can't book you.</p>
+            {{-- This was "Availability Toggles — block off days so new clients
+                 can't book you", with a switch on every row. The switches were
+                 spans. They did nothing, they were always on, and there is no
+                 availability setting on the professional side for them to do
+                 anything TO: busy is worked out from whether the day already
+                 has a booking.
+
+                 So a professional could read it, see every day switched on,
+                 and believe they had told the platform when they were free.
+                 The days are real and worth showing; the control was not. --}}
+            <div class="mc-cc-h"><span class="ic" style="background:rgba(139,92,246,0.12);color:var(--accent-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/><path d="M9 16l2 2 4-4"/></svg></span><b>Your next few days</b></div>
+            <p>Worked out from what is already booked.</p>
             <div style="border:1px solid var(--border-color);border-radius:10px;padding:4px 12px;">
                 @foreach($availability as $av)
-                    @php
-                        if ($av['busy']) { $sLabel='Fully Booked'; $sColor='#ef4444'; $tColor='#ef4444'; }
-                        else { $sLabel='Available'; $sColor='#10b981'; $tColor='#10b981'; }
-                    @endphp
+                    @php $colour = $av['busy'] ? '#ef4444' : '#10b981'; @endphp
                     <div class="mc-av-row">
                         <span class="mc-av-d">{{ $av['date']->format('M d') }}</span>
-                        <span class="mc-av-s" style="color:{{ $sColor }};">{{ $sLabel }}</span>
-                        <span class="mc-tog on" style="background:{{ $tColor }};"></span>
+                        <span class="mc-av-s" style="color:{{ $colour }};">{{ $av['busy'] ? 'Booked' : 'Nothing on' }}</span>
                     </div>
                 @endforeach
             </div>
@@ -302,27 +260,46 @@
              Gap #5, 2026-08-05). When it is built, this panel comes back
              showing the actual connection state instead of a fixed tick. --}}
 
-        {{-- Travel Time Calculator --}}
+        {{-- A "Travel Time Calculator" stood here.
+
+             It printed 35 mins, as a number typed into the page, and then
+             worked out "Leave By" from it. Nothing measures travel time —
+             there is no maps provider on the platform, which is Sir Peter's
+             own outstanding item — so the figure was the same 35 minutes for
+             a venue down the road and one three hours away.
+
+             That is not decoration. A professional reading "Leave By 5:25
+             PM" and believing it arrives late to somebody's wedding, and the
+             site told them to.
+
+             What IS known is where the next thing is and when it starts, so
+             that is what the card shows now. The travel time comes back when
+             there is something behind it. --}}
         <div class="mc-cc-card">
-            <div class="mc-cc-h"><span class="ic" style="background:rgba(249,115,22,0.12);color:var(--brand-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 17H3v-5l2-5h11l3 5h2v5h-2"/><circle cx="7.5" cy="17.5" r="2"/><circle cx="17.5" cy="17.5" r="2"/></svg></span><b>Travel Time Calculator</b></div>
-            <p>See travel time and when you should leave.</p>
-            @php $dest = $agenda->first()['title'] ?? 'your event'; $leaveBy = isset($agenda[0]) && !$agenda[0]['all_day'] ? $agenda[0]['start']->copy()->subMinutes(35)->format('g:i A') : '5:25 PM'; @endphp
-            <div class="mc-tt-row"><span class="k">From</span><span class="v">Your Location</span><span class="pin"><svg viewBox="0 0 24 24" fill="#2563eb" stroke="none"><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7z"/><circle cx="12" cy="9" r="2.5" fill="#fff"/></svg></span></div>
-            <div class="mc-tt-row" style="border-top:1px solid var(--border-color);"><span class="k">To</span><span class="v">{{ \Illuminate\Support\Str::limit($dest, 18) }}</span><span class="pin"><svg viewBox="0 0 24 24" fill="#ef4444" stroke="none"><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7z"/><circle cx="12" cy="9" r="2.5" fill="#fff"/></svg></span></div>
-            <div class="mc-tt-big">
-                <div style="flex:1;"><div class="k">Travel Time</div><div class="v" style="color:var(--brand-text);">35 mins</div></div>
-                <svg viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2"><path d="M5 17H3v-5l2-5h11l3 5h2v5h-2"/><circle cx="7.5" cy="17.5" r="2"/><circle cx="17.5" cy="17.5" r="2"/></svg>
-            </div>
-            <div class="mc-tt-big" style="border-top:none;padding-top:4px;">
-                <div style="flex:1;"><div class="k">Leave By</div><div class="v" style="color:var(--info-text);">{{ $leaveBy }}</div></div>
-            </div>
+            <div class="mc-cc-h"><span class="ic" style="background:rgba(249,115,22,0.12);color:var(--brand-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7z"/><circle cx="12" cy="9" r="2.5"/></svg></span><b>Where you are needed next</b></div>
+            @php $next = $agenda->first(); @endphp
+            @if($next)
+                <p>{{ $next['title'] }}</p>
+                <div class="mc-tt-row"><span class="k">Where</span><span class="v">{{ \Illuminate\Support\Str::limit($next['sub'] ?: 'Not given', 22) }}</span></div>
+                <div class="mc-tt-row" style="border-top:1px solid var(--border-color);">
+                    <span class="k">Starts</span>
+                    <span class="v">{{ $next['all_day'] ? 'All day' : $next['start']?->format('g:i A') }}</span>
+                </div>
+                <div class="mc-tt-row" style="border-top:1px solid var(--border-color);">
+                    <span class="k">Day</span><span class="v">{{ $next['start']?->format('D j M') }}</span>
+                </div>
+            @else
+                <p>Nothing booked. Your next job appears here with its place and time.</p>
+            @endif
         </div>
     </div>
 
     {{-- ════════ Bottom banner ════════ --}}
     <div class="mc-banner">
         <span class="clock">@include('professional.calendar._cal_clock', ['w' => 48])</span>
-        <div class="mc-banner-txt"><b>Stay Organized. Be On Time. Win More.</b><p>My Calendar keeps your day on track so you can focus on what matters most—your clients.</p></div>
+        {{-- "Win More" is a promise about somebody's business, which Sir
+             Peter's rules on claims forbid. --}}
+        <div class="mc-banner-txt"><b>Your days, in one place.</b><p>Shifts and bookings together, so one screen says where you are needed.</p></div>
         <a href="{{ route('professional.calendar.index') }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>Go to Full Calendar <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
     </div>
 </div>

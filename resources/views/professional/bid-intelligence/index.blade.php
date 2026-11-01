@@ -5,8 +5,9 @@
 {{-- Bid Intelligence — explainer + a live snapshot of the pro's bid pipeline
      performance. REAL data: donut + legend = mutually-exclusive bid buckets
      (invited opportunities + requested/won/lost bookings); win-rate, average
-     bid and response timers derived. AI insight / follow-up / market band are
-     explainer UI. Professional blue accent (#2563eb) per portal theme. --}}
+     bid and response timers derived. The invented market band went on
+     2026-08-05 and the data-free recommendation on 2026-11-01; every figure
+     here is measured. Professional blue accent (#2563eb) per portal theme. --}}
 
 @php
     $segMap = collect($segments)->keyBy('key');
@@ -58,28 +59,6 @@
     .bi-sec-h b { font-size: 19px; font-weight: 800; color: var(--text-primary); }
     .bi-sec-sub { font-size: 12.5px; color: var(--text-muted); margin: 0 0 16px; padding-left: 40px; }
 
-    /* ── Detailed Section Breakdown (3 cols) ── */
-    .bi-bd { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 16px; }
-    .bi-bd-col { border: 1px solid var(--border-color); border-radius: 14px; padding: 18px; }
-    .bi-bd-h { font-size: 14.5px; font-weight: 800; color: var(--bi-blue); margin-bottom: 12px; line-height: 1.3; }
-    .bi-bd-note { font-size: 12.5px; color: var(--text-secondary); line-height: 1.55; margin: 0 0 12px; }
-    .bi-bd-note b { color: var(--text-primary); }
-    .bi-bd-sep { height: 1px; background: var(--border-color); margin: 12px 0; }
-    .bi-bd-leg { display: flex; gap: 11px; padding: 8px 0; align-items: flex-start; }
-    .bi-bd-leg .dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; margin-top: 3px; }
-    .bi-bd-leg b { font-size: 12.5px; color: var(--text-primary); }
-    .bi-bd-leg p { font-size: 11px; color: var(--text-muted); margin: 1px 0 0; line-height: 1.4; }
-    .bi-navmock { background: var(--bg-card-hover); border: 1px solid var(--border-color); border-radius: 12px; padding: 14px; display: flex; gap: 14px; align-items: center; margin: 12px 0; }
-    .bi-navmock .lines { flex: 1; }
-    .bi-navmock .lrow { display: flex; align-items: center; gap: 8px; margin-bottom: 9px; }
-    .bi-navmock .lrow:last-child { margin-bottom: 0; }
-    .bi-navmock .chk { width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-    .bi-navmock .chk svg { width: 11px; height: 11px; color: #fff; }
-    .bi-navmock .ln { flex: 1; height: 7px; border-radius: 4px; background: var(--border-color); }
-    .bi-navmock .cal { width: 56px; height: 56px; border-radius: 12px; background: rgba(37,99,235,0.1); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-    .bi-navmock .cal svg { width: 28px; height: 28px; color: var(--info-text); }
-    .bi-bd-cta { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px; background: rgba(37,99,235,0.06); border-radius: 11px; font-size: 13.5px; font-weight: 800; color: var(--bi-blue); text-decoration: none; }
-    .bi-bd-cta svg { width: 15px; height: 15px; }
 
     /* ── What happens (4 cols) ── */
     .bi-cc { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 16px; }
@@ -125,7 +104,7 @@
     .bi-banner a { display: inline-flex; align-items: center; gap: 9px; background: #2563eb; color: #fff; font-size: 15px; font-weight: 800; padding: 14px 24px; border-radius: 12px; text-decoration: none; white-space: nowrap; }
     .bi-banner a svg { width: 17px; height: 17px; }
 
-    @media (max-width: 1200px) { .bi-hero, .bi-hero-l { grid-template-columns: 1fr; } .bi-bd { grid-template-columns: 1fr; } .bi-cc { grid-template-columns: repeat(2, minmax(0,1fr)); } }
+    @media (max-width: 1200px) { .bi-hero, .bi-hero-l { grid-template-columns: 1fr; } .bi-cc { grid-template-columns: repeat(2, minmax(0,1fr)); } }
     @media (max-width: 760px) { .bi-cc { grid-template-columns: 1fr; } .bi-donut-wrap { grid-template-columns: 1fr; } }
 </style>
 @endpush
@@ -189,46 +168,21 @@
         </div>
     </div>
 
-    {{-- ════════ Detailed Section Breakdown ════════ --}}
-    <div class="bi-card" style="margin-bottom:20px;">
-        <div class="bi-sec-h"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span><b>Detailed Section Breakdown</b></div>
-        <p class="bi-sec-sub">Understand how your bids move through the pipeline.</p>
-        <div class="bi-bd">
-            {{-- 1. Target Header --}}
-            <div class="bi-bd-col">
-                <div class="bi-bd-h">1. The Target Header <span style="color:var(--text-muted);font-weight:600;">(Top Section)</span></div>
-                <p class="bi-bd-note"><b style="color:var(--info-text);">The Goal:</b> The target and arrow icon shows that this tool helps you aim for and hit your sales goals.</p>
-                <div class="bi-bd-sep"></div>
-                <p class="bi-bd-note"><b style="color:var(--accent-text);">The Mission:</b> The text explains that tracking your past performance is the secret to winning more future jobs.</p>
-            </div>
-            {{-- 2. Donut Chart & Legend --}}
-            <div class="bi-bd-col">
-                <div class="bi-bd-h">2. The Donut Chart &amp; Legend <span style="color:var(--text-muted);font-weight:600;">(Middle Section)</span></div>
-                <p class="bi-bd-note">The colorful circle and list show your <b>{{ $stats['total'] }} Total Bids</b> divided into progress steps.</p>
-                @foreach($segments as $seg)
-                    <div class="bi-bd-leg"><span class="dot" style="background:{{ $seg['color'] }};"></span><div><b>{{ $seg['name'] }} ({{ $seg['count'] }})</b><p>{{ $seg['desc'] }}</p></div></div>
-                @endforeach
-            </div>
-            {{-- 3. Navigation Gate --}}
-            <div class="bi-bd-col">
-                <div class="bi-bd-h">3. The Navigation Gate <span style="color:var(--text-muted);font-weight:600;">(Bottom Section)</span></div>
-                <p class="bi-bd-note">The <b>"View Full Pipeline"</b> button takes you to the complete sales calendar and master tracking spreadsheet.</p>
-                <div class="bi-navmock">
-                    <div class="lines">
-                        <div class="lrow"><span class="chk" style="background:#8b5cf6;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span><span class="ln"></span></div>
-                        <div class="lrow"><span class="chk" style="background:#10b981;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span><span class="ln" style="width:80%;"></span></div>
-                        <div class="lrow"><span class="chk" style="background:#10b981;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg></span><span class="ln" style="width:65%;"></span></div>
-                    </div>
-                    <span class="cal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>
-                </div>
-                <a href="{{ route('professional.proposals.index') }}" class="bi-bd-cta">View Full Pipeline <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
-            </div>
-        </div>
-    </div>
+    {{-- A "Detailed Section Breakdown" stood here, as it did on My Calendar
+         and the Lead Pipeline, and it went for the same reasons: three
+         columns explaining this page on this page, one of them a drawing of
+         an interface shown inside the interface.
+
+         This one also promised that View Full Pipeline leads to "the
+         complete sales calendar and master tracking spreadsheet". Neither
+         exists; the button opens Proposals. --}}
 
     {{-- ════════ What happens if you click ════════ --}}
     <div class="bi-sec-h"><span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2 3 14h9l-1 8 10-12h-9l1-8z"/></svg></span><b>What Happens if You Click?</b></div>
-    <p class="bi-sec-sub">Unlock deep-dive features to help you win more jobs.</p>
+    {{-- Was "Unlock deep-dive features to help you win more jobs", which
+         promises an outcome and frames working controls as something you
+         have not got yet. --}}
+    <p class="bi-sec-sub">What each of these shows you.</p>
     <div class="bi-cc">
         {{-- Win/Loss Reports --}}
         <div class="bi-cc-card">
@@ -240,10 +194,12 @@
                     <div class="k" style="color:var(--info-text);">Insight</div>
                     <p>You have <b>{{ \App\Models\Bid::where('supplier_id', auth()->id())->where('status','submitted')->count() }}</b> active bids. Bids viewed by clients convert far more often than un-opened ones. Follow up on the ones going quiet.</p>
                 </div>
-                <div class="bi-ai-box" style="background:rgba(16,185,129,0.07);">
-                    <div class="k" style="color:var(--ok-text);">Recommendation</div>
-                    <p>Consider adjusting pricing or highlighting more value on bids that stall after being viewed.</p>
-                </div>
+                {{-- A "Recommendation" box stood here, telling every
+                     professional the same thing: consider adjusting pricing
+                     or highlighting more value. Nothing had been read to
+                     arrive at it. Advice the platform gives is advice the
+                     platform is answerable for, and Sir Peter's rules put
+                     expert advice out of scope. --}}
             </div>
         </div>
         {{-- Client Response Timers --}}
@@ -297,7 +253,9 @@
                 <line x1="22" y1="24" x2="40" y2="10" stroke="#1e293b" stroke-width="2.5" stroke-linecap="round"/><path d="M40 10l4-4 1 5-5-1z" fill="#f59e0b"/>
             </svg>
         </span>
-        <div class="bi-banner-txt"><b>Track. Analyze. Win More.</b><p>Use Bid Intelligence to aim smarter, follow up faster, and close more deals.</p></div>
+        {{-- "Win More" and "close more deals" promise an outcome, which Sir
+             Peter's rules on claims forbid. --}}
+        <div class="bi-banner-txt"><b>Your bids, measured.</b><p>What you sent, what was opened, and what came back.</p></div>
         <a href="{{ route('professional.leads.index') }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Go to Full Pipeline <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
     </div>
 </div>

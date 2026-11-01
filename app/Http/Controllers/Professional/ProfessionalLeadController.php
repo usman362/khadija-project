@@ -163,7 +163,14 @@ class ProfessionalLeadController extends Controller
         // numbers are all measured from the same instant.
         $today = $now;
 
-        return view('professional.leads.index', compact('pipeline', 'leads', 'stats', 'conversion', 'today'));
+        /*
+         * How many leads the rate is out of.
+         *
+         * The gauge needs to tell "nothing has booked yet" from "nothing has
+         * come in yet". It had neither: it read `$conversion ?: 82`, so a
+         * professional with no leads at all was shown 82% and the word High.
+         */
+        return view('professional.leads.index', compact('pipeline', 'leads', 'stats', 'conversion', 'totalFunnel', 'today'));
     }
 
     /**
