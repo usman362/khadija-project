@@ -130,14 +130,28 @@ class AgreementPageController extends Controller
 
         $booking->load(['event', 'client', 'supplier', 'conversation']);
 
-        // Client controls whether the chat transcript is fed to the AI.
-        // Default true so existing "Generate" buttons keep working.
-        $includeChat = $request->boolean('include_chat', true);
+        /*
+         * Client controls whether the chat transcript is fed to the AI.
+         *
+         * No default, and that is the point. It used to default to true "so
+         * existing Generate buttons keep working", which threw the choice
+         * away: an unchecked checkbox is not submitted at all, so the one
+         * form's own instruction, "Uncheck to generate a clean, standard
+         * agreement from booking details only", did the opposite and the
+         * whole client-professional conversation went to OpenAI anyway.
+         *
+         * Absent now means not included. This is a private conversation
+         * leaving the platform to a third party, so the reading that sends
+         * less is the one to take when nothing was said. The form submits an
+         * explicit 0 as well, so the two agree rather than one covering for
+         * the other.
+         */
+        $includeChat = $request->boolean('include_chat');
 
         // Only require a conversation when the client actually wants the AI to
         // reference it — skipping chat means booking-context-only is fine.
         if ($includeChat && (!$booking->conversation || $booking->conversation->messages()->count() === 0)) {
-            return back()->with('error', 'Please start a conversation with the other party before generating a chat-aware agreement, or uncheck "Include pro chat" to generate from booking details only.');
+            return back()->with('error', 'Please start a conversation with the other party before generating a chat-aware agreement, or uncheck "Include professional chat" to generate from booking details only.');
         }
 
         // Check: no fully accepted agreement exists

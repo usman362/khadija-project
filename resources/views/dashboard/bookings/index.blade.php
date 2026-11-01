@@ -97,6 +97,10 @@
                                             Review carefully before accepting.
                                         </p>
                                         <div class="form-check">
+                                            {{-- An unchecked box is not submitted at all, so without
+                                                 this the server could not tell "no" from "nothing was
+                                                 asked" and the transcript was sent either way. --}}
+                                            <input type="hidden" name="include_chat" value="0">
                                             <input class="form-check-input" type="checkbox"
                                                 value="1" checked
                                                 name="include_chat"
@@ -105,7 +109,7 @@
                                                 <strong>Include professional chat in my agreement</strong>
                                             </label>
                                             <div class="form-text">
-                                                We.ll use your conversation with the pro when building your final document, pulling in dates, prices, and specifics you discussed. Uncheck to generate a clean, standard agreement from booking details only.
+                                                We'll use your conversation with the professional when building your final document, pulling in dates, prices, and specifics you discussed. Uncheck to generate a clean, standard agreement from booking details only.
                                             </div>
                                         </div>
                                     </div>

@@ -158,8 +158,12 @@ class AgreementTest extends TestCase
             'status' => 'requested',
         ]);
 
+        // Asking for the chat is now said rather than assumed. An empty
+        // request used to mean "include it", which was the bug in
+        // UncheckingTheChatActuallyKeepsItOutTest: it made unchecking the box
+        // do nothing. Only a chat-aware agreement needs a conversation.
         $response = $this->actingAs($this->client)
-            ->post("/app/agreements/generate/{$booking2->id}");
+            ->post("/app/agreements/generate/{$booking2->id}", ['include_chat' => '1']);
 
         $response->assertRedirect();
         $response->assertSessionHas('error');
