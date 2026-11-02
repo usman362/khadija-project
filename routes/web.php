@@ -1264,8 +1264,16 @@ Route::middleware('auth')->group(function () {
         // create Package Services + bid on gigs. "My Gigs" here = work ASSIGNED to
         // the pro. Per Peter, the old gig-create URL is REPURPOSED (not deleted)
         // into the pro's Create-a-Package form so pros keep their ability to list.
-        Route::get('/gigs/create', fn () => redirect()->route('professional.packages.create'))
-            ->name('professional.gigs.create');
+        /*
+         * No "create a gig" route any more. A professional does not create a
+         * gig: a gig is a client's job, and it becomes theirs when the client
+         * awards it, which is what sets events.supplier_id and is what My
+         * Gigs reads. The only way in is the Bidding Board.
+         *
+         * This one answered "create a gig" by opening the package form, which
+         * is the same mixing of the two that Sir Peter ruled against. Nothing
+         * linked to it.
+         */
         // Merged into the Gig Operations Hub as its My Gigs tab (R42,
         // amended 2026-08-05). Same reason as Contracts above.
         Route::get('/gigs', fn () => redirect()->route('professional.gig-hub.index', ['tab' => 'gigs']))
