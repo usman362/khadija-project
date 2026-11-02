@@ -40,6 +40,11 @@ class ProfessionalPriorityController extends Controller
             ->where('status', 'completed')
             ->sum('price');
 
+        // How many things are actually waiting. Used by the empty state, so
+        // a professional with nothing is told so rather than shown four
+        // cards reading zero with no explanation.
+        $priorityCount = $contractsAwaiting + $newProposals + $openShifts;
+
         $cards = [
             'contracts' => $contractsAwaiting,
             'staffing'  => $openShifts,
@@ -53,6 +58,6 @@ class ProfessionalPriorityController extends Controller
          * venue beside a hardcoded guest count. The illustrations are fixed
          * text now, so the query and the count that went with it are gone.
          */
-        return view('professional.priority.index', compact('cards'));
+        return view('professional.priority.index', compact('cards', 'priorityCount'));
     }
 }

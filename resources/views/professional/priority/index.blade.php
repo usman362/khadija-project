@@ -200,6 +200,45 @@
                     </div>
                 </div>
 
+                {{-- What happens --}}
+                {{-- The page used to open with four sections explaining what a
+                     priority action is made of, and these, the only part of it
+                     that is this professional's own work, sat at the bottom
+                     under the heading "What happens when you click this card?".
+                     An explainer is not the feature. --}}
+                <div class="pa-wh-title">WHAT NEEDS YOU NOW</div>
+                @if($priorityCount < 1)
+                    <p style="font-size:13px;color:var(--text-muted);margin:-2px 0 12px;">Nothing is waiting on you right now. New offers and tasks appear here.</p>
+                @endif
+                <div class="pa-whs">
+                    <div class="pa-wh c1">
+                        <div class="pa-wh-h"><span class="pa-wh-ico" style="background:#ef4444;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span><span class="pa-wh-nm">Contract awaiting signature</span></div>
+                        <p>A secure legal page shows the full digital contract between you and the client.</p>
+                        <div class="pa-wh-meta">{{ $cards['contracts'] }} pending</div>
+                        <a href="{{ route('professional.contracts.index') }}" class="pa-wh-btn" style="background:#b91c1c;">Review &amp; Sign</a>
+                    </div>
+                    <div class="pa-wh c2">
+                        <div class="pa-wh-h"><span class="pa-wh-ico" style="background:#f97316;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg></span><span class="pa-wh-nm">Staffing shortage detected</span></div>
+                        <p>Your crew dashboard shows exactly which jobs are empty.</p>
+                        <div class="pa-wh-meta">{{ $cards['staffing'] }} open shift{{ $cards['staffing'] == 1 ? '' : 's' }}</div>
+                        <a href="{{ route('professional.team.index') }}" class="pa-wh-btn" style="background:#f97316;">Hire Staff</a>
+                    </div>
+                    <div class="pa-wh c3">
+                        <div class="pa-wh-h"><span class="pa-wh-ico" style="background:#2563eb;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span><span class="pa-wh-nm">New bids to respond to</span></div>
+                        <p>The active negotiation screen shows a countdown timer so you don't miss it.</p>
+                        <div class="pa-wh-meta">{{ $cards['bids'] }} awaiting you</div>
+                        <a href="{{ route('professional.proposals.index') }}" class="pa-wh-btn" style="background:#2563eb;">Respond Now</a>
+                    </div>
+                    <div class="pa-wh c4">
+                        <div class="pa-wh-h"><span class="pa-wh-ico" style="background:#10b981;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span><span class="pa-wh-nm">Payment released</span></div>
+                        <p>Your financial vault shows the payment has been released safely.</p>
+                        <div class="pa-wh-meta">Amount: {{ $money($cards['escrow']) }}</div>
+                        <a href="{{ route('professional.earnings.index') }}" class="pa-wh-btn" style="background:#047857;">View Payment</a>
+                    </div>
+                </div>
+
+                <details class="pa-explain" style="margin-top:22px;">
+                    <summary style="cursor:pointer;font-size:12px;font-weight:800;letter-spacing:.4px;color:var(--text-muted);padding:10px 0;">HOW PRIORITY ACTIONS WORKS</summary>
                 {{-- WHAT --}}
                 <div class="pa-sec">
                     <div class="pa-sec-l">
@@ -292,44 +331,7 @@
                     @endforeach
                 </div>
 
-                {{-- What happens --}}
-                <div class="pa-wh-title">WHAT HAPPENS WHEN YOU CLICK THIS CARD?</div>
-                <div class="pa-whs">
-                    <div class="pa-wh c1">
-                        <div class="pa-wh-h"><span class="pa-wh-ico" style="background:#ef4444;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span><span class="pa-wh-nm">Contract awaiting signature</span></div>
-                        <p>A secure legal page shows the full digital contract between you and the client.</p>
-                        <div class="pa-wh-meta">{{ $cards['contracts'] }} pending</div>
-                        <a href="{{ route('professional.contracts.index') }}" class="pa-wh-btn" style="background:#b91c1c;">Review &amp; Sign</a>
-                    </div>
-                    <div class="pa-wh c2">
-                        <div class="pa-wh-h"><span class="pa-wh-ico" style="background:#f97316;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg></span><span class="pa-wh-nm">Staffing shortage detected</span></div>
-                        <p>Your crew dashboard shows exactly which jobs are empty.</p>
-                        <div class="pa-wh-meta">{{ $cards['staffing'] }} open shift{{ $cards['staffing'] == 1 ? '' : 's' }}</div>
-                        <a href="{{ route('professional.team.index') }}" class="pa-wh-btn" style="background:#f97316;">Hire Staff</a>
-                    </div>
-                    <div class="pa-wh c3">
-                        <div class="pa-wh-h"><span class="pa-wh-ico" style="background:#2563eb;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span><span class="pa-wh-nm">New bids to respond to</span></div>
-                        <p>The active negotiation screen shows a countdown timer so you don't miss it.</p>
-                        <div class="pa-wh-meta">{{ $cards['bids'] }} awaiting you</div>
-                        <a href="{{ route('professional.proposals.index') }}" class="pa-wh-btn" style="background:#2563eb;">Respond Now</a>
-                    </div>
-                    <div class="pa-wh c4">
-                        <div class="pa-wh-h"><span class="pa-wh-ico" style="background:#10b981;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span><span class="pa-wh-nm">Payment released</span></div>
-                        <p>Your financial vault shows the payment has been released safely.</p>
-                        <div class="pa-wh-meta">Amount: {{ $money($cards['escrow']) }}</div>
-                        <a href="{{ route('professional.earnings.index') }}" class="pa-wh-btn" style="background:#047857;">View Payment</a>
-                    </div>
-                </div>
-
-                {{-- In short --}}
-                <div class="pa-short">
-                    <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"/><path d="M12 15l-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/></svg></span>
-                    <div class="pa-short-txt"><b>In Short</b><p>Priority Actions makes sure you see the right things at the right time, so you can win more gigs and grow your business!</p></div>
-                    <a href="{{ route('professional.dashboard') }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Go to Dashboard</a>
-                </div>
-            </div>
-        </div>
-
+                </details>
         {{-- ─── SIDEBAR ─── --}}
         <div class="pa-side">
             <div class="pa-card">
@@ -368,9 +370,14 @@
                 <div class="pa-tip"><svg viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg><div><b>Stay Organized</b><p>Check your Priority Actions often so nothing important gets missed.</p></div></div>
             </div>
 
+            {{-- "Ready to Win More Gigs? Enable smart notifications and stay
+                 ahead of the competition." Six banners in this shape came off
+                 the professional screens on 1 November, against Sir Peter's
+                 rule that the platform does not promise an outcome. This one
+                 was missed. The link survives without the promise. --}}
             <div class="pa-notif">
-                <h4>Ready to Win More Gigs?</h4>
-                <p>Enable smart notifications and stay ahead of the competition.</p>
+                <h4>Notifications</h4>
+                <p>Choose how you hear about new offers and tasks.</p>
                 <a href="{{ route('professional.notifications.index') }}">Go to Notification Settings →</a>
             </div>
         </div>
