@@ -9,6 +9,13 @@ Artisan::command('inspire', function () {
 })->purpose('Display an inspiring quote');
 
 // Daily at 03:10 local time, purge user accounts whose 60-day grace period has expired.
+/*
+ * The three jobs that touch nobody's inbox stay on UTC on purpose. They run
+ * in the small hours, and local clocks skip an hour outright when daylight
+ * saving starts, so a 03:10 local job simply would not happen that day. UTC
+ * has no such gap. Only the jobs a person receives are moved to the reader's
+ * clock.
+ */
 Schedule::command('users:purge-expired')
     ->dailyAt('03:10')
     ->withoutOverlapping()
@@ -30,7 +37,21 @@ Schedule::command('agreements:purge-old-pdfs')
  * nothing twice.
  */
 Schedule::command('subscriptions:renewal-notices')
-    ->dailyAt('06:00')
+    /*
+     * Nine in the morning where the reader is, not where the server is.
+     *
+     * Every time here was written as a bare hour, which Laravel reads in the
+     * app timezone, and that is UTC. This one meant 06:00 UTC, so a notice
+     * about somebody's money would have arrived at 1am Eastern. Nobody had
+     * felt it because cron had never been set up to call the scheduler at
+     * all, so none of these had ever run.
+     *
+     * display_timezone is the one place that decides what time it is for a
+     * person here, the same setting the pages read. Nine in the morning is
+     * far from the hour DST skips, so it cannot fall into the gap.
+     */
+    ->dailyAt('09:00')
+    ->timezone(config('app.display_timezone'))
     ->withoutOverlapping()
     ->onOneServer();
 
@@ -45,7 +66,11 @@ Schedule::command('subscriptions:renewal-notices')
  * two runs in a day send nothing twice.
  */
 Schedule::command('attendance:chase')
+    // 9 and 17 UTC is 4am and midday Eastern, and the note above is about
+    // exactly that: a chaser arriving at 4 in the morning is the one people
+    // learn to ignore. The hours were right, the clock was not.
     ->twiceDaily(9, 17)
+    ->timezone(config('app.display_timezone'))
     ->withoutOverlapping()
     ->onOneServer();
 
