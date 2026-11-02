@@ -266,7 +266,13 @@ class RequestFeeTermsTest extends TestCase
         $this->startBidding();
 
         $this->actingAs($this->client)
-            ->post(route('client.bsr.save', 'event'), ['location_kind' => 'area'])
+            // The subject here is the missing name, not the place. "Not sure
+            // yet" has had to name a town since Sir Peter asked for it beside
+            // the city and state on an exact address, so the fixture gives one.
+            ->post(route('client.bsr.save', 'event'), [
+                'location_kind' => 'area',
+                'location'      => 'Baltimore, MD',
+            ])
             ->assertSessionHasNoErrors();
 
         $this->assertNotEmpty(session('bsr_wizard')['title'] ?? null);

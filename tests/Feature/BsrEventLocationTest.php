@@ -377,4 +377,45 @@ class BsrEventLocationTest extends TestCase
         $this->assertStringContainsString('function retotal', $html,
             'The breakdown cannot add up: the code that adds it up is not on this step.');
     }
+
+    /**
+     * "Not sure yet" still has to say which town.
+     *
+     * Sir Peter asked for this beside the city and state on an exact address.
+     * The panel behind that option has asked for a city and state since it
+     * was built and nothing ever made it answer, so a request could be
+     * published with no place on it at all, which is a request no
+     * professional can be matched to.
+     */
+    public function test_not_sure_yet_still_needs_a_city_and_state(): void
+    {
+        $this->startWizard();
+
+        $this->step(['location_kind' => 'area', 'location' => ''])
+            ->assertSessionHasErrors('location');
+    }
+
+    public function test_not_sure_yet_is_accepted_once_the_area_is_given(): void
+    {
+        $this->startWizard();
+
+        $this->step(['location_kind' => 'area', 'location' => 'Baltimore, MD'])
+            ->assertSessionHasNoErrors();
+
+        $this->assertSame('Baltimore, MD', $this->wizard()['location']);
+    }
+
+    /**
+     * Sir Peter asked for an asterisk rather than the word, so the two kinds
+     * of mark on this form do not read as different rules.
+     */
+    public function test_a_required_field_is_marked_with_an_asterisk(): void
+    {
+        $this->startWizard();
+
+        $html = $this->actingAs($this->client)
+            ->get(route('client.bsr.step', 'event'))->getContent();
+
+        $this->assertStringNotContainsString('(required)', $html);
+    }
 }

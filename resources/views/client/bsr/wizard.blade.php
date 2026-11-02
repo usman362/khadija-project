@@ -653,7 +653,7 @@
                 </div>
                 <div class="ed-towngrid">
                     <div>
-                        <label class="bw-loclabel" style="margin-top:0;">City or Town <span class="bw-optional" style="text-transform:none;">(required)</span></label>
+                        <label class="bw-loclabel" style="margin-top:0;">City or Town <span class="req">*</span></label>
                         <div data-bw-towns data-max="{{ $__maxTowns }}">
                             @foreach($__towns as $__t)
                                 <div class="bw-town" data-bw-town>
@@ -706,7 +706,7 @@
             {{-- Not sure: just the area. --}}
             <div class="bw-needpanel" data-bw-panel="unsure" @if($__need !== 'unsure') hidden @endif>
                 <input type="hidden" name="location_kind" value="area" @disabled($__need !== 'unsure')>
-                <label class="bw-loclabel" for="bw_area">City and state</label>
+                <label class="bw-loclabel" for="bw_area">City and state <span class="req">*</span></label>
                 <input type="text" name="location" id="bw_area" value="{{ $__need === 'unsure' ? $__loc : '' }}" placeholder="e.g. Baltimore, MD" @disabled($__need !== 'unsure')>
             </div>
         </div>

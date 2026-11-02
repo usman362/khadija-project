@@ -77,6 +77,36 @@ class EventAddress
     }
 
     /**
+     * "Not sure yet" still has to name a town.
+     *
+     * Sir Peter asked for this beside the city and state on an exact address.
+     * A client who has not settled on a venue has a reason not to know the
+     * place; they do not have a reason not to know the area, and a request
+     * with no place on it cannot be matched to anybody.
+     *
+     * Here rather than in the one form that offers the option today, for the
+     * same reason cityMessage is here: the three request forms must not start
+     * explaining this differently.
+     */
+    public static function assertAreaGiven(array $data): void
+    {
+        if (($data['location_kind'] ?? null) !== 'area') {
+            return;
+        }
+
+        if (trim((string) ($data['location'] ?? '')) === '') {
+            throw ValidationException::withMessages(['location' => static::areaMessage()]);
+        }
+    }
+
+    public static function areaMessage(): string
+    {
+        return 'Tell us the city and state you are planning around, even if the venue '
+            . 'is not settled. It is how we know which '
+            . \App\Support\Vocabulary::providers() . ' to show your request to.';
+    }
+
+    /**
      * The state the request is served in, which is the client's own.
      *
      * Shown, never asked. A state field stood on the bidding request once and

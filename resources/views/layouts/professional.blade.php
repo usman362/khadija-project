@@ -492,7 +492,23 @@
         .cl-user-role { font-size: 11px; color: var(--text-muted); }
 
         /* ═══════════════════════ MAIN CONTENT ═══════════════════════ */
+        /*
+         * One column for the whole page, declared once.
+         *
+         * The bar and the page used to be measured separately: .pro-topbar
+         * had padding 12px 26px and no cap, while .cl-content had padding
+         * 28px 32px and a cap of 1760. So the gutters differed at every
+         * width, and past the cap the page centred while the bar kept going
+         * to the edges, which is the fault the client side fixed on 27
+         * September and this one was left with.
+         *
+         * --cl-edge is the same expression: the plain gutter until the page
+         * reaches its cap, then whatever keeps the bar on the page's own line.
+         */
         .cl-main {
+            --cl-max: 1760px;
+            --cl-gutter: 32px;
+            --cl-edge: max(var(--cl-gutter), calc((100% - var(--cl-max)) / 2 + var(--cl-gutter)));
             margin-left: var(--sidebar-width);
             min-height: 100vh;
             transition: var(--transition);
@@ -515,7 +531,7 @@
         .cl-navbar-left { display: flex; align-items: center; gap: 16px; }
 
         /* ══════ Professional topbar — blue welcome banner ══════ */
-        .pro-topbar { display: flex; align-items: center; gap: 16px; padding: 12px 26px 2px; position: sticky; top: 0; z-index: 100; background: var(--bg-primary); }
+        .pro-topbar { display: flex; align-items: center; gap: 16px; padding: 12px var(--cl-edge) 2px; position: sticky; top: 0; z-index: 100; background: var(--bg-primary); }
         .pro-banner { flex: 1; min-width: 0; display: flex; align-items: center; gap: 16px; background: linear-gradient(120deg, #3b82f6 0%, #2563eb 100%); border-radius: 14px; padding: 13px 18px; box-shadow: 0 6px 18px rgba(37,99,235,0.20); }
         /* Solid, not translucent. A 20%-white disc over the blue lands close enough
            to the banner that white initials on it measured 3.6:1 — the letter read as
@@ -607,10 +623,9 @@
         }
 
         .cl-content {
-            padding: 28px 32px;
-            max-width: 1760px;
-            margin-left: auto;
-            margin-right: auto;
+            padding: 28px var(--cl-edge);
+            /* The cap lives in --cl-edge now, so the bar above and the page
+               below are held to the same line by one number. */
         }
 
         /* ═══════════════════════ CARDS ═══════════════════════ */
@@ -917,7 +932,10 @@
             .cl-sidebar.open { transform: translateX(0); }
             .cl-main { margin-left: 0; }
             .cl-mobile-toggle { display: flex; }
-            .cl-content { padding: 20px 16px; }
+            /* Moves the gutter rather than overriding the padding, so the
+               bar follows the page down to phone width. */
+            .cl-main { --cl-gutter: 16px; }
+            .cl-content { padding: 20px var(--cl-edge); }
             .cl-grid-4, .cl-grid-3, .cl-grid-2 { grid-template-columns: 1fr; }
         }
 

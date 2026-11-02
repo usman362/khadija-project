@@ -446,6 +446,10 @@ class ClientBsrController extends Controller
                     ]);
                 }
             }
+
+            // "Not sure yet" still has to name a town. Same place as the
+            // city rule above, so the three request forms stay in step.
+            \App\Domain\Requests\EventAddress::assertAreaGiven($validated);
         }
 
         /*
