@@ -244,7 +244,7 @@
             <input type="text" name="search" class="mg-filter-search" placeholder="Search gigs, clients..." value="{{ request('search') }}">
         </div>
         <button type="submit" class="mg-filter-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>Filters</button>
-        <button type="button" class="mg-filter-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Export</button>
+        <a class="mg-filter-btn" href="{{ route('professional.gigs.export', request()->only(['search', 'status', 'category'])) }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Export</a>
         {{-- This was "Create a Package", the loudest button on a list of
              gigs. A gig is work a client posted and this professional is
              bidding on or has won; a package is a bundle they sell. Sir

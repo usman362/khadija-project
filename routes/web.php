@@ -1278,6 +1278,9 @@ Route::middleware('auth')->group(function () {
         // amended 2026-08-05). Same reason as Contracts above.
         Route::get('/gigs', fn () => redirect()->route('professional.gig-hub.index', ['tab' => 'gigs']))
             ->middleware('permission:events.view_any')->name('professional.gigs.index');
+        // Before /gigs/{event}, or "export" is read as an event id.
+        Route::get('/gigs/export', [ProfessionalGigController::class, 'export'])
+            ->middleware('permission:events.view_any')->name('professional.gigs.export');
         Route::get('/gigs/{event}', [ProfessionalGigController::class, 'show'])->middleware('permission:events.view')->name('professional.gigs.show');
         /*
          * Who the client will meet at the site. Sir Peter, 28 October: a

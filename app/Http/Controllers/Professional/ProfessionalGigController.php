@@ -17,6 +17,47 @@ class ProfessionalGigController extends Controller
      * still assembles exactly the same data, so the merge changed where the
      * list is shown and nothing about what it shows.
      */
+    /**
+     * The gig list as a CSV.
+     *
+     * The Gig Hub has carried an Export button since it was built and it was
+     * wired to nothing. Reports and Transactions both export; gigs did not,
+     * so the one list a professional would most want to keep was the one that
+     * could not leave the page.
+     *
+     * Same rows the page is showing, filters included, so what downloads is
+     * what they were looking at.
+     */
+    public function export(Request $request): \Symfony\Component\HttpFoundation\StreamedResponse
+    {
+        $gigs = $this->indexData($request)['myGigs'];
+        $me   = $request->user()->id;
+
+        return response()->streamDownload(function () use ($gigs, $me) {
+            $out = fopen('php://output', 'w');
+
+            fputcsv($out, ['Gig', 'Date', 'Start', 'Client', 'Services', 'Status', 'Bids', 'Budget', 'Earned']);
+
+            foreach ($gigs as $gig) {
+                $mine = $gig->bookings->where('supplier_id', $me);
+
+                fputcsv($out, [
+                    $gig->title,
+                    $gig->starts_at?->format('Y-m-d') ?? '',
+                    $gig->starts_at?->format('g:i A') ?? '',
+                    $gig->client?->name ?? '',
+                    $gig->categories->pluck('name')->implode('; '),
+                    ucfirst((string) $gig->status),
+                    $gig->bookings->count(),
+                    $gig->budget !== null ? number_format((float) $gig->budget, 2, '.', '') : '',
+                    number_format((float) $mine->where('status', 'completed')->sum('price'), 2, '.', ''),
+                ]);
+            }
+
+            fclose($out);
+        }, 'my-gigs-' . now()->toDateString() . '.csv', ['Content-Type' => 'text/csv; charset=UTF-8']);
+    }
+
     public function indexData(Request $request): array
     {
         $user = $request->user();

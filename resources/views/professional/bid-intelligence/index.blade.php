@@ -146,7 +146,14 @@
                 <h1>Bid Intelligence</h1>
                 <div class="sub">Track your bid activity and follow up smarter.</div>
                 <div class="bi-feat"><span class="bi-feat-ico" style="background:rgba(37,99,235,0.12);color:var(--info-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span><div><b>Stops Guesswork</b><p>See exactly which clients are engaging with your bids.</p></div></div>
-                <div class="bi-feat"><span class="bi-feat-ico" style="background:rgba(245,158,11,0.12);color:var(--warn-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/></svg></span><div><b>Boosts Wins</b><p>Learn what works so you can win more high-paying jobs.</p></div></div>
+                {{-- "Boosts Wins: learn what works so you can win more
+                     high-paying jobs" was the last of these left. Six banners
+                     in this shape came off the professional screens on 1
+                     November, against Sir Peter's rule that the platform does
+                     not promise an outcome, and this one is a promise about
+                     somebody's income. What the page does is show them their
+                     own record. --}}
+                <div class="bi-feat"><span class="bi-feat-ico" style="background:rgba(245,158,11,0.12);color:var(--warn-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"/><path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2z"/></svg></span><div><b>Shows What Worked</b><p>See which of your bids were accepted, and which were not.</p></div></div>
                 <div class="bi-feat"><span class="bi-feat-ico" style="background:rgba(16,185,129,0.12);color:var(--ok-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/></svg></span><div><b>Organizes Follow-Ups</b><p>Know who to call or email and when.</p></div></div>
                 <div class="bi-feat"><span class="bi-feat-ico" style="background:rgba(249,115,22,0.12);color:var(--brand-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span><div><b>Saves Energy</b><p>Focus your time on the bids that have the best chance.</p></div></div>
             </div>

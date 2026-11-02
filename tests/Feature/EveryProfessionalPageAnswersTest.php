@@ -214,4 +214,57 @@ class EveryProfessionalPageAnswersTest extends TestCase
 
         $this->assertSame([], $bad, "Forms that save nothing:\n  " . implode("\n  ", $bad));
     }
+
+    /**
+     * A button drawn in a row is wired by what it is, not where it sits.
+     *
+     * The Messages composer carried five icons and one of them worked. The
+     * script took "the second button in the compose row", so the paperclip
+     * was the paperclip only while the four dead ones around it kept their
+     * places. They are gone and it is found by name.
+     */
+    public function test_the_message_composer_offers_only_what_it_can_do(): void
+    {
+        $html = $this->actingAs($this->pro)
+            ->get(route('professional.chat.show', ['conversation' => $this->conversation->id]))
+            ->assertSuccessful()->getContent();
+
+        $this->assertStringContainsString('id="pm-attach"', $html);
+        $this->assertStringNotContainsString('title="Emoji"', $html);
+        $this->assertStringNotContainsString('title="Schedule"', $html);
+        $this->assertStringNotContainsString('icons[1]', $html, 'The composer is wired by position again.');
+    }
+
+    /** The Gig Hub's Export button had no destination for as long as it existed. */
+    public function test_the_gig_list_can_actually_be_exported(): void
+    {
+        $response = $this->actingAs($this->pro)->get(route('professional.gigs.export'));
+
+        $response->assertSuccessful();
+        $this->assertStringContainsString('text/csv', $response->headers->get('content-type'));
+
+        $csv = $response->streamedContent();
+
+        $this->assertStringContainsString('Gig,Date,Start,Client', $csv);
+        $this->assertStringContainsString($this->event->title, $csv, 'The export left out a gig that is theirs.');
+    }
+
+    /** Sir Peter's rule: the platform does not promise an outcome. */
+    public function test_no_professional_page_promises_more_business(): void
+    {
+        $promises = [];
+
+        foreach ($this->pages() as $name => $params) {
+            $html = $this->actingAs($this->pro)->get(route($name, $params))->getContent();
+
+            foreach (['win more', 'close more deals', 'convert more leads', 'stress-free',
+                      'ahead of the competition', 'grow your business'] as $claim) {
+                if (stripos($html, $claim) !== false) {
+                    $promises[] = "{$name}: {$claim}";
+                }
+            }
+        }
+
+        $this->assertSame([], $promises, "Promises still on screen:\n  " . implode("\n  ", $promises));
+    }
 }
