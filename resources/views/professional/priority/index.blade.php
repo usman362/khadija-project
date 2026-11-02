@@ -28,10 +28,19 @@
         Fixed values, and no name on the quote. The reader's own figures are
         further down the page, under the headings that link to them.
     */
-    $exDate   = 'Saturday, 2:00 PM';
-    $exEnd    = '4:00 PM';
-    $exLoc    = 'A venue in your service area';
-    $exBudget = '$2,000 – $3,000';
+    /*
+     * The examples name the fields, not values for them.
+     *
+     * They were fixed figures under headings reading "Example:", which is
+     * honest as far as it goes, but a date, a budget and a guest count sat on
+     * the page looking exactly like every other date, budget and guest count
+     * on this side. Naming the field says what the panel is for and leaves
+     * nothing on screen that could be read as somebody's job.
+     */
+    $exDate   = 'the start time';
+    $exEnd    = 'the finish time';
+    $exLoc    = 'where it is being held';
+    $exBudget = 'what the client has to spend';
 @endphp
 
 @push('styles')
@@ -252,7 +261,7 @@
                         <div class="pa-ex-h">Example:</div>
                         <div class="pa-ex-row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span><b>Date:</b> {{ $exDate }} – {{ $exEnd }}</span></div>
                         <div class="pa-ex-row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg><span><b>Location:</b> {{ $exLoc }}</span></div>
-                        <div class="pa-ex-row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><span><b>Guest Count:</b> 120 Guests</span></div>
+                        <div class="pa-ex-row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><span><b>Guest Count:</b> how many people are coming</span></div>
                         <div class="pa-ex-row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg><span><b>Budget Range:</b> {{ $exBudget }}</span></div>
                     </div>
                 </div>
@@ -283,7 +292,7 @@
                     </div>
                     <div class="pa-ex">
                         <div class="pa-ex-h">Example:</div>
-                        <div class="pa-ex-row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg><span><b>Offer:</b> $300</span></div>
+                        <div class="pa-ex-row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg><span><b>Offer:</b> what they are offering you</span></div>
                         {{-- A clock counted down from 04:32:15 here, on an offer
                              that does not exist, next to the reader's own real
                              price. Watching a timer run is not an illustration
@@ -355,7 +364,7 @@
                     </div>
                     <div class="pa-li">
                         <span class="pa-li-ico" style="background:rgba(249,115,22,0.1);color:var(--brand-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>
-                        <div class="pa-li-body"><div class="pa-li-t">The EXTRAS (Offer &amp; Urgency)</div><div class="pa-li-d">Offer: $300 · with a time limit</div></div>
+                        <div class="pa-li-body"><div class="pa-li-t">The EXTRAS (Offer &amp; Urgency)</div><div class="pa-li-d">The offer, and how long it stands</div></div>
                         <span class="pa-li-btn b-decline">Decline</span>
                     </div>
                     <div class="pa-live-foot"><a href="{{ route('professional.proposals.index') }}">View All Actions →</a></div>

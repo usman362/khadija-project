@@ -39,13 +39,16 @@ class AnEmptyProfessionalSeesNoFiguresTest extends TestCase
     ];
 
     /**
-     * Pages allowed to print a figure to an empty account, and why.
+     * Nothing is allowed to print a figure to an account with no records.
      *
-     * Priority Actions is an explainer. Its figures sit under panels headed
-     * "Example:" and are fixed on purpose, so that nothing on them is ever
-     * mistaken for the reader's own work. Everything else must be silent.
+     * Priority Actions used to be the exception: an explainer whose panels
+     * carried fixed values under headings reading "Example:". Honest as far
+     * as it went, but a date, a budget and a guest count sat there looking
+     * like every other date, budget and guest count on this side. They name
+     * the field now instead of showing a value for it, so there is no
+     * exception left to make.
      */
-    private const EXPLAINERS = ['professional.priority.index'];
+    private const EXPLAINERS = [];
 
     public function test_no_page_shows_a_figure_to_an_account_with_no_records(): void
     {
@@ -90,7 +93,22 @@ class AnEmptyProfessionalSeesNoFiguresTest extends TestCase
              */
             preg_match_all('/#[A-Z]{2,}-[0-9][0-9-]*/u', $text, $refs);
 
-            $found = array_values(array_unique(array_merge($money, $pct, $refs[0])));
+            /*
+             * A clock time. The review page printed a literal "12:00 AM"
+             * beside a real date, so the line was half somebody's event and
+             * half nothing.
+             *
+             * Dates are deliberately NOT checked here. Today's date is in the
+             * banner on every page and the calendar shows this week, so the
+             * check would be all false alarms. An invented date carries an
+             * invented job with it, and the money, name and reference checks
+             * catch that.
+             */
+            preg_match_all('/\b[0-9]{1,2}:[0-9]{2}\s?(?:AM|PM)\b/u', $text, $times);
+
+            $found = array_values(array_unique(
+                array_merge($money, $pct, $refs[0], $times[0])
+            ));
 
             if ($found) {
                 $offenders[] = str_replace('professional.', '', $name) . ': ' . implode(' ', $found);

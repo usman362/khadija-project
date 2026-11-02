@@ -171,7 +171,16 @@
 
                 <div class="pr-evt">
                     <span class="l"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/></svg>EVENT COMPLETED</span>
-                    <span class="r">12:00 AM<br>{{ $pendingReview?->event?->ends_at?->format('M d, Y') ?? $pendingReview?->event?->starts_at?->format('M d, Y') ?? now()->format('M d, Y') }}</span>
+                    @php
+                        // The time was the literal "12:00 AM", printed beside a
+                        // real date, so the line was half somebody's event and
+                        // half nothing. It is the event's own finish, or its
+                        // start where there is no finish, and blank when the
+                        // event has neither.
+                        $__ev   = $pendingReview?->event;
+                        $__when = $__ev?->ends_at ?? $__ev?->starts_at;
+                    @endphp
+                    <span class="r">@if($__when){{ $__when->format('g:i A') }}<br>{{ $__when->format('M d, Y') }}@else&mdash;@endif</span>
                 </div>
                 <div class="pr-evt-body">
                     @if($pendingReview)
@@ -206,7 +215,16 @@
                         ['communication', 'Communication Clarity', 'Was the plan clear and easy to follow?', '#2563eb', 'chat'],
                         ['safety', 'Safety & Hospitality', 'Did the client provide a safe environment and take care of professionals?', '#8b5cf6', 'shield'],
                     ];
-                    $defaults = ['punctuality' => 4, 'communication' => 5, 'safety' => 4];
+                    /*
+                     * Nothing is pre-selected.
+                     *
+                     * The three rows opened on four, five and four stars. The
+                     * controller requires all three, so that requirement was
+                     * being met by the page's own guess rather than by the
+                     * professional choosing: anyone who submitted without
+                     * touching them rated a real client 4, 5 and 4, and the
+                     * overall score was averaged from it.
+                     */
                 @endphp
                 @foreach($metrics as $m)
                     <div class="pr-metric">
@@ -221,11 +239,14 @@
                         <div class="pr-metric-row">
                             <span class="pr-stars" data-group="{{ $m[0] }}">
                                 @for($v = 5; $v >= 1; $v--)
-                                    <input type="radio" name="{{ $m[0] }}" id="{{ $m[0] }}-{{ $v }}" value="{{ $v }}" {{ $defaults[$m[0]] == $v ? 'checked' : '' }}>
+                                    <input type="radio" name="{{ $m[0] }}" id="{{ $m[0] }}-{{ $v }}" value="{{ $v }}" >
                                     <label for="{{ $m[0] }}-{{ $v }}">★</label>
                                 @endfor
                             </span>
-                            <span class="pr-score-tag" data-score="{{ $m[0] }}">{{ number_format($defaults[$m[0]], 1) }}<span class="x">/5</span></span>
+                            {{-- A dash until they pick. It printed the default and no script ever
+                                 moved it, so the number beside the stars stayed where it
+                                 started however many you clicked. --}}
+                            <span class="pr-score-tag" data-score="{{ $m[0] }}"><span class="v">&mdash;</span><span class="x">/5</span></span>
                         </div>
                     </div>
                 @endforeach
@@ -336,4 +357,20 @@
     update();
 })();
 </script>
+
+@push('scripts')
+<script>
+(function () {
+    // The number beside each row follows its stars.
+    document.querySelectorAll('.pr-metric').forEach(function (row) {
+        const tag = row.querySelector('.pr-score-tag .v');
+        row.querySelectorAll('input[type="radio"]').forEach(function (input) {
+            input.addEventListener('change', function () {
+                if (tag) tag.textContent = Number(input.value).toFixed(1);
+            });
+        });
+    });
+})();
+</script>
+@endpush
 @endsection
