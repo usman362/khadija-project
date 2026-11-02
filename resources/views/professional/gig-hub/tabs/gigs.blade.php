@@ -245,7 +245,12 @@
         </div>
         <button type="submit" class="mg-filter-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg>Filters</button>
         <button type="button" class="mg-filter-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>Export</button>
-        <a href="{{ route('professional.packages.create') }}" class="mg-filter-btn pink"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Create a Package</a>
+        {{-- This was "Create a Package", the loudest button on a list of
+             gigs. A gig is work a client posted and this professional is
+             bidding on or has won; a package is a bundle they sell. Sir
+             Peter's rule is that the two are never mixed, and the primary
+             action on a page of gigs is to find more of them. --}}
+        <a href="{{ route('professional.bidding-board.index') }}" class="mg-filter-btn pink"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>Find Gigs to Bid On</a>
     </form>
 
     {{-- ════════════ GIG MASTER LIST ════════════ --}}
@@ -345,10 +350,10 @@
         <div class="mg-card">
             <div class="mg-rail-head"><div class="mg-rail-title">Quick Actions</div></div>
             <div class="mg-qa-grid">
-                <a href="{{ route('professional.packages.create') }}" class="mg-qa"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12.89 1.45l8 4A2 2 0 0 1 22 7.24v9.53a2 2 0 0 1-1.11 1.79l-8 4a2 2 0 0 1-1.79 0l-8-4a2 2 0 0 1-1.1-1.8V7.24a2 2 0 0 1 1.11-1.79l8-4a2 2 0 0 1 1.78 0z"/><polyline points="2.32 6.16 12 11 21.68 6.16"/><line x1="12" y1="22.76" x2="12" y2="11"/></svg><span>Create a Package</span></a>
+                <a href="{{ route('professional.direct-offers.show') }}" class="mg-qa"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12.89 1.45l8 4A2 2 0 0 1 22 7.24v9.53a2 2 0 0 1-1.11 1.79l-8 4a2 2 0 0 1-1.79 0l-8-4a2 2 0 0 1-1.1-1.8V7.24a2 2 0 0 1 1.11-1.79l8-4a2 2 0 0 1 1.78 0z"/><polyline points="2.32 6.16 12 11 21.68 6.16"/><line x1="12" y1="22.76" x2="12" y2="11"/></svg><span>Direct Requests</span></a>
                 <a href="{{ route('professional.bidding-board.index') }}" class="mg-qa"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><span>Find Gigs</span></a>
                 <a href="{{ route('professional.proposals.index') }}" class="mg-qa"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg><span>View Proposals</span></a>
-                <a href="{{ route('professional.proposals.index') }}" class="mg-qa"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg><span>Manage Bookings</span></a>
+                <a href="{{ route('professional.calendar.index') }}" class="mg-qa"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"/></svg><span>My Calendar</span></a>
             </div>
         </div>
     </div>
