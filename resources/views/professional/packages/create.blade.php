@@ -556,7 +556,7 @@
                     </svg>
                     <div class="pc-ring-mid"><b id="pcRingPct">{{ $ringPct }}%</b><span>Complete</span></div>
                 </div>
-                <div class="pc-ring-note" id="pcRingNote">Fill in the four steps, then publish.</div>
+                <div class="pc-ring-note" id="pcRingNote">Fill in steps 1 to 4, then publish in step 5.</div>
                 <ul class="pc-ready-list" id="pcReadyList">
                     @foreach($ringSteps as $step)
                         <li data-ring-step="{{ $step['n'] }}" class="{{ $step['done'] ? 'on' : '' }}">
@@ -589,7 +589,19 @@
             <div class="pc-scard">
                 <h4>💡 Package Highlights</h4>
                 <ul class="pc-list">
-                    @foreach(['Appears in Package Search results', 'One contract. One payment.', 'Clients can customize add-ons', 'You control your availability', 'Build trust with verified badge'] as $h)
+                    {{-- "Build trust with verified badge" only when there is a
+                         badge to show. Every verification mark on the site was
+                         switched off on 23 September, and the professional's
+                         own Verification tab was promising the same thing
+                         until 29 October. Selling a package on the strength of
+                         a badge nobody can see is the same promise again. --}}
+                    @foreach(array_filter([
+                        'Appears in Package Search results',
+                        'One contract. One payment.',
+                        'Clients can customize add-ons',
+                        'You control your availability',
+                        \App\Support\VerifiedBadge::shown() ? 'Build trust with verified badge' : null,
+                    ]) as $h)
                         <li><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>{{ $h }}</li>
                     @endforeach
                 </ul>
@@ -752,7 +764,7 @@
         var note = document.getElementById('pcRingNote');
         if (note) note.textContent = pct === 100
             ? 'Everything is filled in. Go to step 5 to publish.'
-            : 'Fill in the four steps, then publish.';
+            : 'Fill in steps 1 to 4, then publish in step 5.';
 
         // Review step
         var rev = {
