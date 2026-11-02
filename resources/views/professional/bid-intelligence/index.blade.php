@@ -207,9 +207,11 @@
             <div class="bi-cc-h"><span class="ic" style="background:rgba(139,92,246,0.12);color:var(--accent-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span><div><b>Client Response Timers</b><p>See exactly how long clients spend reviewing your proposal.</p></div></div>
             <div class="bi-cc-prev">
                 <div class="bi-rt-title">Average Response Time</div>
-                @foreach($responseTimes as $rt)
+                @forelse($responseTimes as $rt)
                     <div class="bi-rt-row"><span class="dot" style="background:{{ $rt['color'] }};"></span><span class="nm">{{ $nameOf($rt['key']) }}</span><span class="v">{{ $rt['days'] }} days</span></div>
-                @endforeach
+                @empty
+                    <p style="font-size:12px;color:var(--text-muted);margin:0;">Nothing to measure yet. These fill in once clients have answered your proposals.</p>
+                @endforelse
             </div>
         </div>
         {{-- Follow-Up Reminder. Renamed from "Follow-Up Automation" (R29):
@@ -239,8 +241,12 @@
         <div class="bi-cc-card">
             <div class="bi-cc-h"><span class="ic" style="background:rgba(249,115,22,0.12);color:var(--brand-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="20" x2="12" y2="10"/><line x1="18" y1="20" x2="18" y2="4"/><line x1="6" y1="20" x2="6" y2="16"/></svg></span><div><b>Your Bid Pricing</b><p>What you have been bidding, on average.</p></div></div>
             <div class="bi-cc-prev">
-                <div class="bi-bm-amt">{{ $money($pricing['avg']) }}</div>
-                <div class="bi-bm-k">Your Average Bid</div>
+                @if($pricing['avg'] !== null)
+                    <div class="bi-bm-amt">{{ $money($pricing['avg']) }}</div>
+                    <div class="bi-bm-k">Your Average Bid</div>
+                @else
+                    <div class="bi-bm-k" style="margin:0;">No bids yet, so there is no average to show.</div>
+                @endif
             </div>
         </div>
     </div>

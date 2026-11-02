@@ -202,23 +202,34 @@
     <div class="pd-stats">
         <div class="pd-stat">
             <div class="pd-stat-top"><span class="pd-stat-ico c-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span><span class="pd-stat-label">Monthly Revenue</span></div>
-            <div class="pd-stat-val">$12,840</div>
-            <div class="pd-stat-foot"><span class="pd-stat-delta">▲ 22% vs last month</span><svg class="pd-stat-spark" width="40" height="18" viewBox="0 0 40 18" fill="none"><polyline points="0,14 8,11 16,12 24,6 32,8 40,2" stroke="#10b981" stroke-width="1.6"/></svg></div>
+            <div class="pd-stat-val">${{ number_format($stats['this_month_earnings'] ?? 0, 2) }}</div>
+            @php
+                // Built here rather than with directives in the markup:
+                // Blade will not compile a directive that follows a word
+                // character, so it printed the directive instead.
+                $__last = (float) ($stats['last_month_earnings'] ?? 0);
+                $__now  = (float) ($stats['this_month_earnings'] ?? 0);
+                $__move = $__last > 0 ? (int) round(($__now - $__last) / $__last * 100) : null;
+                $__trend = $__move === null
+                    ? 'Nothing last month to compare'
+                    : ($__move >= 0 ? '▲' : '▼') . ' ' . abs($__move) . '% vs last month';
+            @endphp
+            <div class="pd-stat-foot"><span class="pd-stat-delta muted">{{ $__trend }}</span></div>
         </div>
         <div class="pd-stat">
-            <div class="pd-stat-top"><span class="pd-stat-ico c-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span><span class="pd-stat-label">Active Proposals</span></div>
-            <div class="pd-stat-val">14</div>
-            <div class="pd-stat-foot"><span class="pd-stat-delta">▲ 27% vs last month</span><svg class="pd-stat-spark" width="40" height="18" viewBox="0 0 40 18" fill="none"><polyline points="0,12 8,13 16,8 24,10 32,5 40,4" stroke="#2563eb" stroke-width="1.6"/></svg></div>
+            <div class="pd-stat-top"><span class="pd-stat-ico c-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span><span class="pd-stat-label">Awaiting Your Response</span></div>
+            <div class="pd-stat-val">{{ $stats['awaiting_you'] ?? 0 }}</div>
+            <div class="pd-stat-foot"><span class="pd-stat-delta muted">Requests nobody has answered yet</span></div>
         </div>
         <div class="pd-stat">
             <div class="pd-stat-top"><span class="pd-stat-ico c-teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg></span><span class="pd-stat-label">Leads Received</span></div>
-            <div class="pd-stat-val">32</div>
-            <div class="pd-stat-foot"><span class="pd-stat-delta">▲ 12% last month</span><svg class="pd-stat-spark" width="40" height="18" viewBox="0 0 40 18" fill="none"><polyline points="0,13 8,9 16,11 24,7 32,9 40,3" stroke="#14b8a6" stroke-width="1.6"/></svg></div>
+            <div class="pd-stat-val">{{ $stats['leads_total'] ?? 0 }}</div>
+            <div class="pd-stat-foot"><span class="pd-stat-delta muted">Everything that has reached you</span></div>
         </div>
         <div class="pd-stat">
             <div class="pd-stat-top"><span class="pd-stat-ico c-purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><span class="pd-stat-label">Upcoming Gigs</span></div>
-            <div class="pd-stat-val">15</div>
-            <div class="pd-stat-foot"><span class="pd-stat-delta">▲ 3 this month</span><svg class="pd-stat-spark" width="40" height="18" viewBox="0 0 40 18" fill="none"><polyline points="0,10 8,11 16,9 24,10 32,6 40,5" stroke="#8b5cf6" stroke-width="1.6"/></svg></div>
+            <div class="pd-stat-val">{{ $stats['upcoming_gigs'] ?? 0 }}</div>
+            <div class="pd-stat-foot"><span class="pd-stat-delta muted">Confirmed and still ahead of you</span></div>
         </div>
         <div class="pd-stat">
             {{-- "Win Rate" is derived from sealed bid outcomes — a leak the rules
@@ -229,14 +240,14 @@
             <div class="pd-stat-foot"><span class="pd-stat-delta">Open on the board now</span></div>
         </div>
         <div class="pd-stat">
-            <div class="pd-stat-top"><span class="pd-stat-ico c-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span><span class="pd-stat-label">Response Time (Avg)</span><svg class="pd-stat-info" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></div>
-            <div class="pd-stat-val">18m</div>
-            <div class="pd-stat-foot"><span class="pd-stat-delta">Excellent</span><svg class="pd-stat-spark" width="40" height="18" viewBox="0 0 40 18" fill="none"><polyline points="0,8 8,9 16,7 24,8 32,6 40,7" stroke="#2563eb" stroke-width="1.6"/></svg></div>
+            <div class="pd-stat-top"><span class="pd-stat-ico c-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span><span class="pd-stat-label">Average Rating</span></div>
+            <div class="pd-stat-val">@if(($stats['review_count'] ?? 0) > 0){{ number_format($stats['avg_rating'] ?? 0, 1) }}@else&mdash;@endif</div>
+            <div class="pd-stat-foot"><span class="pd-stat-delta muted">{{ $stats['review_count'] ?? 0 }} {{ ($stats['review_count'] ?? 0) === 1 ? 'review' : 'reviews' }}</span></div>
         </div>
         <div class="pd-stat">
-            <div class="pd-stat-top"><span class="pd-stat-ico c-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span><span class="pd-stat-label">Visibility Score</span><svg class="pd-stat-info" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg></div>
-            <div class="pd-stat-val">92<span style="font-size:12px;color:var(--text-muted);font-weight:700;">/100</span></div>
-            <div class="pd-stat-foot"><span class="pd-stat-delta">Excellent</span><svg class="pd-stat-spark" width="40" height="18" viewBox="0 0 40 18" fill="none"><polyline points="0,11 8,8 16,9 24,5 32,6 40,3" stroke="#10b981" stroke-width="1.6"/></svg></div>
+            <div class="pd-stat-top"><span class="pd-stat-ico c-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span><span class="pd-stat-label">Total Booked</span></div>
+            <div class="pd-stat-val">${{ number_format($stats['total_booked'] ?? 0, 2) }}</div>
+            <div class="pd-stat-foot"><span class="pd-stat-delta muted">All of your confirmed work</span></div>
         </div>
         <div class="pd-stat">
             <div class="pd-stat-top"><span class="pd-stat-ico c-orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span><span class="pd-stat-label">Payment Pending</span></div>
@@ -277,56 +288,38 @@
                 <span class="pd-card-title">Gig Operations Hub</span>
                 <a href="{{ route('professional.gig-hub.index', ['tab' => 'gigs']) }}" class="pd-card-link">View All Gigs <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
             </div>
-            <div class="pd-tabs">
-                <span class="pd-tab active">All Gigs (15)</span>
-                <span class="pd-tab">In Progress (6)</span>
-                <span class="pd-tab">Completed (48)</span>
-                <span class="pd-tab">Upcoming Today (5)</span>
-            </div>
             <div class="pd-gtable-wrap">
             <table class="pd-gtable">
-                <thead><tr><th>Event / Client</th><th>Date</th><th>Budget</th><th>Status</th><th>Staff</th><th>Progress</th></tr></thead>
+                {{-- Five invented jobs stood here, with a client's name on each
+                     one: Corporate Gala Dinner for ABC Corporation, a wedding
+                     for Emily & Michael, and so on, together with staffing
+                     counts and progress rings for work nobody had done. The
+                     controller was loading this professional's five most recent
+                     bookings the whole time and the table never used them.
+
+                     Staff and Progress are gone rather than guessed: a booking
+                     carries no progress figure, and the crew assigned to one is
+                     the point of contact, which the gig page shows properly. --}}
+                <thead><tr><th>Event / Client</th><th>Date</th><th>Amount</th><th>Status</th></tr></thead>
                 <tbody>
-                    <tr>
-                        <td><div class="pd-g-event"><span class="pd-g-thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><div><div class="pd-g-name">Corporate Gala Dinner</div><div class="pd-g-client">ABC Corporation</div></div></div></td>
-                        <td class="pd-g-date">May 30, 2026</td>
-                        <td class="pd-g-budget">$3,000 - $5,000</td>
-                        <td><span class="pd-g-status st-confirmed">Confirmed</span></td>
-                        <td><span class="pd-g-staff">6/6 <span class="chat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>2</span></span></td>
-                        <td><span class="pd-ring" style="background:conic-gradient(#10b981 92%, var(--border-color) 0);"><span style="width:22px;height:22px;border-radius:50%;background:var(--bg-card);display:flex;align-items:center;justify-content:center;">92%</span></span></td>
-                    </tr>
-                    <tr>
-                        <td><div class="pd-g-event"><span class="pd-g-thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></span><div><div class="pd-g-name">Outdoor Wedding Reception</div><div class="pd-g-client">Emily & Michael</div></div></div></td>
-                        <td class="pd-g-date">Jun 14, 2026</td>
-                        <td class="pd-g-budget">$2,000 - $4,000</td>
-                        <td><span class="pd-g-status st-confirmed">Confirmed</span></td>
-                        <td><span class="pd-g-staff">3/5 <span class="chat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>4</span></span></td>
-                        <td><span class="pd-ring" style="background:conic-gradient(#f59e0b 75%, var(--border-color) 0);"><span style="width:22px;height:22px;border-radius:50%;background:var(--bg-card);display:flex;align-items:center;justify-content:center;">75%</span></span></td>
-                    </tr>
-                    <tr>
-                        <td><div class="pd-g-event"><span class="pd-g-thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></span><div><div class="pd-g-name">Tech Conference 2026</div><div class="pd-g-client">Tech Innovators</div></div></div></td>
-                        <td class="pd-g-date">Jun 17, 2026</td>
-                        <td class="pd-g-budget">$1,500 - $3,000</td>
-                        <td><span class="pd-g-status st-inprogress">In Progress</span></td>
-                        <td><span class="pd-g-staff">3/5 <span class="chat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>4</span></span></td>
-                        <td><span class="pd-ring" style="background:conic-gradient(#f59e0b 60%, var(--border-color) 0);"><span style="width:22px;height:22px;border-radius:50%;background:var(--bg-card);display:flex;align-items:center;justify-content:center;">60%</span></span></td>
-                    </tr>
-                    <tr>
-                        <td><div class="pd-g-event"><span class="pd-g-thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="6"/><path d="M15.477 12.89L17 22l-5-3-5 3 1.523-9.11"/></svg></span><div><div class="pd-g-name">Private Birthday Party</div><div class="pd-g-client">Jason Carter</div></div></div></td>
-                        <td class="pd-g-date">May 22, 2026</td>
-                        <td class="pd-g-budget">$900 - $1,400</td>
-                        <td><span class="pd-g-status st-today">Today</span></td>
-                        <td><span class="pd-g-staff">7/7 <span class="chat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>1</span></span></td>
-                        <td><span class="pd-ring" style="background:conic-gradient(#10b981 100%, var(--border-color) 0);"><span style="width:22px;height:22px;border-radius:50%;background:var(--bg-card);display:flex;align-items:center;justify-content:center;">100%</span></span></td>
-                    </tr>
-                    <tr>
-                        <td><div class="pd-g-event"><span class="pd-g-thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12h20"/><path d="M5 12a7 7 0 0 1 14 0"/><path d="M2 12a10 10 0 0 0 20 0"/></svg></span><div><div class="pd-g-name">Beach Wedding Ceremony</div><div class="pd-g-client">Sarah Johnson</div></div></div></td>
-                        <td class="pd-g-date">Jun 6, 2026</td>
-                        <td class="pd-g-budget">$1,800 - $2,400</td>
-                        <td><span class="pd-g-status st-confirmed">Confirmed</span></td>
-                        <td><span class="pd-g-staff">4/6 <span class="chat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>0</span></span></td>
-                        <td><span class="pd-ring" style="background:conic-gradient(#10b981 80%, var(--border-color) 0);"><span style="width:22px;height:22px;border-radius:50%;background:var(--bg-card);display:flex;align-items:center;justify-content:center;">80%</span></span></td>
-                    </tr>
+                    @forelse($recentBookings as $__b)
+                        <tr>
+                            <td>
+                                <div class="pd-g-event">
+                                    <span class="pd-g-thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>
+                                    <div>
+                                        <div class="pd-g-name">{{ $__b->event?->title ?? 'Untitled event' }}</div>
+                                        <div class="pd-g-client">{{ $__b->client?->name ?? 'Client removed' }}</div>
+                                    </div>
+                                </div>
+                            </td>
+                            <td class="pd-g-date">{{ $__b->event?->starts_at?->format('M d, Y') ?? 'No date set' }}</td>
+                            <td class="pd-g-budget">${{ number_format((float) $__b->price, 2) }}</td>
+                            <td><span class="pd-g-status st-confirmed">{{ ucfirst($__b->status) }}</span></td>
+                        </tr>
+                    @empty
+                        <tr><td colspan="4" style="padding:18px;text-align:center;color:var(--text-muted);font-size:12px;">Nothing booked yet. Gigs you win appear here.</td></tr>
+                    @endforelse
                 </tbody>
             </table>
             </div>
@@ -345,21 +338,23 @@
                 <a href="{{ route('professional.bid-intelligence.index') }}" class="pd-card-link">View Full Pipeline <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
             </div>
             <div class="pd-bid-body">
-                <div class="pd-donut"><div class="pd-donut-c"><b>25</b><span>Total Bids</span></div></div>
+                <div class="pd-donut"><div class="pd-donut-c"><b>{{ $bidTotal }}</b><span>{{ $bidTotal === 1 ? 'Bid' : 'Bids' }}</span></div></div>
                 <div class="pd-bid-legend">
-                    <div class="pd-bid-leg"><span class="pd-bid-dot" style="background:#2563eb;"></span><span class="nm">Invited</span><span class="ct">8</span><span class="pc">(32%)</span></div>
-                    <div class="pd-bid-leg"><span class="pd-bid-dot" style="background:#8b5cf6;"></span><span class="nm">Submitted</span><span class="ct">6</span><span class="pc">(24%)</span></div>
-                    <div class="pd-bid-leg"><span class="pd-bid-dot" style="background:#06b6d4;"></span><span class="nm">Viewed</span><span class="ct">4</span><span class="pc">(16%)</span></div>
-                    <div class="pd-bid-leg"><span class="pd-bid-dot" style="background:#f59e0b;"></span><span class="nm">Negotiation</span><span class="ct">3</span><span class="pc">(12%)</span></div>
-                    <div class="pd-bid-leg"><span class="pd-bid-dot" style="background:#10b981;"></span><span class="nm">Won</span><span class="ct">3</span><span class="pc">(12%)</span></div>
-                    <div class="pd-bid-leg"><span class="pd-bid-dot" style="background:#ef4444;"></span><span class="nm">Lost</span><span class="ct">1</span><span class="pc">(4%)</span></div>
+                    @forelse($bidBreakdown as $__row)
+                        <div class="pd-bid-leg">
+                            <span class="pd-bid-dot" style="background:{{ $__row['color'] }};"></span>
+                            <span class="nm">{{ $__row['label'] }}</span>
+                            <span class="ct">{{ $__row['count'] }}</span>
+                            <span class="pc">({{ $bidTotal > 0 ? (int) round($__row['count'] / $bidTotal * 100) : 0 }}%)</span>
+                        </div>
+                    @empty
+                        <p style="font-size:12px;color:var(--text-muted);margin:0;">You have not bid on anything yet.</p>
+                    @endforelse
                 </div>
             </div>
-            <div class="pd-bid-rec">
-                <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 3l1.9 4.6L18.5 9.5 13.9 11.4 12 16l-1.9-4.6L5.5 9.5 10.1 7.6 12 3z"/></svg></span>
-                <div class="pd-bid-rec-txt"><b>Recommendation</b>Wedding packages are winning 21% more than DJ-only packages.</div>
-                <svg class="pd-bid-rec-spark" width="44" height="26" viewBox="0 0 44 26" fill="none"><polyline points="0,22 9,16 18,18 27,9 36,11 44,3" stroke="#10b981" stroke-width="1.8"/></svg>
-            </div>
+            {{-- A "Recommendation" sat here: wedding packages were winning 21%
+                 more than DJ-only packages. Nothing measured it, and a figure
+                 about what wins work is one a professional prices against. --}}
         </div>
 
         {{-- Finance Hub --}}
@@ -369,12 +364,14 @@
                 <span class="pd-card-title">Finance Hub</span>
             </div>
             <div class="pd-fin-grid">
-                <div class="pd-fin-box"><div class="k">Available Balance</div><div class="v">$4,250.00</div></div>
-                <div class="pd-fin-box"><div class="k">Secure Payment Held</div><div class="v">$7,850.00</div></div>
+                {{-- Three boxes, because three are the ones anything stands
+                     behind. "Secure Payment Held", "Taxes Owed" and
+                     "Est. Profit (MTD)" were $7,850, $1,250 and $6,450 typed
+                     into the page: there is no escrow balance, no tax figure
+                     and no cost side to profit from anywhere in the system. --}}
+                <div class="pd-fin-box"><div class="k">Available Balance</div><div class="v">${{ number_format($stats['available_balance'] ?? 0, 2) }}</div></div>
                 <div class="pd-fin-box"><div class="k">Pending Payout</div><div class="v">${{ number_format($stats['pending_payout'] ?? 0, 2) }}</div></div>
-                <div class="pd-fin-box"><div class="k">Released This Month</div><div class="v green">$9,640.00</div></div>
-                <div class="pd-fin-box"><div class="k">Taxes Owed</div><div class="v amber">$1,250.00</div></div>
-                <div class="pd-fin-box"><div class="k">Est. Profit (MTD)</div><div class="v">$6,450.00</div></div>
+                <div class="pd-fin-box"><div class="k">Earned This Month</div><div class="v green">${{ number_format($stats['this_month_earnings'] ?? 0, 2) }}</div></div>
             </div>
             <div class="pd-fin-actions">
                 <a href="{{ route('professional.transactions.index') }}" class="pd-fin-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Invoices</a>
@@ -389,26 +386,23 @@
                 <a href="{{ route('professional.calendar.index') }}" class="pd-card-link">View Calendar <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
             </div>
             <div class="pd-sch-list">
-                <div class="pd-sch-row"><span class="pd-sch-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span><span class="pd-sch-time">1:00 PM</span><span class="pd-sch-body"><span class="pd-sch-name">Drive to Venue</span></span><span class="pd-sch-dur">30 min</span></div>
-                <div class="pd-sch-row"><span class="pd-sch-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/></svg></span><span class="pd-sch-time">1:30 PM</span><span class="pd-sch-body"><span class="pd-sch-name">Setup Time</span></span><span class="pd-sch-dur">1 hr</span></div>
-                <div class="pd-sch-row"><span class="pd-sch-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><span class="pd-sch-time">2:30 PM</span><span class="pd-sch-body"><span class="pd-sch-name">Corporate Gala Dinner</span></span><span class="pd-sch-dur">6:00 PM</span></div>
-                <div class="pd-sch-row"><span class="pd-sch-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><span class="pd-sch-time">6:00 PM</span><span class="pd-sch-body"><span class="pd-sch-name">Breakdown</span></span><span class="pd-sch-dur">1 hr</span></div>
+                @forelse($todaySchedule as $__t)
+                    <div class="pd-sch-row">
+                        <span class="pd-sch-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>
+                        <span class="pd-sch-time">{{ $__t->event?->starts_at?->format('g:i A') ?? '' }}</span>
+                        <span class="pd-sch-body"><span class="pd-sch-name">{{ $__t->event?->title ?? 'Untitled event' }}</span></span>
+                        <span class="pd-sch-dur">{{ $__t->event?->ends_at?->format('g:i A') ?? '' }}</span>
+                    </div>
+                @empty
+                    <p style="font-size:12px;color:var(--text-muted);margin:0;padding:4px 0;">Nothing booked for today.</p>
+                @endforelse
             </div>
             <a href="{{ route('professional.calendar.index') }}" class="pd-sch-open">Open Full Calendar →</a>
-            <div class="pd-map">
-                <div class="pd-map-grid"></div>
-                <div class="pd-map-route"></div>
-                <span class="pd-map-pin" style="top:26%; left:16%;"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7z"/></svg></span>
-                <span class="pd-map-pin" style="bottom:24%; right:22%;"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2a7 7 0 0 0-7 7c0 5 7 13 7 13s7-8 7-13a7 7 0 0 0-7-7z"/></svg></span>
-                <span class="pd-map-label">Baltimore, MD</span>
-            </div>
-            <div class="pd-meta-row">
-                <div class="pd-meta-box"><svg viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.2" y1="4.2" x2="5.6" y2="5.6"/><line x1="18.4" y1="18.4" x2="19.8" y2="19.8"/></svg><div><div class="t">84°F</div><div class="s">Partly Cloudy</div></div></div>
-                <div class="pd-meta-box"><svg viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"/></svg><div><div class="t">20%</div><div class="s">Rain</div></div></div>
-            </div>
-            <div class="pd-traffic">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 17H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h11v11"/><circle cx="7.5" cy="17.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/><path d="M16 8h3l3 4v3h-2"/></svg>
-                <span><b>Traffic is light</b> · 25 min to venue</span>
+            {{-- A drawn map with two pins, "84°F Partly Cloudy", "20% Rain"
+                 and "Traffic is light · 25 min to venue" stood here. None of
+                 it came from anywhere: there is no map or weather provider
+                 connected, which is one of the open items with Sir Peter.
+                 Put it back when there is something real behind it. --}}
             </div>
         </div>
     </div>

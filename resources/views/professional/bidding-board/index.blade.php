@@ -426,9 +426,12 @@
                     <span>$</span>
                     <input type="number" name="amount" id="bbAmount" min="1" step="1" placeholder="0" required>
                 </div>
-                <div class="bb-net" id="bbNet" data-commission="{{ $commissionPct ?? 5 }}"
+                {{-- The rate comes from Commission, which is the one place that
+                     knows it. A literal 5 here happens to match Starter today
+                     and would quietly stop matching the day a rate changes. --}}
+                <div class="bb-net" id="bbNet" data-commission="{{ $commissionPct ?? \App\Support\Commission::rateFor(auth()->user()) }}"
                      style="margin-top:8px;font-size:12.5px;color:var(--text-muted);display:none;">
-                    Platform commission ({{ rtrim(rtrim(number_format($commissionPct ?? 5, 2), '0'), '.') }}%):
+                    Platform commission ({{ rtrim(rtrim(number_format($commissionPct ?? \App\Support\Commission::rateFor(auth()->user()), 2), '0'), '.') }}%):
                     <b id="bbFee" style="color:var(--text-primary);">$0</b>
                     · You net <b id="bbNetAmt" style="color:var(--ok-text);">$0</b>
                     <span style="display:block;margin-top:2px;">Deducted only on a finalized contract, never on bids that don't win.</span>

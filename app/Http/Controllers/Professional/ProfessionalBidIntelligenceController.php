@@ -106,24 +106,32 @@ class ProfessionalBidIntelligenceController extends Controller
         if ($avgBid <= 0) {
             $avgBid = (float) Event::where('is_published', true)->whereNotNull('budget')->avg('budget');
         }
-        $avgBid = $avgBid > 0 ? round($avgBid) : 3200;
+        // Null rather than 3200. A professional with no bids was shown an
+        // average bid of $3,200, which is a figure about their own pricing
+        // that nobody had worked out.
+        $avgBid = $avgBid > 0 ? round($avgBid) : null;
 
         // ── Response timers (real where data exists, else fallback) ─
-        $avgDays = function ($query, float $fallback) {
+        $avgDays = function ($query) {
             $rows = $query->get(['created_at', 'updated_at']);
             if ($rows->isEmpty()) {
-                return $fallback;
+                return null;
             }
             $sum = $rows->sum(fn ($r) => $r->created_at->floatDiffInDays($r->updated_at));
             return round($sum / $rows->count(), 1);
         };
-        $responseTimes = [
-            ['key' => 'invited',   'color' => self::COLORS['invited'],   'days' => 2.1],
-            ['key' => 'submitted', 'color' => self::COLORS['submitted'], 'days' => $avgDays($base()->where('status', 'requested'), 1.8)],
-            ['key' => 'viewed',    'color' => self::COLORS['viewed'],    'days' => 3.2],
-            ['key' => 'won',       'color' => self::COLORS['won'],       'days' => $avgDays($base()->whereIn('status', ['confirmed', 'completed']), 2.6)],
-            ['key' => 'lost',      'color' => self::COLORS['lost'],      'days' => $avgDays($base()->where('status', 'cancelled'), 1.5)],
-        ];
+        /*
+         * Three stages are measured. "Invited" and "viewed" were 2.1 and 3.2
+         * days, typed in and never worked out from anything, sitting in the
+         * same chart as the three that are real. A bar nobody measured does
+         * not belong beside bars that were, so they are gone rather than
+         * given a number of their own.
+         */
+        $responseTimes = array_values(array_filter([
+            ['key' => 'submitted', 'color' => self::COLORS['submitted'], 'days' => $avgDays($base()->where('status', 'requested'))],
+            ['key' => 'won',       'color' => self::COLORS['won'],       'days' => $avgDays($base()->whereIn('status', ['confirmed', 'completed']))],
+            ['key' => 'lost',      'color' => self::COLORS['lost'],      'days' => $avgDays($base()->where('status', 'cancelled'))],
+        ], fn ($row) => $row['days'] !== null));
 
         // Only the professional's own average is real, so only that is
         // shown. The low/mid/high band that used to sit beside it was this
