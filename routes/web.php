@@ -1278,6 +1278,15 @@ Route::middleware('auth')->group(function () {
         // amended 2026-08-05). Same reason as Contracts above.
         Route::get('/gigs', fn () => redirect()->route('professional.gig-hub.index', ['tab' => 'gigs']))
             ->middleware('permission:events.view_any')->name('professional.gigs.index');
+        /*
+         * My Services & Pricing. Choosing WHICH services stays on the
+         * profile; this is what each one costs, which had nowhere to live.
+         */
+        Route::get('/services', [\App\Http\Controllers\Professional\ProfessionalServicePricingController::class, 'index'])
+            ->name('professional.services.index');
+        Route::patch('/services', [\App\Http\Controllers\Professional\ProfessionalServicePricingController::class, 'update'])
+            ->name('professional.services.update');
+
         // Before /gigs/{event}, or "export" is read as an event id.
         Route::get('/gigs/export', [ProfessionalGigController::class, 'export'])
             ->middleware('permission:events.view_any')->name('professional.gigs.export');
