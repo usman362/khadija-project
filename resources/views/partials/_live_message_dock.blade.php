@@ -16,10 +16,21 @@
     thing.
 --}}
 @auth
-@if(\App\Support\MessengerAccess::dock(auth()->user()) && ! request()->routeIs('client.chat.*'))
+@if(\App\Support\MessengerAccess::dock(auth()->user()) && ! request()->routeIs('client.chat.*', 'professional.chat.*'))
 @php
     $__lmdUser = auth()->user();
-    $__lmdFull = route('client.chat.index');
+
+    /*
+     * Which Messages this reader's own is.
+     *
+     * The dock was written for both sides from the start: the colours, the
+     * accent and the third menu item all follow the role already. Three
+     * routes stayed on the client's, which is why it could only ever be put
+     * on client pages. A professional sent to /client/messages lands
+     * somewhere that is not theirs.
+     */
+    $__lmdHome = \App\Support\RoleColours::roleOf($__lmdUser) === 'professional' ? 'professional' : 'client';
+    $__lmdFull = route($__lmdHome . '.chat.index');
     /*
      * One colour per account type (Sir Peter, 22 Sep): client orange,
      * professional blue, admin green, influencer purple. It drives your own
@@ -363,7 +374,7 @@
         send: @json(route('conversations.messages.store', ['conversation' => '__ID__'])),
         read: @json(route('conversations.mark-read', ['conversation' => '__ID__'])),
         mute: @json(route('conversations.mute', ['conversation' => '__ID__'])),
-        page: @json(route('client.chat.show', ['conversation' => '__ID__'])),
+        page: @json(route($__lmdHome . '.chat.show', ['conversation' => '__ID__'])),
     };
     var POLL_MS = 20000;
     var KEY = 'lmd.v1', SEEN = 'lmd.seen', DND = 'lmd.dnd';
@@ -992,7 +1003,7 @@
                 data-tip="Do Not Disturb" aria-label="Do Not Disturb">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
         </button>
-        <a class="lmd-cbtn" href="{{ route('client.notifications.index') }}" data-tip="Message Settings" aria-label="Message Settings">
+        <a class="lmd-cbtn" href="{{ route($__lmdHome . '.notifications.index') }}" data-tip="Message Settings" aria-label="Message Settings">
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1a1.7 1.7 0 0 0-1.1-1.5 1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1a1.7 1.7 0 0 0 1.5-1.1 1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></svg>
         </a>
     </div>

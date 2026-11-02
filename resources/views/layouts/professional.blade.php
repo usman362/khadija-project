@@ -982,11 +982,28 @@
         /* ═══════════════════════ LOGOUT BUTTON ═══════════════════════ */
     </style>
     @include('partials._a11y')
+    @include('partials._searchable_select')
+
     {{-- Idea 3: whether a professional gets the pop-up messenger is decided by
-         their membership, in MessengerAccess — not by which layout they are on.
-         Included ahead of the styles stack, because a @push after its @stack
-         has already rendered goes nowhere. --}}
-    @include('partials._message_dock')
+         their membership, in MessengerAccess, not by which layout they are on.
+         Run ahead of the styles stack, because a @push after its @stack has
+         already rendered goes nowhere.
+
+         Run here but PRINTED IN THE BODY, which is the same fix the client
+         layout carries and this one did not: a <div> inside <head> ends the
+         head early, so the bar and its icons drew before any of their CSS and
+         flashed at full size on every page load.
+
+         The live dock is here now too. It was written for both sides from the
+         start, with the role's own colours and its own third menu item, but
+         three of its routes pointed at the client's Messages, so a
+         professional using it landed somewhere that was not theirs. Those
+         follow the role now. The launcher is off because the live bar is the
+         way in, and two of them is one too many. --}}
+    @php ob_start(); @endphp
+    @include('partials._message_dock', ['launcher' => false])
+    @include('partials._live_message_dock')
+    @php $__dockMarkup = ob_get_clean(); @endphp
 
     @stack('styles')
 </head>
@@ -1301,6 +1318,9 @@
 
     {{-- Shared role enable confirmation modal --}}
     @include('partials._role_enable_modal')
+
+    {{-- The docks' markup, held back from <head> above. --}}
+    {!! $__dockMarkup ?? '' !!}
 
     {{-- AI Chatbot floating widget --}}
     @include('partials._ai_chatbot_widget')

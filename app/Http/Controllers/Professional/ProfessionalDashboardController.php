@@ -54,7 +54,14 @@ class ProfessionalDashboardController extends Controller
             'pending_count'       => $money['pendingCount'],
             'this_month_earnings' => $thisMonthNet,
             'last_month_earnings' => $lastMonthNet,
-            'total_booked' => $money['total'],
+            /*
+             * Earnings' 'total' is a COUNT of bookings, not money. Printed
+             * through number_format with a dollar sign in front it turned
+             * eight completed jobs worth $3,330 into "$8.00". 'earned' is the
+             * money, net of commission, which is the basis the Earnings and
+             * Transactions pages use.
+             */
+            'total_booked' => $money['earned'],
             'avg_rating'   => round((float) Review::where('reviewee_id', $user->id)->where('is_hidden', false)->avg('rating'), 1),
             'review_count' => $reviewCount,
 
