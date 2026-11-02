@@ -267,16 +267,19 @@
             <div class="pd-card-head">
                 <span class="pd-card-ico c-orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span>
                 <span class="pd-card-title">Priority Actions</span>
-                <span class="pd-pill-count">7</span>
+                <span class="pd-pill-count">{{ $attention->sum('count') }}</span>
                 <a href="{{ route('professional.priority.index') }}" class="pd-card-link">View All <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
             </div>
             <div class="pd-pa">
-                <div class="pd-pa-row"><span class="pd-pa-ico c-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span><div class="pd-pa-body"><div class="pd-pa-title">Contract awaiting signature</div><div class="pd-pa-sub">Corporate Gala Dinner</div></div><span class="pd-pa-pri pri-high">High</span></div>
-                <div class="pd-pa-row"><span class="pd-pa-ico c-orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span><div class="pd-pa-body"><div class="pd-pa-title">Staffing shortage detected</div><div class="pd-pa-sub">Outdoor Wedding</div></div><span class="pd-pa-pri pri-medium">Medium</span></div>
-                <div class="pd-pa-row"><span class="pd-pa-ico c-purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span><div class="pd-pa-body"><div class="pd-pa-title">2 bids expire in 2 hours</div><div class="pd-pa-sub">Tech Conference 2026</div></div><span class="pd-pa-pri pri-medium">Medium</span></div>
-                <div class="pd-pa-row"><span class="pd-pa-ico c-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg></span><div class="pd-pa-body"><div class="pd-pa-title">Payment released</div><div class="pd-pa-sub">Private Birthday Party</div></div><span class="pd-pa-pri pri-low">Low</span></div>
-                <div class="pd-pa-row"><span class="pd-pa-ico c-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><div class="pd-pa-body"><div class="pd-pa-title">Calendar conflict</div><div class="pd-pa-sub">May 24 – Double Booking</div></div><span class="pd-pa-pri pri-high">High</span></div>
-                <div class="pd-pa-row"><span class="pd-pa-ico c-orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span><div class="pd-pa-body"><div class="pd-pa-title">Late invoice</div><div class="pd-pa-sub">Invoice #INV-2026-1048</div></div><span class="pd-pa-pri pri-medium">Medium</span></div>
+                @forelse($attention as $__a)
+                    <a href="{{ $__a['to'] }}" class="pd-pa-row" style="text-decoration:none;">
+                        <span class="pd-pa-ico {{ $__a['tone'] }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></span>
+                        <div class="pd-pa-body"><div class="pd-pa-title">{{ $__a['title'] }}</div></div>
+                        <span class="pd-pa-pri pri-medium">{{ $__a['count'] }}</span>
+                    </a>
+                @empty
+                    <p style="font-size:12px;color:var(--text-muted);margin:0;padding:4px 0;">Nothing needs you right now.</p>
+                @endforelse
             </div>
             <div class="pd-pa-foot"><a href="{{ route('professional.priority.index') }}">View All Actions →</a></div>
         </div>

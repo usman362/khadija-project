@@ -82,7 +82,15 @@ class AnEmptyProfessionalSeesNoFiguresTest extends TestCase
             $money = array_diff($money[0], ['$0', '$0.00']);
             $pct   = array_diff($pct[0], ['0%', '100%', $this->commissionRate($pro)]);
 
-            $found = array_values(array_unique(array_merge($money, $pct)));
+            /*
+             * Invoice #INV-2026-1048 slipped past the first version of this,
+             * because a reference number carries neither a currency symbol
+             * nor a percent sign. So anything shaped like a record's own
+             * identifier counts too.
+             */
+            preg_match_all('/#[A-Z]{2,}-[0-9][0-9-]*/u', $text, $refs);
+
+            $found = array_values(array_unique(array_merge($money, $pct, $refs[0])));
 
             if ($found) {
                 $offenders[] = str_replace('professional.', '', $name) . ': ' . implode(' ', $found);

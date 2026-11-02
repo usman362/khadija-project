@@ -114,6 +114,49 @@ class ProfessionalDashboardController extends Controller
 
         $bidTotal = (int) $bidCounts->sum();
 
+        /*
+         * What actually wants this professional's attention, counted the same
+         * way the Priority Actions page counts it so the two never disagree.
+         *
+         * The card used to list six fixed rows under a pill reading 7: a
+         * contract awaiting signature on a Corporate Gala Dinner, a staffing
+         * shortage, two bids expiring in two hours, a payment released, a
+         * calendar conflict on May 24 and a late invoice numbered
+         * INV-2026-1048. None of it belonged to anybody.
+         */
+        $attention = collect([
+            [
+                'title' => 'Agreements awaiting your signature',
+                'count' => \App\Models\Finalization::where('supplier_id', $user->id)
+                    ->whereNotNull('client_signed_at')
+                    ->whereNull('supplier_signed_at')
+                    ->count(),
+                'tone'  => 'c-blue',
+                'to'    => route('professional.agreements.index'),
+            ],
+            [
+                'title' => 'Requests waiting for your answer',
+                'count' => $stats['awaiting_you'],
+                'tone'  => 'c-purple',
+                'to'    => route('professional.proposals.index'),
+            ],
+            [
+                'title' => 'Shifts still open on your crew',
+                'count' => \App\Models\Shift::where('supplier_id', $user->id)
+                    ->where('status', 'open')->count(),
+                'tone'  => 'c-orange',
+                'to'    => route('professional.team.index'),
+            ],
+            [
+                'title' => 'Reviews you have not replied to',
+                'count' => \App\Models\Review::where('reviewee_id', $user->id)
+                    ->where('is_hidden', false)
+                    ->whereNull('response')->count(),
+                'tone'  => 'c-green',
+                'to'    => route('professional.reviews.index'),
+            ],
+        ])->filter(fn ($row) => $row['count'] > 0)->values();
+
         // Recent bookings
         $recentBookings = Booking::where('supplier_id', $user->id)
             ->with(['event:id,title,starts_at', 'client:id,name'])
@@ -139,7 +182,7 @@ class ProfessionalDashboardController extends Controller
         $feed = OpportunityFeed::for($user, $myServicesOnly);
 
         return view('professional.dashboard', compact(
-            'stats', 'recentBookings', 'todaySchedule', 'bidBreakdown', 'bidTotal',
+            'stats', 'recentBookings', 'todaySchedule', 'bidBreakdown', 'bidTotal', 'attention',
             'subscription', 'feed', 'myServicesOnly'
         ));
     }
