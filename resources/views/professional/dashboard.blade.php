@@ -121,6 +121,9 @@
     .pd-g-budget { font-weight: 600; color: var(--text-primary); }
     .pd-g-status { font-size: 9.5px; font-weight: 800; padding: 3px 8px; border-radius: 6px; white-space: nowrap; }
     .st-confirmed { background: rgba(16,185,129,0.12); color: var(--ok-text); }
+    .st-waiting   { background: rgba(245,158,11,0.14); color: var(--brand-text); }
+    .st-off       { background: rgba(239,68,68,0.12); color: var(--bad-text); }
+    .st-quiet     { background: rgba(148,163,184,0.18); color: var(--text-muted); }
     .st-inprogress { background: rgba(245,158,11,0.14); color: var(--warn-text); }
     .st-today { background: rgba(37,99,235,0.12); color: var(--info-text); }
     .pd-g-staff { font-size: 11px; color: var(--text-secondary); display: inline-flex; align-items: center; gap: 7px; white-space: nowrap; }
@@ -318,7 +321,18 @@
                             </td>
                             <td class="pd-g-date">{{ $__b->event?->starts_at?->format('M d, Y') ?? 'No date set' }}</td>
                             <td class="pd-g-budget">${{ number_format((float) $__b->price, 2) }}</td>
-                            <td><span class="pd-g-status st-confirmed">{{ ucfirst($__b->status) }}</span></td>
+                            @php
+                                // One class for every status printed green, so
+                                // a cancelled booking wore the colour that
+                                // means it went well.
+                                $__tone = match ($__b->status) {
+                                    'confirmed', 'completed'  => 'st-confirmed',
+                                    'cancelled', 'declined'   => 'st-off',
+                                    'requested', 'pending'    => 'st-waiting',
+                                    default                   => 'st-quiet',
+                                };
+                            @endphp
+                            <td><span class="pd-g-status {{ $__tone }}">{{ ucfirst($__b->status) }}</span></td>
                         </tr>
                     @empty
                         <tr><td colspan="4" style="padding:18px;text-align:center;color:var(--text-muted);font-size:12px;">Nothing booked yet. Gigs you win appear here.</td></tr>

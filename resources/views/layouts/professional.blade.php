@@ -1282,7 +1282,28 @@
                         <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
                     </button>
 
-                    @include('partials._topbar-messages', ['portal' => 'professional'])
+                    {{-- The AI assistant as a header icon beside the theme
+                         toggle, the same as the client side, rather than a
+                         floating bubble. Sir Peter, 11 September. The bubble
+                         sat over the page content in the bottom corner and,
+                         now that the live message bar is here too, the two
+                         were stacked on top of each other. Same condition the
+                         assistant itself uses to appear at all. --}}
+                    @php
+                        $__aiOn = auth()->check()
+                            && (bool) \App\Models\Setting::get('chatbot.enabled', true)
+                            && ! empty(\App\Models\Setting::get('openai.api_key') ?: config('services.openai.key'));
+                    @endphp
+                    @if($__aiOn)
+                        <button type="button" class="cl-theme-toggle cl-ai-toggle" data-ai-open title="AI Assistant" aria-label="Open AI assistant">
+                            <svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/></svg>
+                        </button>
+                    @endif
+
+                    {{-- opensDock, now that the live bar is on these pages too:
+                         the icon opens the messages window rather than leaving
+                         the page, which is what it does for a client. --}}
+                    @include('partials._topbar-messages', ['portal' => 'professional', 'opensDock' => true])
 
                     {{-- Notifications bell + account, both real dropdowns --}}
                     @include('partials._topbar-menus', ['portal' => 'professional', 'trigger' => 'avatar'])
@@ -1322,8 +1343,9 @@
     {{-- The docks' markup, held back from <head> above. --}}
     {!! $__dockMarkup ?? '' !!}
 
-    {{-- AI Chatbot floating widget --}}
-    @include('partials._ai_chatbot_widget')
+    {{-- Opened from the header icon above; no floating bubble, same as the
+         client side. --}}
+    @include('partials._ai_chatbot_widget', ['bubble' => false])
 
     <script>
         // Close sidebar on mobile when clicking outside
