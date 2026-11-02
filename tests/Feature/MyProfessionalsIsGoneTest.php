@@ -122,7 +122,10 @@ class MyProfessionalsIsGoneTest extends TestCase
     {
         $client = $this->client();
 
-        $pro = User::factory()->create(['primary_role' => 'professional']);
+        // Named, not faked. The page escapes an apostrophe to &#039;, so a
+        // seed producing "Kamron O'Connell" fails the assertion below while
+        // most seeds pass: the flake this project has now met four times.
+        $pro = User::factory()->create(['primary_role' => 'professional', 'name' => 'Hollis Tremaine']);
         $pro->assignRole('professional');
         $pro->getOrCreateProfile()->update([
             'country' => 'US', 'state' => 'MD', 'city' => 'Baltimore',

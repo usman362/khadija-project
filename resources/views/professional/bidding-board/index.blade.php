@@ -451,7 +451,12 @@
                 {{-- The quick form is a price and a note. The full proposal —
                      itemised price, availability, plan, terms — is where the
                      client actually compares people, so offer the way through. --}}
-                <a class="bb-full" id="bbFullLink" href="#">Build a full proposal instead →</a>
+                {{-- No href until the modal is opened and one is set below.
+                     It carried href="#", so until a gig was chosen it was a
+                     link that led to the top of the page. An anchor with no
+                     href is inert, which is what "no destination yet" should
+                     look like. --}}
+                <a class="bb-full" id="bbFullLink">Build a full proposal instead →</a>
             </div>
         </form>
     </div>

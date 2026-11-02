@@ -24,7 +24,20 @@ class UserFactory extends Factory
     public function definition(): array
     {
         return [
-            'name' => fake()->name(),
+            /*
+             * A name with no apostrophe in it.
+             *
+             * Faker produces "Kamron O'Connell" on some seeds and not others,
+             * and a page quite correctly escapes that to &#039;. Tests that
+             * compare a fixture's raw name against rendered HTML therefore
+             * pass on most seeds and fail on a few, which has cost this
+             * project four separate sessions chasing a failure that was never
+             * about the code under test.
+             *
+             * Escaping is right and stays; it is the comparison that cannot
+             * work. A test that wants to check escaping sets its own name.
+             */
+            'name' => str_replace("'", '', fake()->name()),
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
             'password' => static::$password ??= Hash::make('password'),
