@@ -26,8 +26,29 @@ class ProfessionalTeamController extends Controller
             ->where('status', 'active')->orderBy('name')->get();
         $totalStaff = $staff->count();
 
+        /*
+         * On shift means on shift now, by the clock.
+         *
+         * Filling a shift used to stamp it 'on_shift' whatever its date, and
+         * nothing ever moved it on afterwards, so a shift filled for next
+         * Saturday appeared under "Current On-Shift" with the words "actively
+         * working now" beside it. A stored status nobody updates cannot
+         * answer a question about right now, so the times answer it instead.
+         */
         $onShift = Shift::where('supplier_id', $user->id)
-            ->where('status', 'on_shift')
+            ->whereNotNull('staff_id')
+            ->whereIn('status', ['assigned', 'on_shift'])
+            ->where('starts_at', '<=', now())
+            ->where('ends_at', '>=', now())
+            ->with('staff')
+            ->orderBy('starts_at')
+            ->get();
+
+        // Filled, but not started yet.
+        $upcomingShifts = Shift::where('supplier_id', $user->id)
+            ->whereNotNull('staff_id')
+            ->whereIn('status', ['assigned', 'on_shift'])
+            ->where('starts_at', '>', now())
             ->with('staff')
             ->orderBy('starts_at')
             ->get();
@@ -51,6 +72,15 @@ class ProfessionalTeamController extends Controller
         $laborCost    = round($weekShifts->sum(fn ($s) => $s->hours() * (float) ($s->staff?->hourly_rate ?? 0)), 2);
         $laborWorkers = $weekShifts->pluck('staff_id')->unique()->count();
 
+        /*
+         * How many of those people have no hourly rate on file. Without this
+         * the card prints a total of $0.00 beside six hours of work, which
+         * reads as "this costs nothing" when it means "we were never told
+         * what she charges".
+         */
+        $laborUnrated = $weekShifts->filter(fn ($s) => ! (float) ($s->staff?->hourly_rate ?? 0))
+            ->pluck('staff_id')->unique()->count();
+
         $stats = [
             'total_staff' => $totalStaff,
             'on_shift'    => $onShift->count(),
@@ -61,9 +91,10 @@ class ProfessionalTeamController extends Controller
             'cost'    => $laborCost,
             'hours'   => $laborHours,
             'workers' => $laborWorkers,
+            'unrated' => $laborUnrated,
         ];
 
-        return view('professional.team.index', compact('staff', 'onShift', 'openShifts', 'stats', 'labor'));
+        return view('professional.team.index', compact('staff', 'onShift', 'upcomingShifts', 'openShifts', 'stats', 'labor'));
     }
 
     /** Add a crew member. */
@@ -152,8 +183,11 @@ class ProfessionalTeamController extends Controller
         if ($staffId) {
             $staff = StaffMember::where('supplier_id', $user->id)->where('id', $staffId)->first();
         } else {
+            // Busy means busy during THIS shift, not busy at some point.
             $busyIds = Shift::where('supplier_id', $user->id)
-                ->where('status', 'on_shift')
+                ->whereIn('status', ['assigned', 'on_shift'])
+                ->where('starts_at', '<', $shift->ends_at)
+                ->where('ends_at', '>', $shift->starts_at)
                 ->pluck('staff_id')->filter()->all();
             $staff = StaffMember::where('supplier_id', $user->id)
                 ->where('status', 'active')
@@ -166,7 +200,10 @@ class ProfessionalTeamController extends Controller
             return back()->with('status', 'No available crew member to fill this shift. Add more staff first.');
         }
 
-        $shift->update(['staff_id' => $staff->id, 'status' => 'on_shift']);
+        // Assigned, not on shift: whether they are working is a question the
+        // clock answers, and a shift filled today for next week is not
+        // somebody working now.
+        $shift->update(['staff_id' => $staff->id, 'status' => 'assigned']);
 
         return back()->with('status', "Shift filled by {$staff->name}.");
     }

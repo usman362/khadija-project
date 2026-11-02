@@ -129,7 +129,7 @@
             <div class="pt-chip"><svg viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><span>Track Team Headcount</span></div>
             <div class="pt-chip"><svg viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg><span>Monitor On-Shift</span></div>
             <div class="pt-chip"><svg viewBox="0 0 24 24" fill="none" stroke="#8b5cf6" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span>Spot Open Shifts</span></div>
-            <div class="pt-chip"><svg viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span>Communicate Instantly</span></div>
+            <div class="pt-chip"><svg viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span>Keep Their Details To Hand</span></div>
         </div>
     </div>
 
@@ -166,11 +166,22 @@
                 </div>
                 <div class="pt-onshift-foot">
                     <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
-                    <div class="t"><b>{{ $onShift->count() }} workers on shift</b><span>Tap to message team</span></div>
-                    <a href="{{ route('professional.chat.index') }}">View On-Shift Team →</a>
+                    {{-- This said "Tap to message team" and linked to Messages,
+                         which is the client conversation inbox. A staff member
+                         has no account to be messaged at: Sir Peter decided on
+                         29 October against individual staff logins. Their phone
+                         and email sit on their own record instead. --}}
+                    <div class="t"><b>{{ $onShift->count() }} {{ $onShift->count() === 1 ? 'worker' : 'workers' }} on shift</b><span>Their contact details are on the crew list below</span></div>
                 </div>
             @else
-                <div class="pt-empty">No one is on shift right now. Fill an open shift to put your crew to work.</div>
+                <div class="pt-empty">
+                    No one is on shift right now.
+                    @if(($upcomingShifts ?? collect())->isNotEmpty())
+                        Next: {{ $upcomingShifts->first()->staff?->name }} on {{ $upcomingShifts->first()->starts_at?->format('M d') }} at {{ $upcomingShifts->first()->starts_at?->format('g:i A') }}.
+                    @else
+                        Fill an open shift to put your crew to work.
+                    @endif
+                </div>
             @endif
         </div>
 
@@ -186,7 +197,10 @@
                     <form method="POST" action="{{ route('professional.team.shifts.fill', $sh) }}">@csrf<button class="pt-fill" type="submit">Fill Shift</button></form>
                 </div>
             @empty
-                <div class="pt-empty">No open shifts. Your crew is fully booked. Create a shift below to staff up.</div>
+                {{-- "Your crew is fully booked" was printed even with nobody on
+                     the crew, which reads as an answer about people who do not
+                     exist. --}}
+                <div class="pt-empty">@if($staff->isEmpty())No open shifts, and nobody on your crew yet. Add somebody below, then create a shift.@else No open shifts. Everyone you have is accounted for. Create a shift below to staff up.@endif</div>
             @endforelse
         </div>
     </div>
@@ -233,7 +247,7 @@
     </div>
 
     {{-- Manage staffing --}}
-    <button class="pt-manage-btn" type="button" onclick="document.getElementById('pt-manage').classList.toggle('open')">Manage Staffing <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button>
+    <button class="pt-manage-btn" type="button" onclick="document.getElementById('pt-manage').classList.toggle('open')">Add Crew and Shifts <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></button>
 
     <div class="pt-manage-panel" id="pt-manage">
         <div class="pt-card">
@@ -291,27 +305,37 @@
     </div>
 
     {{-- Feature cards --}}
+    {{-- Four cards stood here and two of them described features that do
+         not exist.
+
+         "Interactive Shift Scheduler: drag and drop staff into open shifts"
+         had no button and there is no drag and drop anywhere on this page.
+
+         "Team Chat: message on-shift workers instantly" opened the client
+         conversation inbox. A staff member cannot be messaged at all: Sir
+         Peter decided on 29 October against individual staff logins, so they
+         are named records with a phone number, not accounts.
+
+         "Send Shift Requests: notify available staff to claim open shifts"
+         notified nobody. Its button opened the panel above and scrolled to
+         it, and a staff member has no account to claim a shift with.
+
+         The labour estimate is real and stays. --}}
     <div class="pt-feats">
-        <div class="pt-feat f1">
-            <div class="pt-feat-h"><span class="pt-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><span class="pt-feat-nm">Interactive Shift Scheduler</span></div>
-            <p>Drag &amp; drop staff into open shifts.</p>
-        </div>
-        <div class="pt-feat f2">
-            <div class="pt-feat-h"><span class="pt-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span><span class="pt-feat-nm">Team Chat</span></div>
-            <p>Message on-shift workers instantly.</p>
-            <a href="{{ route('professional.chat.index') }}" class="pt-feat-btn" style="background:#047857;">Open Chat</a>
-        </div>
         <div class="pt-feat f3">
-            <div class="pt-feat-h"><span class="pt-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span><span class="pt-feat-nm">Labor Cost Estimator</span></div>
-            <p>Estimate payroll cost for this week.</p>
+            <div class="pt-feat-h"><span class="pt-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg></span><b>Labour This Week</b></div>
+            {{-- Filled shifts only, which is what the controller counts: an
+                 open shift has nobody on it and so no rate to cost. Saying
+                 "this week's shifts" would read as all of them. --}}
+            <p>Shifts you have filled this week, at your crew's hourly rates.</p>
             <div class="pt-labor-total-k">Estimated Total</div>
             <div class="pt-labor-total">${{ number_format($labor['cost'], 2) }}</div>
-            <div class="pt-labor-meta">{{ $labor['hours'] }} hrs · {{ $labor['workers'] }} workers</div>
-        </div>
-        <div class="pt-feat f4">
-            <div class="pt-feat-h"><span class="pt-feat-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></span><span class="pt-feat-nm">Send Shift Requests</span></div>
-            <p>Notify available staff to claim open shifts.</p>
-            <button class="pt-feat-btn" type="button" style="background:#f97316;" onclick="document.getElementById('pt-manage').classList.add('open');window.scrollTo({top:document.getElementById('pt-manage').offsetTop-80,behavior:'smooth'});"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:14px;height:14px;"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>Notify Crew</button>
+            <div class="pt-labor-meta">{{ $labor['hours'] }} hrs · {{ $labor['workers'] }} {{ $labor['workers'] === 1 ? 'worker' : 'workers' }}</div>
+            @if(($labor['unrated'] ?? 0) > 0)
+                <div class="pt-labor-meta" style="color:var(--brand-text);margin-top:4px;">
+                    {{ $labor['unrated'] }} of them {{ $labor['unrated'] === 1 ? 'has' : 'have' }} no hourly rate on file, so {{ $labor['unrated'] === 1 ? 'their' : 'those' }} hours are not in this total.
+                </div>
+            @endif
         </div>
     </div>
 </div>
