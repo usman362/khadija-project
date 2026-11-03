@@ -54,7 +54,60 @@ final class BudgetGuide
 
         $all = self::amounts($categoryId, null);
 
-        return $all->count() >= self::MINIMUM ? self::summarise($all, 'everywhere') : null;
+        if ($all->count() >= self::MINIMUM) {
+            return self::summarise($all, 'everywhere');
+        }
+
+        /*
+         * Last, what professionals ASK for it.
+         *
+         * The note above says a price list is what somebody hopes to charge
+         * and a bid is what they offered for a real job, and that is still
+         * true, which is why this comes last and never displaces a bid. But
+         * a service nobody has bid on yet had nothing at all, and a client
+         * planning around it was left guessing. Asking prices are evidence,
+         * just weaker, and the scope says which it is so the screen can say
+         * so rather than passing one off as the other.
+         *
+         * These are the prices professionals set on My Services & Pricing,
+         * which is what Sir Peter asked for in the first place: "our
+         * professionals will need to provide a price list for each service".
+         */
+        if ($state) {
+            $localAsking = self::askingPrices($categoryId, $state);
+
+            if ($localAsking->count() >= self::MINIMUM) {
+                return self::summarise($localAsking, 'asking_state');
+            }
+        }
+
+        $asking = self::askingPrices($categoryId, null);
+
+        return $asking->count() >= self::MINIMUM ? self::summarise($asking, 'asking') : null;
+    }
+
+    /**
+     * What professionals say they charge, from My Services & Pricing.
+     *
+     * Only those who can actually answer the request: the price sits on the
+     * services pivot, so a professional who has dropped the service has no
+     * row here either.
+     *
+     * @return Collection<int, float>
+     */
+    private static function askingPrices(int $categoryId, ?string $state): Collection
+    {
+        return \App\Models\User::query()
+            ->whereHas('roles', fn ($q) => $q->where('name', 'professional'))
+            ->when($state, fn ($q) => $q->whereHas('profile', fn ($p) => $p->where('state', $state)))
+            ->join('category_user', 'category_user.user_id', '=', 'users.id')
+            ->where('category_user.category_id', $categoryId)
+            ->whereNotNull('category_user.price')
+            ->where('category_user.price', '>', 0)
+            ->pluck('category_user.price')
+            ->map(fn ($a) => (float) $a)
+            ->sort()
+            ->values();
     }
 
     /**
@@ -138,10 +191,28 @@ final class BudgetGuide
             . 'because fewer than that is not a guide, it is an anecdote.';
     }
 
+    /** Is this figure built from asking prices rather than from bids? */
+    public static function isAsking(array $guide): bool
+    {
+        return str_starts_with($guide['scope'], 'asking');
+    }
+
     /** How to say it, in one sentence, without overstating what it is. */
     public static function sentence(array $guide): string
     {
-        $where = $guide['scope'] === 'state' ? 'in your state' : 'on GigResource';
+        $local = in_array($guide['scope'], ['state', 'asking_state'], true);
+        $where = $local ? 'in your state' : 'on GigResource';
+
+        if (self::isAsking($guide)) {
+            // Said as what it is. Nobody has bid on this service yet, so the
+            // only evidence is what professionals say they charge, and the
+            // sentence must not borrow the weight of a real offer.
+            return 'No one has bid on this service yet. Professionals ' . $where . ' list $'
+                . number_format($guide['low']) . ' to $' . number_format($guide['high'])
+                . ' for it, usually around $' . number_format($guide['typical'])
+                . ', across ' . $guide['count'] . ' '
+                . \Illuminate\Support\Str::plural('price', $guide['count']) . '.';
+        }
 
         return 'Professionals ' . $where . ' have bid $'
             . number_format($guide['low']) . ' to $' . number_format($guide['high'])

@@ -271,4 +271,85 @@ class BudgetGuideTest extends TestCase
             );
         }
     }
+
+    // ── Asking prices, when nobody has bid yet ──────────────
+
+    /** A professional who offers this service at a price. */
+    private function asking(float $price, string $state = 'MD'): User
+    {
+        $u = User::factory()->create(['primary_role' => 'professional']);
+        $u->assignRole('professional');
+        $u->getOrCreateProfile()->update([
+            'country' => 'US', 'state' => $state, 'city' => 'Baltimore',
+            'service_area_status' => \App\Support\ServiceArea::SUPPORTED,
+        ]);
+
+        $u = User::findOrFail($u->id);
+
+        // Attached straight onto the pivot with its price. syncServices()
+        // filters by kind and the service in this class is created without
+        // one, so it would drop the link and leave nothing to price.
+        $u->serviceCategories()->attach($this->service, ['price' => $price]);
+
+        return $u;
+    }
+
+    /**
+     * A bid outranks a price list, always.
+     *
+     * The note at the top of the class is the reason: a price list is what
+     * somebody hopes to charge, a bid is what they offered for a real job.
+     * Asking prices only answer where bids cannot.
+     */
+    public function test_bids_are_preferred_over_asking_prices(): void
+    {
+        foreach ([400, 500, 600] as $amount) {
+            $this->bid($amount);
+        }
+
+        foreach ([5000, 6000, 7000] as $price) {
+            $this->asking($price);
+        }
+
+        $guide = BudgetGuide::forService($this->service, 'MD');
+
+        $this->assertFalse(BudgetGuide::isAsking($guide), 'A price list displaced real bids.');
+        $this->assertSame(600.0, $guide['high']);
+    }
+
+    public function test_asking_prices_answer_where_no_one_has_bid(): void
+    {
+        foreach ([800, 1200, 2000] as $price) {
+            $this->asking($price);
+        }
+
+        $guide = BudgetGuide::forService($this->service, 'MD');
+
+        $this->assertNotNull($guide, 'A service with three listed prices still said nothing.');
+        $this->assertTrue(BudgetGuide::isAsking($guide));
+        $this->assertSame(800.0, $guide['low']);
+        $this->assertSame(2000.0, $guide['high']);
+    }
+
+    /** And it is said as what it is, never borrowing the weight of an offer. */
+    public function test_an_asking_figure_does_not_call_itself_a_bid(): void
+    {
+        foreach ([800, 1200, 2000] as $price) {
+            $this->asking($price);
+        }
+
+        $sentence = BudgetGuide::sentence(BudgetGuide::forService($this->service, 'MD'));
+
+        $this->assertStringContainsString('No one has bid on this service yet', $sentence);
+        $this->assertStringNotContainsString('have bid $', $sentence);
+    }
+
+    /** The same refusal applies: three listed prices, not one or two. */
+    public function test_two_listed_prices_are_still_not_enough(): void
+    {
+        $this->asking(800);
+        $this->asking(1200);
+
+        $this->assertNull(BudgetGuide::forService($this->service, 'MD'));
+    }
 }

@@ -49,6 +49,11 @@
     .pc-grid { display: grid; grid-template-columns: minmax(0,1fr) 320px; gap: 22px; align-items: start; }
 
     .pc-stepper { display: flex; align-items: center; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; padding: 16px 20px; margin-bottom: 20px; }
+    .pc-own { margin-top: 10px; padding: 10px 12px; border: 1px solid var(--border-color); border-radius: 10px; background: var(--bg-card-hover, transparent); }
+    .pc-own b { display: block; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .3px; color: var(--text-muted); margin-bottom: 6px; }
+    .pc-own-row, .pc-own-sum { display: flex; justify-content: space-between; gap: 10px; font-size: 12.5px; color: var(--text-secondary); padding: 3px 0; }
+    .pc-own-row i, .pc-own-sum i { font-style: normal; font-weight: 700; color: var(--text-primary); }
+    .pc-own-sum { border-top: 1px solid var(--border-color); margin-top: 5px; padding-top: 6px; font-weight: 700; color: var(--text-primary); }
     .pc-step { display: flex; align-items: center; gap: 11px; flex: 1; cursor: pointer; }
     .pc-step .num { width: 30px; height: 30px; border-radius: 50%; background: var(--bg-card-hover, #e5e7eb); color: var(--text-muted); font-weight: 800; font-size: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
     .pc-step.on .num, .pc-step.done .num { background: var(--pc); color: #fff; }
@@ -408,6 +413,28 @@
                             <label>Total Package Price <span class="req">*</span></label>
                             <input type="number" name="price" id="pcPrice" class="pc-input" min="0" value="{{ old('price', $p?->price) }}" placeholder="3250" oninput="pcPreview()">
                             <div class="hint">Required to publish. A draft can be saved without it.</div>
+
+                            {{-- What the parts cost, so the bundle price is set
+                                 against something. These come from My Services &
+                                 Pricing; before that page existed there was
+                                 nowhere for them to come from. --}}
+                            @if(($myPrices ?? collect())->isNotEmpty())
+                                <div class="pc-own">
+                                    <b>Your own prices</b>
+                                    @foreach($myPrices as $__s)
+                                        <span class="pc-own-row">{{ $__s->name }}<i>${{ number_format((float) $__s->pivot->price, 2) }}</i></span>
+                                    @endforeach
+                                    <span class="pc-own-sum">Booked separately<i>${{ number_format($myPriceSum, 2) }}</i></span>
+                                </div>
+                            @else
+                                <div class="pc-own">
+                                    <b>Your own prices</b>
+                                    <span class="pc-own-row" style="color:var(--text-muted);">
+                                        None of your services has a price yet.
+                                        <a href="{{ route('professional.services.index') }}">Set them</a>
+                                    </span>
+                                </div>
+                            @endif
                         </div>
                         <div class="pc-field">
                             <label>Price Basis <span class="req">*</span></label>

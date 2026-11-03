@@ -885,7 +885,11 @@
             <p class="bw-guideline">
                 @if($__g1)
                     {{ \App\Domain\Requests\BudgetGuide::sentence($__g1) }}
-                    A guide from real bids, not a quote.
+                    @if(\App\Domain\Requests\BudgetGuide::isAsking($__g1))
+                        A guide from what they list, not a quote.
+                    @else
+                        A guide from real bids, not a quote.
+                    @endif
                 @else
                     {{-- Saying nothing was worse than saying there is nothing:
                          an empty space reads as a broken feature, and did. --}}
@@ -930,7 +934,8 @@
                                  as broken. --}}
                             @if($__g)
                                 <small class="bw-guide" title="{{ \App\Domain\Requests\BudgetGuide::sentence($__g) }}">
-                                    Others bid ${{ number_format($__g['low']) }} to ${{ number_format($__g['high']) }}
+                                    {{ \App\Domain\Requests\BudgetGuide::isAsking($__g) ? 'Others list' : 'Others bid' }}
+                                    ${{ number_format($__g['low']) }} to ${{ number_format($__g['high']) }}
                                     &middot; usually ${{ number_format($__g['typical']) }}
                                 </small>
                             @else
@@ -948,8 +953,24 @@
 
                 @if($__guides)
                     <p class="bw-help" style="margin:4px 0 0;">
-                        The figures beside each service are what {{ \App\Support\Vocabulary::providers() }} have bid on GigResource for that
-                        work{{ collect($__guides)->contains(fn ($g) => $g['scope'] === 'state') ? ', in your state where there was enough to go on' : '' }}.
+                        @php
+                            // Which kinds are on screen, so the sentence says
+                            // what they are. A listed price and a real bid are
+                            // not the same evidence and must not be summed up
+                            // as though they were.
+                            $__anyBid    = collect($__guides)->contains(fn ($g) => ! \App\Domain\Requests\BudgetGuide::isAsking($g));
+                            $__anyAsking = collect($__guides)->contains(fn ($g) => \App\Domain\Requests\BudgetGuide::isAsking($g));
+                            $__anyLocal  = collect($__guides)->contains(fn ($g) => in_array($g['scope'], ['state', 'asking_state'], true));
+                        @endphp
+                        The figures beside each service are what {{ \App\Support\Vocabulary::providers() }}
+                        @if($__anyBid && $__anyAsking)
+                            have bid, or list as their price where nobody has bid yet,
+                        @elseif($__anyAsking)
+                            list as their price for that work, since nobody has bid on it yet,
+                        @else
+                            have bid on GigResource for that work
+                        @endif
+                        {{ $__anyLocal ? ', in your state where there was enough to go on' : '' }}.
                         They are a guide, not a quote.
                     </p>
                 @endif

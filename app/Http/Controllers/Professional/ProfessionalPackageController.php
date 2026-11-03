@@ -144,10 +144,33 @@ class ProfessionalPackageController extends Controller
     /** Shared reference data for the Create/Edit package form. */
     private function formData(): array
     {
+        /*
+         * What this professional's own services come to, one by one.
+         *
+         * A package is priced as a bundle, and until now that number was set
+         * against nothing: the form asked for a total with no reminder of
+         * what the parts cost. These are the prices they set on My Services &
+         * Pricing, which is what makes a bundle price a discount rather than
+         * a guess.
+         *
+         * Not the same list the package is built from. A package is tagged
+         * with the 27 service categories a client browses by; these are the
+         * level-3 services this professional actually sells. Shown beside the
+         * price, never substituted for the tags.
+         */
+        $priced = auth()->user()?->serviceCategories()
+            ->where('categories.kind', Category::SERVICE)
+            ->orderBy('categories.name')
+            ->get()
+            ->filter(fn ($s) => $s->pivot->price !== null)
+            ->values() ?? collect();
+
         return [
             'categories'  => Category::getNestedDropdownList(),
             'serviceList' => PackageController::services(),
             'eventTypes'  => self::EVENT_TYPES,
+            'myPrices'    => $priced,
+            'myPriceSum'  => (float) $priced->sum(fn ($s) => (float) $s->pivot->price),
         ];
     }
 
