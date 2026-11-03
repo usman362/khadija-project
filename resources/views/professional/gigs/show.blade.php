@@ -478,6 +478,62 @@
                         </div>
                     </div>
                     @endif
+
+                    {{-- When each service runs.
+
+                         Sir Peter asked for per-service times for one reason,
+                         in his own words: so bidders see when each runs and
+                         whether they overlap. The client has been able to set
+                         them since 28 September and they appear on the client's
+                         own event page. The bidders they were for could not see
+                         them anywhere.
+
+                         Only shown where the client actually broke the day up.
+                         A service that simply follows the event is marked as
+                         such rather than repeated as though it were an answer. --}}
+                    @php
+                        $__timeline = \App\Domain\Requests\ServiceTimeline::of($event);
+                        $__anyOwn   = collect($__timeline)->contains(fn ($r) => $r['own']);
+                        $__clashes  = $__anyOwn ? \App\Domain\Requests\ServiceTimeline::overlaps($event) : [];
+                    @endphp
+                    @if($__anyOwn)
+                    <div class="gig-detail-row">
+                        <div class="gig-detail-icon" style="background: var(--accent-blue-soft); color: var(--accent-blue);">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                        </div>
+                        <div>
+                            <div class="gig-detail-label">When each service runs</div>
+                            @foreach($__timeline as $__row)
+                                @if($__row['starts_at'] || $__row['note'])
+                                    <div class="gig-detail-value" style="margin-bottom:2px;">
+                                        <span style="font-weight:500;opacity:.75;">{{ $__row['name'] }}</span>
+                                        @if($__row['starts_at'])
+                                            &middot; {{ $__row['starts_at']->format('g:i A') }}@if($__row['ends_at']) to {{ $__row['ends_at']->format('g:i A') }}@endif
+                                            @if($__d = \App\Domain\Requests\ServiceTimeline::duration($__row['minutes'])) &middot; {{ $__d }}@endif
+                                            @unless($__row['own']) &middot; with the event @endunless
+                                        @endif
+                                        @if($__row['note'])
+                                            <span style="display:block;font-size:12px;font-weight:500;opacity:.7;">{{ $__row['note'] }}</span>
+                                        @endif
+                                    </div>
+                                @endif
+                            @endforeach
+
+                            {{-- The other half of what he asked for. Two services
+                                 running at once is the client's plan, not a
+                                 mistake, but a bidder has to know before they
+                                 promise to be in both places. --}}
+                            @if($__clashes)
+                                <div style="font-size:12px;margin-top:5px;color:var(--brand-text);">
+                                    Running at the same time:
+                                    @foreach($__clashes as $__pair)
+                                        {{ $__pair[0] }} and {{ $__pair[1] }}@if(! $loop->last); @endif
+                                    @endforeach
+                                </div>
+                            @endif
+                        </div>
+                    </div>
+                    @endif
                     @if($event->client)
                     <div class="gig-detail-row">
                         <div class="gig-detail-icon" style="background: var(--accent-blue-soft); color: var(--accent-blue);">
