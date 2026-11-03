@@ -254,6 +254,21 @@ class ProfessionalBiddingBoardController extends Controller
             'perPage'       => $perPage,
             'total'         => $total,
             'commissionPct' => Commission::rateFor($user),
+            /*
+             * What this professional lists for each service, so opening a bid
+             * does not start from an empty box.
+             *
+             * It is their own figure from My Services & Pricing, offered as a
+             * starting point and editable, never a recommendation from us: we
+             * have no business telling somebody what to charge, and the note
+             * beside the field says whose number it is.
+             */
+            'myPrices'      => $user->serviceCategories()
+                                ->where('categories.kind', \App\Models\Category::SERVICE)
+                                ->whereNotNull('category_user.price')
+                                ->get()
+                                ->mapWithKeys(fn ($s) => [$s->id => (float) $s->pivot->price])
+                                ->all(),
             'lockedCount'   => $lockedCount,
             'isElite'       => $this->isElite($user),
             'myActivity'    => $this->myActivity($user),

@@ -78,6 +78,10 @@
     .bb-field label { display: block; font-size: 12px; font-weight: 700; color: var(--text-secondary); margin-bottom: 6px; }
     .bb-field input[type=number], .bb-field textarea { width: 100%; border: 1px solid var(--border-color); border-radius: 10px; padding: 10px 12px; font-size: 14px; font-family: inherit; color: var(--text-primary); background: var(--bg-body, var(--bg-card)); }
     .bb-field textarea { min-height: 78px; resize: vertical; }
+    /* :not([hidden]), or display:block beats the hidden attribute and the
+       note stays on screen swallowing clicks. HiddenActuallyHides catches it. */
+    .bb-ownprice:not([hidden]) { display: block; }
+    .bb-ownprice { margin-top: 6px; font-size: 12px; color: var(--text-muted); line-height: 1.5; }
     .bb-amtwrap { position: relative; }
     .bb-amtwrap span { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-weight: 800; color: var(--text-muted); }
     .bb-amtwrap input { padding-left: 26px !important; }
@@ -426,6 +430,11 @@
                     <span>$</span>
                     <input type="number" name="amount" id="bbAmount" min="1" step="1" placeholder="0" required>
                 </div>
+                {{-- Filled from their own listed price when they have one, and
+                     said as theirs. A suggestion from us about what to charge
+                     would be a figure we have no business putting in front of
+                     somebody about their own money. --}}
+                <small class="bb-ownprice" id="bbOwnPrice" hidden></small>
                 {{-- The rate comes from Commission, which is the one place that
                      knows it. A literal 5 here happens to match Starter today
                      and would quietly stop matching the day a rate changes. --}}
@@ -520,6 +529,35 @@
         if (amount) { amount.addEventListener('input', updateNet); }
         var svcWrap = document.getElementById('bbServiceWrap');
         var svcSel = document.getElementById('bbCategory');
+        // Their own listed prices, keyed by service id.
+        var myPrices = @json($myPrices ?? []);
+        var ownNote  = document.getElementById('bbOwnPrice');
+
+        /*
+         * Offer their own price for the service in hand, and only when the box
+         * is empty: an amount they typed, or a bid they already placed, is
+         * theirs and is never overwritten.
+         */
+        function suggestOwnPrice() {
+            if (!ownNote) { return; }
+
+            var id = svcSel && svcSel.value ? svcSel.value : null;
+            var price = id && myPrices[id] !== undefined ? myPrices[id] : null;
+
+            if (price === null) {
+                ownNote.hidden = true;
+                return;
+            }
+
+            if (!amount.value) {
+                amount.value = price;
+                updateNet();
+            }
+
+            ownNote.hidden = false;
+            ownNote.textContent = 'Your listed price for this service is $'
+                + Number(price).toLocaleString() + '. Change it to suit the job.';
+        }
         function open(btn) {
             eventId.value = btn.getAttribute('data-event-id');
             gig.textContent = btn.getAttribute('data-title');
@@ -540,10 +578,15 @@
                 // Show the picker only when there's more than one service (MSR/ER).
                 svcWrap.style.display = services.length > 1 ? 'block' : 'none';
             }
+            suggestOwnPrice();
             updateNet();
             modal.classList.add('open');
             setTimeout(function () { amount.focus(); }, 50);
         }
+        // Switching service on a multi-service request offers that service's
+        // price instead, by the same rule: only into an empty box.
+        if (svcSel) { svcSel.addEventListener('change', suggestOwnPrice); }
+
         function close() { modal.classList.remove('open'); }
         document.querySelectorAll('[data-bid-open]').forEach(function (b) {
             b.addEventListener('click', function () { open(b); });
