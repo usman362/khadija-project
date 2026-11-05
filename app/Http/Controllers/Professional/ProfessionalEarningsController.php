@@ -87,6 +87,22 @@ class ProfessionalEarningsController extends Controller
                 'gross'       => (float) $b->price,
                 'net'         => \App\Support\Commission::netOf((float) $b->price, $user),
                 'status'      => ucfirst((string) $b->status),
+
+                /*
+                 * The arithmetic behind the two figures beside it.
+                 *
+                 * Khadijah's 28 October screen opens each row into its own
+                 * breakdown, and this is the whole of it: the amount, the rate
+                 * that applied, what that rate took, and what is left. Read
+                 * from Commission, so a row cannot disagree with the band at
+                 * the top of the page or with the totals above it.
+                 */
+                'rate'        => \App\Support\Commission::rateFor($user),
+                'fee'         => \App\Support\Commission::on((float) $b->price, $user),
+                'client'      => $b->client?->name,
+                'gig'         => $b->event?->title,
+                'paid'        => in_array($b->status, ['completed'], true),
+                'event_id'    => $b->event_id,
             ]);
     }
 }

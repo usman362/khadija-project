@@ -33,6 +33,23 @@
 </style>
 @endpush
 
+@push('styles')
+<style>
+    .ern-break { margin-top: 6px; text-align: left; font-weight: 400; }
+    .ern-break > summary { list-style: none; cursor: pointer; font-size: 10.5px; font-weight: 700;
+        color: var(--accent-blue, #2563eb); text-align: right; }
+    .ern-break > summary::-webkit-details-marker { display: none; }
+    .ern-break > div { margin-top: 7px; background: var(--bg-page, var(--bg-card));
+        border: 1px solid var(--border-color); border-radius: 9px; padding: 9px 11px; }
+    .ern-break span { display: flex; justify-content: space-between; gap: 12px; font-size: 11.5px;
+        color: var(--text-secondary, var(--text-muted)); padding: 3px 0; }
+    .ern-break i { font-style: normal; font-weight: 700; color: var(--text-primary); }
+    .ern-break .sum { border-top: 1px solid var(--border-color); margin-top: 4px; padding-top: 6px;
+        font-weight: 800; color: var(--text-primary); }
+    .ern-break .note { display: block; color: var(--text-muted); font-size: 10.5px; margin-top: 5px; }
+</style>
+@endpush
+
 @section('content')
     {{-- Header --}}
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
@@ -191,7 +208,21 @@
                                 <td>{{ $row['description'] }}</td>
                                 <td><span class="cl-badge">{{ $row['status'] }}</span></td>
                                 <td style="text-align: right;">${{ number_format($row['gross'], 2) }}</td>
-                                <td style="text-align: right; font-weight: 600;">${{ number_format($row['net'], 2) }}</td>
+                                <td style="text-align: right; font-weight: 600;">
+                                    ${{ number_format($row['net'], 2) }}
+                                    {{-- The arithmetic, on the row it belongs to.
+                                         Two figures side by side with nothing
+                                         between them read as a discrepancy. --}}
+                                    <details class="ern-break">
+                                        <summary>Breakdown</summary>
+                                        <div>
+                                            <span>Client paid<i>${{ number_format($row['gross'], 2) }}</i></span>
+                                            <span>Platform fee at {{ rtrim(rtrim(number_format($row['rate'], 2), '0'), '.') }}%<i>&minus;${{ number_format($row['fee'], 2) }}</i></span>
+                                            <span class="sum">Yours<i>${{ number_format($row['net'], 2) }}</i></span>
+                                            <span class="note">{{ $row['paid'] ? 'Counted in your earnings.' : 'Not counted until the booking is completed.' }}</span>
+                                        </div>
+                                    </details>
+                                </td>
                             </tr>
                         @endforeach
                     </tbody>

@@ -77,6 +77,16 @@
     .pg-banner a svg { width: 15px; height: 15px; }
 
     @media (max-width: 1200px) { .pg-top { grid-template-columns: 1fr; } }
+    .pg-work { display: grid; grid-template-columns: minmax(0,1fr) 300px; gap: 18px; align-items: start; }
+    .pg-rail { display: flex; flex-direction: column; gap: 16px; }
+    .pg-rail-h { font-size: 12.5px; font-weight: 800; color: var(--text-primary); margin: 0 0 10px; }
+    .pg-rail-row { padding: 8px 0; border-top: 1px solid var(--border-color); }
+    .pg-rail-row:first-of-type { border-top: 0; }
+    .pg-rail-row b { display: block; font-size: 12.5px; font-weight: 700; color: var(--text-primary); }
+    .pg-rail-row span { display: block; font-size: 11.5px; color: var(--text-secondary, var(--text-muted)); }
+    .pg-rail-row i { font-style: normal; font-size: 10.5px; color: var(--text-muted); }
+    .pg-rail-none { font-size: 12.5px; color: var(--text-muted); }
+    @media (max-width: 1100px) { .pg-work { grid-template-columns: 1fr; } }
     /* Below the gigs it is one column of explanation, not a side panel. */
     .pg-top-after { grid-template-columns: 1fr; margin-top: 20px; }
     @media (max-width: 760px) { .pg-scores { grid-template-columns: 1fr; } }
@@ -85,6 +95,7 @@
 <div class="pg">
 
     {{-- ════════ Top: intro + gig snapshot ════════ --}}
+    <div class="pg-work">
         <div class="pg-card">
             <div class="pg-hub-h">
                 <span class="pg-hub-ico"><svg viewBox="0 0 32 28" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="9" width="26" height="17" rx="3.5" fill="#2563eb"/><rect x="3" y="9" width="26" height="17" rx="3.5" fill="url(#hbg)" opacity="0.22"/><rect x="11" y="3.5" width="10" height="6.5" rx="2" fill="#1d4ed8"/><rect x="13" y="5.5" width="6" height="3.2" rx="1.4" fill="#3b82f6"/><rect x="3" y="15" width="26" height="2" fill="rgba(255,255,255,0.4)"/><rect x="13.5" y="16" width="5" height="3.6" rx="1.5" fill="#fff"/><defs><linearGradient id="hbg" x1="3" y1="9" x2="29" y2="26"><stop stop-color="#fff"/><stop offset="1" stop-color="#1e40af"/></linearGradient></defs></svg></span>
@@ -124,6 +135,40 @@
             @endforelse
             <a href="{{ route('professional.gig-hub.index', ['tab' => 'gigs']) }}" class="pg-viewall">View All Gigs →</a>
         </div>
+
+        <aside class="pg-rail">
+            {{-- Khadijah's 28 October screen carries these two beside the
+                 gigs. Both read records that already exist: there is no
+                 activity log, and adding one would mean a second account of
+                 what the bookings and agreements already know. --}}
+            <div class="pg-card">
+                <h4 class="pg-rail-h">Upcoming deadlines</h4>
+                @forelse ($deadlines as $d)
+                    <div class="pg-rail-row">
+                        <b>{{ $d['title'] }}</b>
+                        <span>{{ $d['subject'] ?: $d['kind'] }}</span>
+                        <i>{{ $d['when'] ?? $d['due']->timezone(config('app.display_timezone'))->format('j M Y') }}</i>
+                    </div>
+                @empty
+                    <div class="pg-rail-none">Nothing with a date on it.</div>
+                @endforelse
+            </div>
+
+            <div class="pg-card">
+                <h4 class="pg-rail-h">Recent activity</h4>
+                @forelse ($activity as $a)
+                    <div class="pg-rail-row">
+                        <b>{{ $a['what'] }}</b>
+                        @if ($a['subject']) <span>{{ $a['subject'] }}</span> @endif
+                        <i>{{ $a['at']->humanAgo() }}</i>
+                    </div>
+                @empty
+                    <div class="pg-rail-none">Nothing has happened yet.</div>
+                @endforelse
+            </div>
+        </aside>
+    </div>
+
 
     {{-- The explanation sat beside the gigs at half width, so somebody
          opening this page read about the page before they could read their

@@ -67,6 +67,25 @@
 </style>
 @endpush
 
+@push('styles')
+<style>
+    .mc-note { grid-column: 1 / -1; margin-top: 12px; border-top: 1px solid var(--border-color); padding-top: 10px; }
+    .mc-note > summary { list-style: none; cursor: pointer; display: flex; gap: 7px; align-items: center; flex-wrap: wrap; }
+    .mc-note > summary::-webkit-details-marker { display: none; }
+    .mc-tag { font-size: 10.5px; font-weight: 700; padding: 2px 8px; border-radius: 20px;
+        border: 1px solid var(--border-color); color: var(--text-secondary, var(--text-muted)); }
+    .mc-notetext { font-size: 11.5px; color: var(--text-muted); }
+    .mc-noteform { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,2fr) auto; gap: 10px; align-items: end; margin-top: 11px; }
+    .mc-noteform label { font-size: 10.5px; font-weight: 700; color: var(--text-muted); display: block; }
+    .mc-noteform input { width: 100%; font: inherit; font-size: 12.5px; margin-top: 4px; padding: 8px 10px;
+        border-radius: 9px; border: 1px solid var(--border-color);
+        background: var(--bg-page, var(--bg-card)); color: var(--text-primary); }
+    .mc-noteform button { font: inherit; font-size: 12.5px; font-weight: 700; padding: 9px 16px; border: 0;
+        border-radius: 9px; background: var(--accent-blue, #2563eb); color: #fff; cursor: pointer; }
+    @media (max-width: 760px) { .mc-noteform { grid-template-columns: 1fr; } }
+</style>
+@endpush
+
 @section('content')
 <div class="mc-card mc-intro">
     <h1>My Clients</h1>
@@ -160,8 +179,20 @@
             @else
                 <div class="mc-v quiet">Nothing booked</div>
             @endif
-            <div class="mc-k" style="margin-top:12px;">Earned</div>
-            <div class="mc-v">{{ $money($r['earned']) }}</div>
+            <div class="mc-k" style="margin-top:12px;">Lifetime value</div>
+            <div class="mc-v">{{ $money($r['gross']) }}</div>
+            <div class="mc-v quiet">{{ $money($r['earned']) }} yours, after commission</div>
+
+            {{-- Who has gone quiet. Measured from the later of the last job
+                 and the last message, because either counts as contact.
+                 Where there has been neither, it says so rather than showing
+                 a number nobody can stand behind. --}}
+            <div class="mc-k" style="margin-top:12px;">Last contact</div>
+            @if($r['last_contact'])
+                <div class="mc-v">{{ $r['last_contact']->humanAgo() }}</div>
+            @else
+                <div class="mc-v quiet">Never</div>
+            @endif
         </div>
 
         <div class="mc-acts">
@@ -181,6 +212,40 @@
                 </a>
             @endif
         </div>
+
+        {{-- Tags and a quick note, in the professional's own words.
+
+             Khadijah's screen has both. Nothing on the platform records that
+             a client is "high value" or "prefers evening setup", so the only
+             honest version is one the professional writes. The client never
+             sees it. --}}
+        <details class="mc-note">
+            <summary>
+                @if($r['tags'])
+                    @foreach($r['tags'] as $tag)<span class="mc-tag">{{ $tag }}</span>@endforeach
+                @endif
+                @if($r['note'])
+                    <span class="mc-notetext">{{ \Illuminate\Support\Str::limit($r['note'], 90) }}</span>
+                @endif
+                @if(! $r['tags'] && ! $r['note'])
+                    <span class="mc-notetext">Add tags or a private note</span>
+                @endif
+            </summary>
+            <form method="POST" action="{{ route('professional.clients.note', $r['client']['id']) }}" class="mc-noteform">
+                @csrf
+                <label>
+                    Tags
+                    <input type="text" name="tags" maxlength="160" value="{{ implode(', ', $r['tags']) }}"
+                           placeholder="Comma separated, up to six">
+                </label>
+                <label>
+                    Private note
+                    <input type="text" name="note" maxlength="400" value="{{ $r['note'] }}"
+                           placeholder="Only you can see this">
+                </label>
+                <button type="submit">Save</button>
+            </form>
+        </details>
     </div>
 @empty
     <div class="mc-card mc-none">

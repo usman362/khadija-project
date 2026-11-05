@@ -109,11 +109,79 @@ class ProfessionalGigHubController extends Controller
          */
         $today = $now;
 
+        /*
+         * Khadijah's 28 October screen carries two more columns beside the
+         * gigs: what is due, and what has just happened. Both are read off
+         * records that already exist rather than a new activity log.
+         */
+        $deadlines = \App\Support\PriorityActions::forProfessional($user)
+            ->filter(fn ($i) => $i['due'] !== null)
+            ->take(5)
+            ->values();
+
+        $activity = $this->activity($user);
+
         return view('professional.gig-hub.index', array_merge(
-            compact('tab', 'stats', 'gigs', 'crew', 'msg', 'money', 'today'),
+            compact('tab', 'stats', 'gigs', 'crew', 'msg', 'money', 'today', 'deadlines', 'activity'),
             $tab === 'gigs'      ? $this->gigsTab($request) : [],
             $tab === 'contracts' ? $this->contractsTab($request, $money) : [],
         ));
+    }
+
+    /**
+     * What has just happened on this professional's own jobs.
+     *
+     * There is no activity table, and inventing one would mean a second
+     * record of things the bookings and agreements already know. This reads
+     * the most recent change on each and puts them in one order.
+     *
+     * @return array<int, array{at:\Illuminate\Support\Carbon, what:string, subject:?string}>
+     */
+    private function activity($user): array
+    {
+        $rows = collect();
+
+        Booking::where('supplier_id', $user->id)
+            ->with('event:id,title')
+            ->latest('updated_at')
+            ->take(6)
+            ->get()
+            ->each(function (Booking $b) use ($rows) {
+                $rows->push([
+                    'at'      => $b->updated_at,
+                    'what'    => match ($b->status) {
+                        'requested'   => 'A client asked you for this',
+                        'confirmed'   => 'Booking confirmed',
+                        'in_progress' => 'Work started',
+                        'completed'   => 'Marked completed',
+                        'cancelled'   => 'Booking cancelled',
+                        default       => 'Booking updated',
+                    },
+                    'subject' => $b->event?->title,
+                ]);
+            });
+
+        \App\Models\Agreement::whereHas('booking', fn ($q) => $q->where('supplier_id', $user->id))
+            ->with('booking.event:id,title')
+            ->latest('updated_at')
+            ->take(6)
+            ->get()
+            ->each(function ($a) use ($rows) {
+                $rows->push([
+                    'at'      => $a->updated_at,
+                    'what'    => $a->supplier_accepted_at
+                        ? 'You signed the agreement'
+                        : ($a->client_accepted_at ? 'The client signed, waiting on you' : 'Agreement updated'),
+                    'subject' => $a->booking?->event?->title,
+                ]);
+            });
+
+        return $rows
+            ->filter(fn ($r) => $r['at'] !== null)
+            ->sortByDesc(fn ($r) => $r['at']->timestamp)
+            ->take(6)
+            ->values()
+            ->all();
     }
 
     /** What the old My Gigs page needed. */

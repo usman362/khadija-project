@@ -144,8 +144,36 @@ class ProfessionalBidIntelligenceController extends Controller
             'avg_bid'  => $avgBid,
         ]);
 
+        /*
+         * The rest of Khadijah's 28 October screen, read off the bids
+         * themselves rather than off bookings.
+         *
+         * Her screen also carries an AI win rate predictor, a market
+         * benchmark and a smart recommendation. None of the three is here:
+         * the platform has no model, no competitor data and no record of why
+         * a client chose somebody else, so each would be a number invented on
+         * the screen a professional uses to decide what to charge.
+         */
+        $bids = \App\Support\BidPerformance::bids($user);
+
+        $performance = [
+            'record'  => \App\Support\BidPerformance::record($bids),
+            'byEvent' => \App\Support\BidPerformance::splitBy(
+                $bids, fn ($b) => $b->event?->event_type
+            ),
+            'byPlace' => \App\Support\BidPerformance::splitBy(
+                $bids, fn ($b) => $b->event?->state
+            ),
+            'byService' => \App\Support\BidPerformance::splitBy(
+                $bids, fn ($b) => $b->category?->name
+            ),
+            'byPrice' => \App\Support\BidPerformance::byPrice($bids),
+            'lost'    => \App\Support\BidPerformance::lost($bids),
+            'season'  => \App\Support\BidPerformance::season($bids),
+        ];
+
         return view('professional.bid-intelligence.index', compact(
-            'stats', 'segments', 'donutGradient', 'responseTimes', 'pricing'
+            'stats', 'segments', 'donutGradient', 'responseTimes', 'pricing', 'performance'
         ));
     }
 }

@@ -1,373 +1,183 @@
 @extends('layouts.professional')
 
 @section('title', 'Priority Actions')
+@section('page-title', 'Priority Actions')
 
-{{-- Priority Actions: an explainer for the feature, plus the reader's own
-     counts (contracts to sign, new proposals, open shifts, secure payment)
-     from ProfessionalPriorityController.
+{{-- Khadijah's 28 October screen: one list of the things actually waiting on
+     this professional, with tabs across the top and a right hand column for
+     today, the deadlines coming, and the last thirty days.
 
-     The panels headed "Example:" are illustrations and hold no real data.
-     They used to be filled from the reader's newest requested booking, so a
-     real client's name appeared under an invented quote and a real address
-     beside a hardcoded guest count, and with no booking the page invented a
-     job outright. Keep them fixed. --}}
+     What this replaced was four counters. "3 contracts" tells somebody three
+     contracts need signing without telling them which three, so every row here
+     names its own record and carries the button that opens it. --}}
 
 @php
-    $money = fn ($n) => '$' . number_format((float) $n, 0);
-
-    /*
-        This page explains what a priority action is made of, so the panels
-        beside each part are illustrations and nothing else.
-
-        They used to be filled from the reader's newest requested booking,
-        which mixed the two: a real client's name sat under an invented quote
-        about a son's tenth birthday, a real venue address sat beside a
-        hardcoded guest count, and when there was no booking at all the page
-        invented one. Nobody reading it could tell which half was theirs.
-
-        Fixed values, and no name on the quote. The reader's own figures are
-        further down the page, under the headings that link to them.
-    */
-    /*
-     * The examples name the fields, not values for them.
-     *
-     * They were fixed figures under headings reading "Example:", which is
-     * honest as far as it goes, but a date, a budget and a guest count sat on
-     * the page looking exactly like every other date, budget and guest count
-     * on this side. Naming the field says what the panel is for and leaves
-     * nothing on screen that could be read as somebody's job.
-     */
-    $exDate   = 'the start time';
-    $exEnd    = 'the finish time';
-    $exLoc    = 'where it is being held';
-    $exBudget = 'what the client has to spend';
+    $tones = [
+        'urgent' => ['Urgent',   '#ef4444'],
+        'soon'   => ['Due soon', '#f59e0b'],
+        'new'    => ['New',      '#2563eb'],
+        'open'   => ['Open',     '#64748b'],
+    ];
+    $money = fn ($v) => '$' . number_format((float) $v, 2);
 @endphp
 
 @push('styles')
 <style>
-    .pa { --pa-blue: #2563eb; }
-    .pa-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 20px 22px; }
+    .pa-layout { display: grid; grid-template-columns: minmax(0,1fr) 330px; gap: 20px; align-items: start; }
+    .pa-head { display: flex; align-items: center; gap: 13px; margin-bottom: 16px; }
+    .pa-head .ic { width: 42px; height: 42px; border-radius: 12px; flex: none;
+        background: var(--accent-blue, #2563eb); color: #fff; display: flex; align-items: center; justify-content: center; }
+    .pa-head .ic svg { width: 21px; height: 21px; }
+    .pa-head h1 { font-size: 22px; font-weight: 800; color: var(--text-primary); margin: 0; }
+    .pa-head p { font-size: 13px; color: var(--text-muted); margin: 3px 0 0; }
 
-    /* Slim head: no drawing, no paragraph about the page itself. */
-    .pa-header-slim { align-items: center; gap: 13px; }
-    .pa-header-slim h1 { font-size: 22px; margin: 0; }
-    .pa-header-slim .tag { font-size: 13px; color: var(--text-muted); margin: 3px 0 0; }
-    .pa-grid { display: grid; grid-template-columns: minmax(0,1fr) 320px; gap: 16px; align-items: start; }
+    .pa-tabs { display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 16px; }
+    .pa-tab { padding: 8px 14px; border-radius: 999px; font-size: 12.5px; font-weight: 700;
+        text-decoration: none; color: var(--text-secondary, var(--text-muted));
+        border: 1px solid var(--border-color); background: var(--bg-card); white-space: nowrap; }
+    .pa-tab.on { background: var(--text-primary); color: var(--bg-card); border-color: var(--text-primary); }
+    .pa-tab .n { opacity: .65; margin-left: 4px; }
 
-    /* Header */
-    .pa-header { display: flex; align-items: flex-start; gap: 16px; margin-bottom: 18px; }
-    .pa-h-ico { width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg,#a78bfa,#6d28d9); color: #fff; display: flex; align-items: center; justify-content: center; flex-shrink: 0; box-shadow: 0 8px 18px rgba(124,58,237,0.35); }
-    .pa-h-ico svg { width: 28px; height: 28px; filter: drop-shadow(0 2px 2px rgba(0,0,0,0.15)); }
-    .pa-h-spacer { flex: 1; }
-    .pa-h-art { flex-shrink: 0; width: 168px; align-self: center; }
-    .pa-h-art svg { width: 100%; height: auto; }
-    @media (max-width: 980px) { .pa-h-art { display: none; } }
-    .pa-header h1 { font-size: 30px; font-weight: 800; color: var(--text-primary); margin: 0; }
-    .pa-header .tag { font-size: 14px; color: var(--text-muted); margin: 2px 0 10px; }
-    .pa-header p { font-size: 13px; color: var(--text-secondary); margin: 0; line-height: 1.6; max-width: 560px; }
+    .pa-item { display: grid; grid-template-columns: 86px minmax(0,1fr) auto; gap: 14px; align-items: center;
+        background: var(--bg-card); border: 1px solid var(--border-color); border-left-width: 3px;
+        border-radius: 12px; padding: 14px 16px; margin-bottom: 11px; }
+    .pa-badge { font-size: 9.5px; font-weight: 800; letter-spacing: .4px; text-transform: uppercase;
+        padding: 3px 8px; border-radius: 5px; color: #fff; display: inline-block; }
+    .pa-kind { display: block; font-size: 10.5px; color: var(--text-muted); margin-top: 5px; font-weight: 700; }
+    .pa-item b { display: block; font-size: 13.5px; font-weight: 800; color: var(--text-primary); line-height: 1.3; }
+    .pa-subject { font-size: 12.5px; color: var(--text-secondary, var(--text-muted)); margin-top: 2px; }
+    .pa-detail { font-size: 11.5px; color: var(--text-muted); margin-top: 3px; }
+    .pa-when { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+    .pa-go { font-size: 12.5px; font-weight: 700; padding: 9px 15px; border-radius: 9px; text-decoration: none;
+        background: var(--accent-blue, #2563eb); color: #fff; white-space: nowrap; }
 
-    /* Explainer section */
-    .pa-sec { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,0.9fr); gap: 18px; padding: 18px 0; border-top: 1px solid var(--border-color); }
-    .pa-sec:first-of-type { border-top: none; }
-    .pa-sec-l { min-width: 0; }
-    .pa-sec-h { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; }
-    .pa-sec-ico { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-    .pa-sec-ico svg { width: 18px; height: 18px; }
-    .pa-sec-t { font-size: 17px; font-weight: 800; color: var(--text-primary); }
-    .pa-sec-t span { font-size: 12px; font-weight: 600; color: var(--text-muted); }
-    .pa-sec-d { font-size: 12.5px; color: var(--text-muted); margin: 0 0 10px; }
-    .pa-chk { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-secondary); padding: 3px 0; }
-    .pa-chk svg { width: 14px; height: 14px; color: var(--ok-text); flex-shrink: 0; }
-    .pa-bullet { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--text-secondary); padding: 3px 0; }
-    .pa-bullet .d { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+    .pa-empty { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px;
+        padding: 30px 20px; text-align: center; }
+    .pa-empty b { display: block; font-size: 14.5px; font-weight: 800; color: var(--text-primary); }
+    .pa-empty span { font-size: 13px; color: var(--text-muted); }
 
-    /* Example box */
-    .pa-ex { background: rgba(37,99,235,0.04); border: 1px solid rgba(37,99,235,0.14); border-radius: 12px; padding: 14px 16px; align-self: start; }
-    .pa-ex-h { font-size: 12px; font-weight: 800; color: var(--pa-blue); margin-bottom: 10px; }
-    .pa-ex-row { display: flex; align-items: center; gap: 9px; font-size: 12px; color: var(--text-secondary); padding: 4px 0; }
-    .pa-ex-row svg { width: 14px; height: 14px; color: var(--pa-blue); flex-shrink: 0; }
-    .pa-ex-row b { color: var(--text-primary); }
-    .pa-ex-quote { font-size: 12.5px; font-style: italic; color: var(--text-secondary); line-height: 1.5; }
-    .pa-ex-action { font-size: 12.5px; color: var(--text-secondary); }
-    .pa-ex-action b { color: var(--ok-text); }
+    .pa-rail { display: flex; flex-direction: column; gap: 15px; position: sticky; top: 20px; }
+    .pa-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 15px 16px; }
+    .pa-card h4 { font-size: 12.5px; font-weight: 800; color: var(--text-primary); margin: 0 0 11px; }
+    .pa-row { display: flex; gap: 10px; align-items: baseline; padding: 7px 0; border-top: 1px solid var(--border-color); }
+    .pa-row:first-of-type { border-top: 0; }
+    .pa-row .t { font-size: 11.5px; font-weight: 800; color: var(--accent-blue, #2563eb); white-space: nowrap; flex: none; }
+    .pa-row .m { min-width: 0; }
+    .pa-row .m b { display: block; font-size: 12.5px; font-weight: 700; color: var(--text-primary); }
+    .pa-row .m span { font-size: 11px; color: var(--text-muted); }
+    .pa-none { font-size: 12.5px; color: var(--text-muted); }
 
-    /* How it works */
-    .pa-hiw-title { font-size: 16px; font-weight: 800; color: var(--text-primary); margin: 18px 0 14px; }
-    .pa-steps { display: flex; align-items: stretch; gap: 6px; }
-    .pa-step { flex: 1; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px; padding: 14px 10px; text-align: center; }
-    .pa-step-ico { width: 42px; height: 42px; border-radius: 11px; background: rgba(37,99,235,0.1); color: var(--info-text); display: flex; align-items: center; justify-content: center; margin: 0 auto 9px; }
-    .pa-step-ico svg { width: 21px; height: 21px; }
-    .pa-step h4 { font-size: 12px; font-weight: 800; color: var(--text-primary); margin: 0 0 4px; }
-    .pa-step p { font-size: 10px; color: var(--text-muted); line-height: 1.35; margin: 0; }
-    .pa-step-arr { display: flex; align-items: center; color: var(--text-muted); }
-    .pa-step-arr svg { width: 16px; height: 16px; }
+    .pa-figs { display: grid; grid-template-columns: 1fr 1fr; gap: 11px; }
+    .pa-fig b { display: block; font-size: 17px; font-weight: 800; color: var(--text-primary); line-height: 1.1; }
+    .pa-fig span { font-size: 10.5px; color: var(--text-muted); }
 
-    /* What happens cards */
-    .pa-wh-title { font-size: 15px; font-weight: 800; color: var(--text-primary); margin: 18px 0 12px; }
-    .pa-whs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; align-items: stretch; }
-    .pa-wh { border: 1px solid var(--border-color); border-radius: 12px; padding: 14px; display: flex; flex-direction: column; }
-    .pa-wh.c1 { background: rgba(239,68,68,0.04); } .pa-wh.c2 { background: rgba(249,115,22,0.04); }
-    .pa-wh.c3 { background: rgba(37,99,235,0.04); } .pa-wh.c4 { background: rgba(16,185,129,0.04); }
-    .pa-wh-h { display: flex; align-items: center; gap: 8px; margin-bottom: 7px; }
-    .pa-wh-ico { width: 30px; height: 30px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: #fff; }
-    .pa-wh-ico svg { width: 15px; height: 15px; }
-    .pa-wh-nm { font-size: 12px; font-weight: 800; color: var(--text-primary); line-height: 1.2; }
-    .pa-wh p { font-size: 10.5px; color: var(--text-muted); line-height: 1.4; margin: 0 0 9px; }
-    .pa-wh-meta { font-size: 11px; font-weight: 700; color: var(--text-primary); margin-bottom: 9px; margin-top: auto; }
-    .pa-wh-btn { display: block; text-align: center; padding: 8px; border-radius: 8px; color: #fff; border: none; font-size: 11px; font-weight: 800; cursor: pointer; text-decoration: none; }
-
-    .pa-short { display: flex; align-items: center; gap: 14px; background: rgba(37,99,235,0.05); border: 1px solid rgba(37,99,235,0.18); border-radius: 12px; padding: 15px 18px; margin-top: 16px; }
-    .pa-short .ic { width: 36px; height: 36px; border-radius: 10px; background: rgba(37,99,235,0.12); color: var(--info-text); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-    .pa-short .ic svg { width: 18px; height: 18px; }
-    .pa-short-txt { flex: 1; }
-    .pa-short-txt b { font-size: 12.5px; color: var(--text-primary); }
-    .pa-short-txt p { font-size: 11.5px; color: var(--text-muted); margin: 1px 0 0; }
-    .pa-short a { display: inline-flex; align-items: center; gap: 7px; background: #2563eb; color: #fff; font-size: 12px; font-weight: 800; padding: 10px 16px; border-radius: 9px; text-decoration: none; white-space: nowrap; }
-    .pa-short a svg { width: 14px; height: 14px; }
-
-    /* Sidebar */
-    .pa-side { display: flex; flex-direction: column; gap: 16px; }
-    .pa-side-h { font-size: 12px; font-weight: 800; color: var(--text-primary); letter-spacing: 0.4px; margin-bottom: 4px; }
-    .pa-side-sub { font-size: 11.5px; color: var(--text-muted); margin: 0 0 12px; line-height: 1.45; }
-    .pa-live { border: 1px solid var(--border-color); border-radius: 12px; overflow: hidden; }
-    .pa-live-h { display: flex; align-items: center; justify-content: space-between; padding: 12px 14px; border-bottom: 1px solid var(--border-color); }
-    .pa-live-h b { font-size: 12px; font-weight: 800; color: var(--text-primary); letter-spacing: 0.3px; }
-    .pa-live-count { background: #ef4444; color: #fff; font-size: 10px; font-weight: 800; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 9px; display: inline-flex; align-items: center; justify-content: center; }
-    .pa-li { display: flex; gap: 10px; padding: 11px 14px; border-bottom: 1px solid var(--border-color); }
-    .pa-li-ico { width: 30px; height: 30px; border-radius: 8px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; }
-    .pa-li-ico svg { width: 15px; height: 15px; }
-    .pa-li-body { flex: 1; min-width: 0; }
-    .pa-li-t { font-size: 11.5px; font-weight: 800; color: var(--text-primary); }
-    .pa-li-d { font-size: 10.5px; color: var(--text-muted); line-height: 1.4; }
-    .pa-li-d b { color: var(--text-secondary); }
-    .pa-li-btn { font-size: 10px; font-weight: 800; padding: 4px 10px; border-radius: 6px; align-self: flex-start; white-space: nowrap; border: 1px solid; }
-    .b-accept { color: var(--ok-text); border-color: rgba(16,185,129,0.4); background: rgba(16,185,129,0.08); }
-    .b-counter { color: var(--warn-text); border-color: rgba(245,158,11,0.4); background: rgba(245,158,11,0.08); }
-    .b-decline { color: var(--bad-text); border-color: rgba(239,68,68,0.4); background: rgba(239,68,68,0.08); }
-    .pa-live-foot { padding: 11px 14px; text-align: center; }
-    .pa-live-foot a { font-size: 12px; font-weight: 800; color: var(--pa-blue); text-decoration: none; }
-    .pa-create { display: flex; align-items: center; justify-content: center; gap: 7px; margin: 4px 14px 0; padding: 9px; border-radius: 8px; background: #2563eb; color: #fff; font-size: 11.5px; font-weight: 800; text-decoration: none; }
-    .pa-create svg { width: 13px; height: 13px; }
-
-    .pa-tip { display: flex; gap: 10px; padding: 9px 0; }
-    .pa-tip svg { width: 18px; height: 18px; flex-shrink: 0; }
-    .pa-tip b { font-size: 12px; color: var(--text-primary); }
-    .pa-tip p { font-size: 10.5px; color: var(--text-muted); margin: 2px 0 0; line-height: 1.4; }
-
-    .pa-notif { background: rgba(37,99,235,0.06); border: 1px solid rgba(37,99,235,0.18); border-radius: 14px; padding: 16px; text-align: center; }
-    .pa-notif h4 { font-size: 14px; font-weight: 800; color: var(--text-primary); margin: 0 0 6px; }
-    .pa-notif p { font-size: 11.5px; color: var(--text-muted); margin: 0 0 12px; line-height: 1.45; }
-    .pa-notif a { display: inline-flex; align-items: center; gap: 7px; background: #2563eb; color: #fff; font-size: 12px; font-weight: 800; padding: 10px 16px; border-radius: 9px; text-decoration: none; }
-
-    @media (max-width: 1200px) { .pa-grid { grid-template-columns: 1fr; } .pa-sec, .pa-whs { grid-template-columns: 1fr 1fr; } .pa-steps { flex-wrap: wrap; } .pa-step-arr { display: none; } .pa-step { flex: 1 1 28%; } }
-    @media (max-width: 760px) { .pa-sec, .pa-whs { grid-template-columns: 1fr; } }
+    @media (max-width: 1100px) { .pa-layout { grid-template-columns: 1fr; } .pa-rail { position: static; } }
+    @media (max-width: 620px) { .pa-item { grid-template-columns: 1fr; } }
 </style>
 @endpush
 
 @section('content')
-<div class="pa">
-    <div class="pa-grid">
-
-        {{-- ─── MAIN ─── --}}
-        <div>
-            {{-- Header --}}
-            <div class="pa-card" style="margin-bottom:16px;">
-                {{-- A compact head, not a banner.
-
-                     This opened with a title, a tagline, a paragraph about
-                     itself and a drawing of a clipboard, which together pushed
-                     the actual list of things needing attention below the fold.
-                     Khadijah's 28 October screen puts the list first. --}}
-                <div class="pa-header pa-header-slim">
-                    <span class="pa-h-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></span>
-                    <div>
-                        <h1>Priority Actions</h1>
-                        <div class="tag">Everything waiting on you, in one place.</div>
-                    </div>
-                </div>
-
-                {{-- What happens --}}
-                {{-- The page used to open with four sections explaining what a
-                     priority action is made of, and these, the only part of it
-                     that is this professional's own work, sat at the bottom
-                     under the heading "What happens when you click this card?".
-                     An explainer is not the feature. --}}
-                <div class="pa-wh-title">WHAT NEEDS YOU NOW</div>
-                @if($priorityCount < 1)
-                    <p style="font-size:13px;color:var(--text-muted);margin:-2px 0 12px;">Nothing is waiting on you right now. New offers and tasks appear here.</p>
-                @endif
-                <div class="pa-whs">
-                    <div class="pa-wh c1">
-                        <div class="pa-wh-h"><span class="pa-wh-ico" style="background:#ef4444;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span><span class="pa-wh-nm">Contract awaiting signature</span></div>
-                        <p>A secure legal page shows the full digital contract between you and the client.</p>
-                        <div class="pa-wh-meta">{{ $cards['contracts'] }} pending</div>
-                        <a href="{{ route('professional.contracts.index') }}" class="pa-wh-btn" style="background:#b91c1c;">Review &amp; Sign</a>
-                    </div>
-                    <div class="pa-wh c2">
-                        <div class="pa-wh-h"><span class="pa-wh-ico" style="background:#f97316;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg></span><span class="pa-wh-nm">Staffing shortage detected</span></div>
-                        <p>Your crew dashboard shows exactly which jobs are empty.</p>
-                        <div class="pa-wh-meta">{{ $cards['staffing'] }} open shift{{ $cards['staffing'] == 1 ? '' : 's' }}</div>
-                        <a href="{{ route('professional.team.index') }}" class="pa-wh-btn" style="background:#f97316;">Hire Staff</a>
-                    </div>
-                    <div class="pa-wh c3">
-                        <div class="pa-wh-h"><span class="pa-wh-ico" style="background:#2563eb;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span><span class="pa-wh-nm">New bids to respond to</span></div>
-                        <p>The active negotiation screen shows a countdown timer so you don't miss it.</p>
-                        <div class="pa-wh-meta">{{ $cards['bids'] }} awaiting you</div>
-                        <a href="{{ route('professional.proposals.index') }}" class="pa-wh-btn" style="background:#2563eb;">Respond Now</a>
-                    </div>
-                    <div class="pa-wh c4">
-                        <div class="pa-wh-h"><span class="pa-wh-ico" style="background:#10b981;"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span><span class="pa-wh-nm">Payment released</span></div>
-                        <p>Your financial vault shows the payment has been released safely.</p>
-                        <div class="pa-wh-meta">Amount: {{ $money($cards['escrow']) }}</div>
-                        <a href="{{ route('professional.earnings.index') }}" class="pa-wh-btn" style="background:#047857;">View Payment</a>
-                    </div>
-                </div>
-
-                <details class="pa-explain" style="margin-top:22px;">
-                    <summary style="cursor:pointer;font-size:12px;font-weight:800;letter-spacing:.4px;color:var(--text-muted);padding:10px 0;">HOW PRIORITY ACTIONS WORKS</summary>
-                {{-- WHAT --}}
-                <div class="pa-sec">
-                    <div class="pa-sec-l">
-                        <div class="pa-sec-h"><span class="pa-sec-ico" style="background:rgba(239,68,68,0.12);color:var(--bad-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><span class="pa-sec-t">WHAT <span>(Event Details)</span></span></div>
-                        <p class="pa-sec-d">Shows the important facts about the event.</p>
-                        <div class="pa-chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>When the event happens</div>
-                        <div class="pa-chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Where it happens</div>
-                        <div class="pa-chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Guest count, budget, and other key details</div>
-                    </div>
-                    <div class="pa-ex">
-                        <div class="pa-ex-h">Example:</div>
-                        <div class="pa-ex-row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg><span><b>Date:</b> {{ $exDate }} – {{ $exEnd }}</span></div>
-                        <div class="pa-ex-row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg><span><b>Location:</b> {{ $exLoc }}</span></div>
-                        <div class="pa-ex-row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg><span><b>Guest Count:</b> how many people are coming</span></div>
-                        <div class="pa-ex-row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg><span><b>Budget Range:</b> {{ $exBudget }}</span></div>
-                    </div>
-                </div>
-
-                {{-- WHY --}}
-                <div class="pa-sec">
-                    <div class="pa-sec-l">
-                        <div class="pa-sec-h"><span class="pa-sec-ico" style="background:rgba(37,99,235,0.12);color:var(--info-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span><span class="pa-sec-t">WHY <span>(Client Message)</span></span></div>
-                        <p class="pa-sec-d">Shows why the client needs your help.</p>
-                        <div class="pa-chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>The client tells you what they want</div>
-                        <div class="pa-chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>Helps you understand the event better</div>
-                        <div class="pa-chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>You can decide if it's a good fit for you</div>
-                    </div>
-                    <div class="pa-ex">
-                        <div class="pa-ex-h">Example:</div>
-                        <div class="pa-ex-quote">"My son's 10th birthday! He loves magic and we want a special performance for his friends."</div>
-                    </div>
-                </div>
-
-                {{-- EXTRAS --}}
-                <div class="pa-sec">
-                    <div class="pa-sec-l">
-                        <div class="pa-sec-h"><span class="pa-sec-ico" style="background:rgba(249,115,22,0.12);color:var(--brand-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span><span class="pa-sec-t">EXTRAS <span>(Offer &amp; Urgency)</span></span></div>
-                        <p class="pa-sec-d">Shows the offer details and how soon you need to act.</p>
-                        <div class="pa-chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>How much the client is offering</div>
-                        <div class="pa-chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>How much time you have to respond</div>
-                        <div class="pa-chk"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>You can decide if it's a good offer</div>
-                    </div>
-                    <div class="pa-ex">
-                        <div class="pa-ex-h">Example:</div>
-                        <div class="pa-ex-row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/></svg><span><b>Offer:</b> what they are offering you</span></div>
-                        {{-- A clock counted down from 04:32:15 here, on an offer
-                             that does not exist, next to the reader's own real
-                             price. Watching a timer run is not an illustration
-                             of a field: it is a deadline. --}}
-                        <div class="pa-ex-row"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span><b>Urgency:</b> how long you have left to answer</span></div>
-                    </div>
-                </div>
-
-                {{-- SYSTEM ACTIONS --}}
-                <div class="pa-sec">
-                    <div class="pa-sec-l">
-                        <div class="pa-sec-h"><span class="pa-sec-ico" style="background:rgba(16,185,129,0.12);color:var(--ok-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/></svg></span><span class="pa-sec-t">SYSTEM ACTIONS <span>(What You Can Do)</span></span></div>
-                        <p class="pa-sec-d">Quick buttons to help you take action fast.</p>
-                        <div class="pa-bullet"><span class="d" style="background:#10b981;"></span><b style="color:var(--text-primary);">Accept</b> – Take the offer</div>
-                        <div class="pa-bullet"><span class="d" style="background:#f59e0b;"></span><b style="color:var(--text-primary);">Counter</b> – Make your own offer</div>
-                        <div class="pa-bullet"><span class="d" style="background:#ef4444;"></span><b style="color:var(--text-primary);">Decline</b> – Politely say no</div>
-                    </div>
-                    <div class="pa-ex">
-                        <div class="pa-ex-h">Example:</div>
-                        <div class="pa-ex-action">Click <b>"Accept"</b> if you want the job! The client will be notified instantly.</div>
-                    </div>
-                </div>
-
-                {{-- How it works --}}
-                <div class="pa-hiw-title">HOW IT WORKS FOR PROFESSIONALS</div>
-                <div class="pa-steps">
-                    @php
-                        $steps = [['bell','1. Get Notified',"You'll be alerted when a priority action arrives."],['target','2. Review Details','Check the what, why, and extras.'],['clip','3. Take Action','Accept, counter, or decline the offer.'],['shield','4. Client Reviews','The client reviews and awards the job.'],['trophy','5. You Win & Deliver','You deliver great work and get paid!']];
-                    @endphp
-                    @foreach($steps as $i => $s)
-                        <div class="pa-step">
-                            <div class="pa-step-ico">
-                                @switch($s[0])
-                                    @case('target')<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>@break
-                                    @case('clip')<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1"/></svg>@break
-                                    @case('shield')<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>@break
-                                    @case('trophy')<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"/><path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"/><path d="M4 22h16"/><path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"/></svg>@break
-                                    @default<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-                                @endswitch
-                            </div>
-                            <h4>{{ $s[1] }}</h4>
-                            <p>{{ $s[2] }}</p>
-                        </div>
-                        @if($i < count($steps)-1)<div class="pa-step-arr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></div>@endif
-                    @endforeach
-                </div>
-
-                </details>
-        {{-- ─── SIDEBAR ─── --}}
-        <div class="pa-side">
-            <div class="pa-card">
-                <div class="pa-side-h">EXAMPLE</div>
-                <p class="pa-side-sub">This is what Priority Actions looks like when you have new items.</p>
-                <div class="pa-live">
-                    {{-- Three, because three rows are drawn below it. It read the
-                         reader's real count and then listed three invented items
-                         under it, so a professional with nothing waiting saw
-                         their own "0" above three jobs. --}}
-                    <div class="pa-live-h"><b>PRIORITY ACTIONS</b><span class="pa-live-count">3</span></div>
-                    <div class="pa-li">
-                        <span class="pa-li-ico" style="background:rgba(239,68,68,0.1);color:var(--bad-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>
-                        <div class="pa-li-body"><div class="pa-li-t">The WHAT (Event Details)</div><div class="pa-li-d">{{ $exDate }} – {{ $exEnd }}<br>{{ \Illuminate\Support\Str::limit($exLoc, 24) }}</div></div>
-                        <span class="pa-li-btn b-accept">Accept</span>
-                    </div>
-                    <div class="pa-li">
-                        <span class="pa-li-ico" style="background:rgba(37,99,235,0.1);color:var(--info-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
-                        <div class="pa-li-body"><div class="pa-li-t">The WHY (Client Message)</div><div class="pa-li-d">Special performance request</div></div>
-                        <span class="pa-li-btn b-counter">Counter</span>
-                    </div>
-                    <div class="pa-li">
-                        <span class="pa-li-ico" style="background:rgba(249,115,22,0.1);color:var(--brand-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>
-                        <div class="pa-li-body"><div class="pa-li-t">The EXTRAS (Offer &amp; Urgency)</div><div class="pa-li-d">The offer, and how long it stands</div></div>
-                        <span class="pa-li-btn b-decline">Decline</span>
-                    </div>
-                    <div class="pa-live-foot"><a href="{{ route('professional.proposals.index') }}">View All Actions →</a></div>
-                </div>
-            </div>
-
-            <div class="pa-card">
-                <div class="pa-side-h" style="margin-bottom:10px;">QUICK TIPS</div>
-                <div class="pa-tip"><svg viewBox="0 0 24 24" fill="#f59e0b" stroke="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg><div><b>Act Fast</b><p>Urgent offers can expire. The quicker you respond, the better your chances!</p></div></div>
-                <div class="pa-tip"><svg viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg><div><b>Read Details Carefully</b><p>Understanding the client's message helps you make the best decision.</p></div></div>
-                <div class="pa-tip"><svg viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2"><path d="M12 3v18M3 7h18M6 7l-3 6h6zM18 7l-3 6h6z"/></svg><div><b>Use Counter Wisely</b><p>If the offer is too low, you can make a counter offer and negotiate.</p></div></div>
-                <div class="pa-tip"><svg viewBox="0 0 24 24" fill="none" stroke="#f97316" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg><div><b>Stay Organized</b><p>Check your Priority Actions often so nothing important gets missed.</p></div></div>
-            </div>
-
-            {{-- "Ready to Win More Gigs? Enable smart notifications and stay
-                 ahead of the competition." Six banners in this shape came off
-                 the professional screens on 1 November, against Sir Peter's
-                 rule that the platform does not promise an outcome. This one
-                 was missed. The link survives without the promise. --}}
-            <div class="pa-notif">
-                <h4>Notifications</h4>
-                <p>Choose how you hear about new offers and tasks.</p>
-                <a href="{{ route('professional.notifications.index') }}">Go to Notification Settings →</a>
-            </div>
-        </div>
+<div class="pa-head">
+    <span class="ic">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>
+    </span>
+    <div>
+        <h1>Priority Actions</h1>
+        <p>
+            @if ($total === 0)
+                Nothing is waiting on you right now.
+            @else
+                {{ $total }} {{ \Illuminate\Support\Str::plural('thing', $total) }} waiting on you.
+            @endif
+        </p>
     </div>
 </div>
 
+<div class="pa-layout">
+    <div>
+        <div class="pa-tabs">
+            @foreach ($tabs as $key => $meta)
+                <a class="pa-tab {{ $tab === $key ? 'on' : '' }}"
+                   href="{{ route('professional.priority.index', $key === 'all' ? [] : ['tab' => $key]) }}">
+                    {{ $meta['label'] }}<span class="n">{{ $meta['count'] }}</span>
+                </a>
+            @endforeach
+        </div>
+
+        @forelse ($items as $item)
+            @php [$toneLabel, $toneColour] = $tones[$item['tone']] ?? $tones['open']; @endphp
+            <div class="pa-item" style="border-left-color: {{ $toneColour }};">
+                <div>
+                    <span class="pa-badge" style="background: {{ $toneColour }};">{{ $toneLabel }}</span>
+                    <span class="pa-kind">{{ $item['kind'] }}</span>
+                </div>
+                <div>
+                    <b>{{ $item['title'] }}</b>
+                    @if ($item['subject'])
+                        <div class="pa-subject">{{ $item['subject'] }}</div>
+                    @endif
+                    @if ($item['detail'])
+                        <div class="pa-detail">{{ $item['detail'] }}</div>
+                    @endif
+                    @if ($item['when'])
+                        <div class="pa-when">{{ $item['when'] }}</div>
+                    @endif
+                </div>
+                <a class="pa-go" href="{{ $item['url'] }}">{{ $item['cta'] }}</a>
+            </div>
+        @empty
+            <div class="pa-empty">
+                <b>Nothing here</b>
+                <span>
+                    @if ($tab === 'all')
+                        When a client signs an agreement, sends a request or a deadline comes close, it appears on this list.
+                    @else
+                        Nothing in this group right now. Try All.
+                    @endif
+                </span>
+            </div>
+        @endforelse
+    </div>
+
+    <aside class="pa-rail">
+        <div class="pa-card">
+            <h4>Your schedule today</h4>
+            @forelse ($today as $slot)
+                <div class="pa-row">
+                    <span class="t">{{ $slot['at']->timezone(config('app.display_timezone'))->format('g:i A') }}</span>
+                    <span class="m">
+                        <b>{{ $slot['title'] }}</b>
+                        @if ($slot['where']) <span>{{ $slot['where'] }}</span> @endif
+                    </span>
+                </div>
+            @empty
+                <div class="pa-none">Nothing booked for today.</div>
+            @endforelse
+        </div>
+
+        <div class="pa-card">
+            <h4>Upcoming deadlines</h4>
+            @forelse ($deadlines as $item)
+                <div class="pa-row">
+                    <span class="m">
+                        <b>{{ $item['title'] }}</b>
+                        <span>{{ $item['when'] ?? $item['due']->timezone(config('app.display_timezone'))->format('j M Y') }}</span>
+                    </span>
+                </div>
+            @empty
+                <div class="pa-none">Nothing with a date on it.</div>
+            @endforelse
+        </div>
+
+        <div class="pa-card">
+            <h4>Your last 30 days</h4>
+            <div class="pa-figs">
+                <div class="pa-fig"><b>{{ $snapshot['requests'] }}</b><span>Requests received</span></div>
+                <div class="pa-fig"><b>{{ $snapshot['bids'] }}</b><span>Bids placed</span></div>
+                <div class="pa-fig"><b>{{ $snapshot['won'] }}</b><span>Bookings won</span></div>
+                <div class="pa-fig"><b>{{ $money($snapshot['earned']) }}</b><span>Earned, after fees</span></div>
+            </div>
+        </div>
+    </aside>
+</div>
 @endsection

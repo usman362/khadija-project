@@ -104,6 +104,26 @@
     .bi-banner a { display: inline-flex; align-items: center; gap: 9px; background: #2563eb; color: #fff; font-size: 15px; font-weight: 800; padding: 14px 24px; border-radius: 12px; text-decoration: none; white-space: nowrap; }
     .bi-banner a svg { width: 17px; height: 17px; }
 
+    .bi-perf { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px,1fr)); gap: 16px; margin-bottom: 18px; }
+    .bi-pcard { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; padding: 17px 18px; }
+    .bi-pcard h3 { font-size: 14px; font-weight: 800; color: var(--text-primary); margin: 0 0 13px; }
+    .bi-rec { display: grid; grid-template-columns: repeat(auto-fit, minmax(90px,1fr)); gap: 12px; }
+    .bi-rec b { display: block; font-size: 20px; font-weight: 800; color: var(--text-primary); line-height: 1.1; }
+    .bi-rec span { font-size: 11px; color: var(--text-muted); }
+    .bi-note { font-size: 11.5px; color: var(--text-muted); margin: 12px 0 0; line-height: 1.55; }
+    .bi-split { display: grid; grid-template-columns: minmax(0,1.1fr) minmax(0,1fr) minmax(90px,1.4fr) 46px;
+        gap: 11px; align-items: center; padding: 8px 0; border-top: 1px solid var(--border-color); }
+    .bi-split:first-of-type { border-top: 0; }
+    .bi-split .l { font-size: 12.5px; font-weight: 700; color: var(--text-primary); }
+    .bi-split .t { font-size: 11px; color: var(--text-muted); }
+    .bi-split .b { height: 7px; border-radius: 4px; background: var(--border-color); overflow: hidden; display: block; }
+    .bi-split .b i { display: block; height: 100%; background: var(--accent-blue, #2563eb); }
+    .bi-split .r { font-size: 12.5px; font-weight: 800; color: var(--text-primary); text-align: right; }
+    .bi-months { display: grid; grid-template-columns: repeat(12, 1fr); gap: 6px; align-items: end; height: 110px; }
+    .bi-month { display: flex; flex-direction: column; justify-content: flex-end; align-items: center; height: 100%; gap: 5px; }
+    .bi-month i { display: block; width: 100%; border-radius: 4px 4px 0 0; background: var(--accent-blue, #2563eb); }
+    .bi-month span { font-size: 9.5px; color: var(--text-muted); }
+    @media (max-width: 760px) { .bi-split { grid-template-columns: 1fr auto; } .bi-split .t, .bi-split .b { display: none; } }
     @media (max-width: 1200px) { .bi-hero, .bi-hero-l { grid-template-columns: 1fr; } .bi-cc { grid-template-columns: repeat(2, minmax(0,1fr)); } }
     /* One column each, stacked, now that they are no longer side by side. */
     .bi-hero-top, .bi-hero-why { grid-template-columns: 1fr; }
@@ -140,6 +160,102 @@
             <a href="{{ route('professional.proposals.index') }}" class="bi-pipe-btn">View Full Pipeline <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
         </div>
     </div>
+
+    {{-- This professional's own bidding, grouped the ways the screen groups
+         it. Every figure is a count of their own bids and what became of
+         each, so all of it can be checked by hand.
+
+         A group with nothing decided yet is left out rather than shown at
+         nought per cent: somebody whose first bid is still open has not lost
+         it. --}}
+    @php
+        $biRec = $performance['record'];
+        $biBar = function (array $rows) {
+            return collect($rows)->max('rate') ?: 100;
+        };
+    @endphp
+
+    <div class="bi-perf">
+        <div class="bi-pcard">
+            <h3>Your record</h3>
+            <div class="bi-rec">
+                <div><b>{{ $biRec['placed'] }}</b><span>Bids placed</span></div>
+                <div><b>{{ $biRec['won'] }}</b><span>Won</span></div>
+                <div><b>{{ $biRec['lost'] }}</b><span>Lost</span></div>
+                <div><b>{{ $biRec['open'] }}</b><span>Still open</span></div>
+            </div>
+            <p class="bi-note">
+                @if ($biRec['rate'] === null)
+                    Nothing has been decided yet, so there is no rate to show.
+                @else
+                    You have won {{ $biRec['rate'] }}% of the bids that were decided.
+                    Bids still open are in neither total.
+                @endif
+            </p>
+        </div>
+
+        <div class="bi-pcard">
+            <h3>What you lost</h3>
+            <div class="bi-rec">
+                <div><b>{{ $performance['lost']['count'] }}</b><span>Bids</span></div>
+                <div><b>${{ number_format($performance['lost']['amount'], 0) }}</b><span>At your own prices</span></div>
+            </div>
+            <p class="bi-note">Your figure, not the client's budget. This is work you put a price on and did not get.</p>
+        </div>
+    </div>
+
+    @foreach ([
+        ['By event type', $performance['byEvent']],
+        ['By service', $performance['byService']],
+        ['By state', $performance['byPlace']],
+    ] as [$biTitle, $biRows])
+        @if ($biRows)
+            <div class="bi-pcard" style="margin-bottom:18px;">
+                <h3>{{ $biTitle }}</h3>
+                @php $biMax = $biBar($biRows); @endphp
+                @foreach ($biRows as $row)
+                    <div class="bi-split">
+                        <span class="l">{{ $row['label'] }}</span>
+                        <span class="t">{{ $row['won'] }} of {{ $row['won'] + $row['lost'] }}</span>
+                        <span class="b"><i style="width: {{ $biMax > 0 ? round($row['rate'] / $biMax * 100) : 0 }}%;"></i></span>
+                        <span class="r">{{ $row['rate'] }}%</span>
+                    </div>
+                @endforeach
+            </div>
+        @endif
+    @endforeach
+
+    @if ($performance['byPrice'])
+        <div class="bi-pcard" style="margin-bottom:18px;">
+            <h3>By what you charged</h3>
+            @php $biMax = $biBar($performance['byPrice']); @endphp
+            @foreach ($performance['byPrice'] as $row)
+                <div class="bi-split">
+                    <span class="l">{{ $row['label'] }}</span>
+                    <span class="t">{{ $row['placed'] }} {{ \Illuminate\Support\Str::plural('bid', $row['placed']) }}, averaging ${{ number_format($row['average']) }}</span>
+                    <span class="b"><i style="width: {{ $biMax > 0 ? round($row['rate'] / $biMax * 100) : 0 }}%;"></i></span>
+                    <span class="r">{{ $row['rate'] }}%</span>
+                </div>
+            @endforeach
+            <p class="bi-note">Bands are fixed, so the same bid lands in the same band whatever else you bid on this month.</p>
+        </div>
+    @endif
+
+    @if ($performance['season']['enough'])
+        <div class="bi-pcard" style="margin-bottom:18px;">
+            <h3>When your work falls</h3>
+            @php $seasonMax = collect($performance['season']['months'])->max('count') ?: 1; @endphp
+            <div class="bi-months">
+                @foreach ($performance['season']['months'] as $m)
+                    <div class="bi-month" title="{{ $m['count'] }} {{ \Illuminate\Support\Str::plural('request', $m['count']) }}">
+                        <i style="height: {{ max(3, round($m['count'] / $seasonMax * 100)) }}%;"></i>
+                        <span>{{ $m['label'] }}</span>
+                    </div>
+                @endforeach
+            </div>
+            <p class="bi-note">The months the requests you bid on actually happen in. Your own history, not a season anyone assumed.</p>
+        </div>
+    @endif
 
     <div class="bi-hero bi-hero-why">
         <div class="bi-hero-l">

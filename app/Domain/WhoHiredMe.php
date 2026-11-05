@@ -32,6 +32,11 @@ use Illuminate\Support\Collection;
  * event", no priority score. Nothing on the platform records a client's
  * intention, and a number with nothing behind it is worse on this page than
  * on most: it is the page somebody would use to decide who to chase.
+ *
+ * Lifetime value here is money that has actually been paid, not a projection,
+ * and "next" is a booking that exists rather than one somebody expects. Tags
+ * and the quick note are the professional's own words, written by them and
+ * read back; see App\Models\ProfessionalClientNote.
  */
 final class WhoHiredMe
 {
@@ -67,6 +72,9 @@ final class WhoHiredMe
         }
 
         $conversations = self::conversationsWith($professional, $bookings->pluck('client_id')->unique());
+        $notes = \App\Models\ProfessionalClientNote::where('supplier_id', $professional->id)
+            ->get()
+            ->keyBy('client_id');
         $reviewedBy    = Review::whereIn('booking_id', $bookings->pluck('id'))
             ->where('reviewee_id', $professional->id)
             ->pluck('booking_id')
@@ -80,6 +88,7 @@ final class WhoHiredMe
                 $professional,
                 $conversations,
                 $reviewedBy,
+                $notes,
             ))
             ->sortByDesc(fn (array $r) => $r['last']['at']?->timestamp ?? 0)
             ->values();
@@ -108,6 +117,7 @@ final class WhoHiredMe
         User $professional,
         Collection $conversations,
         array $reviewedBy,
+        Collection $notes,
     ): array {
         $client = $theirs->first()->client;
 
@@ -173,8 +183,36 @@ final class WhoHiredMe
             // The conversation they already have, where there is one. Sending
             // somebody to the message centre to find a name they are already
             // looking at is a step nobody needed.
-            'conversation' => $conversations->get($clientId),
+            'conversation' => $conversations->get($clientId)['id'] ?? null,
+
+            /*
+             * When they were last in touch, so a professional can see who has
+             * gone quiet. Measured from the most recent of the last job they
+             * did together and the last message between them, because either
+             * one counts as contact and neither alone is the whole story.
+             */
+            'last_contact' => self::lastContact($last, $conversations->get($clientId)),
+
+            // The professional's own words. Never shown to the client.
+            'tags' => $notes->get($clientId)?->tags ?: [],
+            'note' => $notes->get($clientId)?->note,
         ];
+    }
+
+    /**
+     * The later of the last job and the last message, or null when there has
+     * been neither. Null is not "a long time ago": it means nobody knows.
+     */
+    private static function lastContact(?Booking $last, ?array $conversation): ?\Illuminate\Support\Carbon
+    {
+        $dates = collect([
+            $last?->event?->starts_at,
+            // Conversations carry no last-message column; the row's own
+            // timestamp moves when a message is written to it.
+            $conversation['at'] ?? null,
+        ])->filter();
+
+        return $dates->isEmpty() ? null : $dates->sortDesc()->first();
     }
 
     /**
@@ -200,7 +238,11 @@ final class WhoHiredMe
             ->reduce(function (Collection $carry, Conversation $c) use ($professional, $clientIds) {
                 foreach ($c->participants as $p) {
                     if ($p->id !== $professional->id && $clientIds->contains($p->id) && ! $carry->has($p->id)) {
-                        $carry->put($p->id, $c->id);
+                        // The id, because the view routes with it, and the
+                        // time, because "last contact" needs it and a second
+                        // query per client would be one query per row on a
+                        // page whose whole point is having many.
+                        $carry->put($p->id, ['id' => $c->id, 'at' => $c->updated_at]);
                     }
                 }
 

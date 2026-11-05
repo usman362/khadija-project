@@ -1221,6 +1221,7 @@ Route::middleware('auth')->group(function () {
          * Leads above is who MIGHT hire them. This is who already has.
          */
         Route::get('/clients', [\App\Http\Controllers\Professional\ProfessionalClientsController::class, 'index'])->name('professional.clients.index');
+        Route::post('/clients/{client}/note', [\App\Http\Controllers\Professional\ProfessionalClientsController::class, 'saveNote'])->name('professional.clients.note');
 
         // My Calendar (schedule home — agenda + month grid + availability)
         Route::get('/calendar', [\App\Http\Controllers\Professional\ProfessionalCalendarController::class, 'index'])->name('professional.calendar.index');
@@ -1295,6 +1296,12 @@ Route::middleware('auth')->group(function () {
             ->name('professional.services.add');
         Route::post('/services/toggle', [\App\Http\Controllers\Professional\ProfessionalServicePricingController::class, 'toggle'])
             ->name('professional.services.toggle');
+        Route::post('/services/rules', [\App\Http\Controllers\Professional\ProfessionalServicePricingController::class, 'saveRules'])
+            ->name('professional.services.rules');
+        Route::post('/services/addons', [\App\Http\Controllers\Professional\ProfessionalServicePricingController::class, 'addAddon'])
+            ->name('professional.services.addons.add');
+        Route::delete('/services/addons/{addon}', [\App\Http\Controllers\Professional\ProfessionalServicePricingController::class, 'removeAddon'])
+            ->name('professional.services.addons.remove');
 
         // Before /gigs/{event}, or "export" is read as an event id.
         Route::get('/gigs/export', [ProfessionalGigController::class, 'export'])

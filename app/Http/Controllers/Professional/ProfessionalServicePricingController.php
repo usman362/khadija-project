@@ -64,6 +64,15 @@ class ProfessionalServicePricingController extends Controller
             ->groupBy(fn ($s) => $s->parent?->name ?: 'Other services')
             ->sortKeys();
 
+        /*
+         * Khadijah's screen puts five tabs across this page. Services was the
+         * only one with anything behind it; the rest were headings. These two
+         * records are what the others needed, and both are the professional's
+         * own words rather than anything derived.
+         */
+        $rules  = \App\Models\PricingRule::firstOrNew(['user_id' => $user->id]);
+        $addons = \App\Models\Addon::where('user_id', $user->id)->orderBy('name')->get();
+
         return view('professional.services.index', [
             'services'   => $services,
             'groups'     => $groups,
@@ -71,6 +80,9 @@ class ProfessionalServicePricingController extends Controller
             'priced'     => $priced->count(),
             'inPackages' => $inPackages,
             'addable'    => $this->addable($services),
+            'tab'        => $this->tab($request),
+            'rules'      => $rules,
+            'addons'     => $addons,
             'counts'     => [
                 'total'    => $services->count(),
                 'active'   => $active->count(),
@@ -79,6 +91,96 @@ class ProfessionalServicePricingController extends Controller
                 'quickbid' => $priced->count(),
             ],
         ]);
+    }
+
+    /** Which tab is open. Anything unrecognised falls back to the services. */
+    private function tab(Request $request): string
+    {
+        $tabs = ['services', 'addons', 'rules', 'travel', 'quickbid'];
+
+        return in_array($request->query('tab'), $tabs, true)
+            ? (string) $request->query('tab')
+            : 'services';
+    }
+
+    /**
+     * Save the pricing rules, the travel charge or the Quick Bid settings.
+     *
+     * One action for all three, because they are one record. Each form sends
+     * only its own fields, so a field this form did not carry is left alone
+     * rather than being blanked by its own absence.
+     */
+    public function saveRules(Request $request): RedirectResponse
+    {
+        $data = $request->validate([
+            'minimum_booking'       => ['nullable', 'numeric', 'min:0', 'max:1000000'],
+            'weekend_surcharge_pct' => ['nullable', 'integer', 'min:0', 'max:100'],
+            'rush_surcharge_pct'    => ['nullable', 'integer', 'min:0', 'max:100'],
+            'travel_free_miles'     => ['nullable', 'integer', 'min:0', 'max:5000'],
+            'travel_rate_per_mile'  => ['nullable', 'numeric', 'min:0', 'max:1000'],
+            'travel_max_miles'      => ['nullable', 'integer', 'min:0', 'max:5000'],
+            'quick_bid_enabled'     => ['nullable', 'boolean'],
+            'quick_bid_terms'       => ['nullable', 'string', 'max:600'],
+            'tab'                   => ['nullable', 'string', 'max:20'],
+        ]);
+
+        $rules = \App\Models\PricingRule::firstOrNew(['user_id' => $request->user()->id]);
+
+        foreach (['minimum_booking', 'weekend_surcharge_pct', 'rush_surcharge_pct',
+                  'travel_free_miles', 'travel_rate_per_mile', 'travel_max_miles',
+                  'quick_bid_terms'] as $field) {
+            if ($request->has($field)) {
+                // Empty means "not set", which is not the same as zero.
+                $rules->{$field} = $data[$field] === '' ? null : $data[$field];
+            }
+        }
+
+        if ($request->has('quick_bid_enabled')) {
+            $rules->quick_bid_enabled = (bool) ($data['quick_bid_enabled'] ?? false);
+        }
+
+        $rules->user_id = $request->user()->id;
+        $rules->save();
+
+        return redirect()
+            ->route('professional.services.index', ['tab' => $data['tab'] ?? 'rules'])
+            ->with('status', 'Saved.');
+    }
+
+    /** Add one optional extra. */
+    public function addAddon(Request $request): RedirectResponse
+    {
+        $data = $request->validate([
+            'name'       => ['required', 'string', 'max:80'],
+            'price'      => ['nullable', 'numeric', 'min:0', 'max:1000000'],
+            'price_unit' => ['nullable', 'string', 'in:flat,hourly,per_person'],
+        ]);
+
+        \App\Models\Addon::create([
+            'user_id'    => $request->user()->id,
+            'name'       => $data['name'],
+            'price'      => $data['price'] ?? null,
+            'price_unit' => $data['price_unit'] ?? 'flat',
+        ]);
+
+        return redirect()
+            ->route('professional.services.index', ['tab' => 'addons'])
+            ->with('status', $data['name'] . ' added.');
+    }
+
+    /** Remove one, but only this professional's own. */
+    public function removeAddon(Request $request, \App\Models\Addon $addon): RedirectResponse
+    {
+        if ($addon->user_id !== $request->user()->id) {
+            abort(404);
+        }
+
+        $name = $addon->name;
+        $addon->delete();
+
+        return redirect()
+            ->route('professional.services.index', ['tab' => 'addons'])
+            ->with('status', $name . ' removed.');
     }
 
     /**

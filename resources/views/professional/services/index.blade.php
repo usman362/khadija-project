@@ -71,6 +71,16 @@
     .sp-tips li { position:relative; padding-left:16px; margin-bottom:8px; font-size:12.5px; color:var(--text-secondary); }
     .sp-tips li::before { content:"\2713"; position:absolute; left:0; color:#10b981; font-weight:800; }
 
+    .sp-tabs { display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 18px; }
+    .sp-tab { padding: 8px 15px; border-radius: 999px; font-size: 12.5px; font-weight: 700;
+        text-decoration: none; color: var(--text-secondary, var(--text-muted));
+        border: 1px solid var(--border-color); background: var(--bg-card); white-space: nowrap; }
+    .sp-tab.on { background: var(--text-primary); color: var(--bg-card); border-color: var(--text-primary); }
+    .sp-three { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 14px; }
+    .sp-inline { display: grid; grid-template-columns: minmax(0,2fr) 120px 140px auto; gap: 11px; align-items: end; margin-top: 16px; }
+    .sp-check { display: flex; gap: 9px; align-items: center; font-size: 13.5px; font-weight: 700; color: var(--text-primary); }
+    textarea.sp-in { font-family: inherit; resize: vertical; }
+    @media (max-width: 860px) { .sp-three, .sp-inline { grid-template-columns: 1fr; } }
     @media (max-width: 1000px) { .sp-row { grid-template-columns:1fr 1fr 1fr; } .sp-tools, .sp-add { grid-template-columns:1fr; } }
 </style>
 @endpush
@@ -96,6 +106,27 @@
     <div class="sp-stat"><div class="n">{{ $counts['inactive'] }}</div><div class="l">Resting, hidden from clients</div></div>
 </div>
 
+{{-- Khadijah's screen puts these five across the page. Services was the only
+     one with anything behind it; the other four had nowhere to store an
+     answer, so a weekend surcharge or a travel charge was typed into every
+     quote by hand. --}}
+@php
+    $spTabs = [
+        'services' => 'Services',
+        'addons'   => 'Add-ons & extras',
+        'rules'    => 'Pricing rules',
+        'travel'   => 'Travel',
+        'quickbid' => 'Quick Bid',
+    ];
+@endphp
+<div class="sp-tabs">
+    @foreach ($spTabs as $key => $label)
+        <a class="sp-tab {{ $tab === $key ? 'on' : '' }}"
+           href="{{ route('professional.services.index', $key === 'services' ? [] : ['tab' => $key]) }}">{{ $label }}</a>
+    @endforeach
+</div>
+
+@if ($tab === 'services')
 {{-- Add Service Offering. Khadijah asked for it here on 5 November; before
      this, the only way to add a service was to leave this page. --}}
 <div class="sp-card">
@@ -248,6 +279,158 @@
         @endforeach
     @endif
 </div>
+
+@endif
+
+@if ($tab === 'addons')
+    {{-- An extra is not a service. Nobody hires somebody for an extra hour of
+         lighting with no lighting under it, so these are listed apart and
+         priced apart. --}}
+    <div class="sp-card">
+        <h2>Add-ons and extras</h2>
+        <p class="sub">The optional things you sell on top of a service. They appear beside your price when you quote.</p>
+
+        @if ($addons->isEmpty())
+            <div class="sp-none">Nothing yet. Add your first one below.</div>
+        @else
+            <table class="sp-table">
+                <thead><tr><th>Extra</th><th>Price</th><th>Charged</th><th></th></tr></thead>
+                <tbody>
+                @foreach ($addons as $addon)
+                    <tr>
+                        <td><strong>{{ $addon->name }}</strong></td>
+                        <td>{{ $addon->price !== null ? '$' . number_format((float) $addon->price, 2) : 'No price yet' }}</td>
+                        <td>{{ ['flat' => 'Flat', 'hourly' => 'Per hour', 'per_person' => 'Per person'][$addon->price_unit] ?? 'Flat' }}</td>
+                        <td style="text-align:right;">
+                            <form method="POST" action="{{ route('professional.services.addons.remove', $addon) }}">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="sp-mini">Remove</button>
+                            </form>
+                        </td>
+                    </tr>
+                @endforeach
+                </tbody>
+            </table>
+        @endif
+
+        <form method="POST" action="{{ route('professional.services.addons.add') }}" class="sp-inline">
+            @csrf
+            <div>
+                <label class="sp-lab" for="adName">Name</label>
+                <input class="sp-in" type="text" id="adName" name="name" maxlength="80" required placeholder="e.g. Extra hour of lighting">
+            </div>
+            <div>
+                <label class="sp-lab" for="adPrice">Price</label>
+                <input class="sp-in" type="number" id="adPrice" name="price" step="0.01" min="0" placeholder="150">
+            </div>
+            <div>
+                <label class="sp-lab" for="adUnit">Charged</label>
+                <select class="sp-sel" id="adUnit" name="price_unit">
+                    <option value="flat">Flat</option>
+                    <option value="hourly">Per hour</option>
+                    <option value="per_person">Per person</option>
+                </select>
+            </div>
+            <button type="submit" class="sp-save">Add extra</button>
+        </form>
+        @error('name') <div class="sp-note" style="color:#b91c1c;">{{ $message }}</div> @enderror
+    </div>
+@endif
+
+@if ($tab === 'rules')
+    <div class="sp-card">
+        <h2>Pricing rules</h2>
+        <p class="sub">What you will not go below, and what you add on. Leave anything blank and it simply does not apply.</p>
+
+        <form method="POST" action="{{ route('professional.services.rules') }}">
+            @csrf
+            <input type="hidden" name="tab" value="rules">
+            <div class="sp-three">
+                <div>
+                    <label class="sp-lab" for="rMin">Minimum booking</label>
+                    <input class="sp-in" type="number" id="rMin" name="minimum_booking" step="0.01" min="0"
+                           value="{{ old('minimum_booking', $rules->minimum_booking) }}" placeholder="e.g. 500">
+                    <div class="sp-note">Blank means you have not set one. It does not mean zero.</div>
+                </div>
+                <div>
+                    <label class="sp-lab" for="rWeekend">Weekend surcharge</label>
+                    <input class="sp-in" type="number" id="rWeekend" name="weekend_surcharge_pct" min="0" max="100"
+                           value="{{ old('weekend_surcharge_pct', $rules->weekend_surcharge_pct) }}" placeholder="percent">
+                </div>
+                <div>
+                    <label class="sp-lab" for="rRush">Short notice surcharge</label>
+                    <input class="sp-in" type="number" id="rRush" name="rush_surcharge_pct" min="0" max="100"
+                           value="{{ old('rush_surcharge_pct', $rules->rush_surcharge_pct) }}" placeholder="percent">
+                </div>
+            </div>
+            <button type="submit" class="sp-save" style="margin-top:14px;">Save pricing rules</button>
+        </form>
+    </div>
+@endif
+
+@if ($tab === 'travel')
+    <div class="sp-card">
+        <h2>Travel</h2>
+        <p class="sub">How far you will go, and what you charge beyond the distance you cover for nothing.</p>
+
+        <form method="POST" action="{{ route('professional.services.rules') }}">
+            @csrf
+            <input type="hidden" name="tab" value="travel">
+            <div class="sp-three">
+                <div>
+                    <label class="sp-lab" for="tFree">Free within</label>
+                    <input class="sp-in" type="number" id="tFree" name="travel_free_miles" min="0" max="5000"
+                           value="{{ old('travel_free_miles', $rules->travel_free_miles) }}" placeholder="miles">
+                </div>
+                <div>
+                    <label class="sp-lab" for="tRate">Then per mile</label>
+                    <input class="sp-in" type="number" id="tRate" name="travel_rate_per_mile" step="0.01" min="0"
+                           value="{{ old('travel_rate_per_mile', $rules->travel_rate_per_mile) }}" placeholder="e.g. 1.50">
+                </div>
+                <div>
+                    <label class="sp-lab" for="tMax">Will not travel past</label>
+                    <input class="sp-in" type="number" id="tMax" name="travel_max_miles" min="0" max="5000"
+                           value="{{ old('travel_max_miles', $rules->travel_max_miles) }}" placeholder="miles">
+                </div>
+            </div>
+            <div class="sp-note" style="margin-top:10px;">
+                This is what you charge to get there. Which states you can work in is a separate thing, set on your
+                <a href="{{ route('professional.profile.index') }}">profile</a>.
+            </div>
+            <button type="submit" class="sp-save" style="margin-top:14px;">Save travel</button>
+        </form>
+    </div>
+@endif
+
+@if ($tab === 'quickbid')
+    <div class="sp-card">
+        <h2>Quick Bid</h2>
+        <p class="sub">Answer a request with the prices you have already set, instead of working them out again.</p>
+
+        <form method="POST" action="{{ route('professional.services.rules') }}">
+            @csrf
+            <input type="hidden" name="tab" value="quickbid">
+            <input type="hidden" name="quick_bid_enabled" value="0">
+            <label class="sp-check">
+                <input type="checkbox" name="quick_bid_enabled" value="1" @checked($rules->quick_bid_enabled)>
+                <span>Fill a bid from my own prices</span>
+            </label>
+            <div class="sp-note">
+                It fills the figure in. It never sends anything: a bid in your name is still yours to send.
+                {{ $counts['quickbid'] }} of your {{ $counts['total'] }} services have a price it can use.
+            </div>
+
+            <div style="margin-top:14px;">
+                <label class="sp-lab" for="qTerms">Terms to include</label>
+                <textarea class="sp-in" id="qTerms" name="quick_bid_terms" rows="4" maxlength="600"
+                          placeholder="e.g. Deposit due on booking. Final numbers one week before.">{{ old('quick_bid_terms', $rules->quick_bid_terms) }}</textarea>
+            </div>
+
+            <button type="submit" class="sp-save" style="margin-top:14px;">Save Quick Bid</button>
+        </form>
+    </div>
+@endif
 
 <div class="sp-card">
     <h2>Getting the most out of this page</h2>

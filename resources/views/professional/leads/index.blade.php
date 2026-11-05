@@ -161,6 +161,26 @@
 </style>
 @endpush
 
+@push('styles')
+<style>
+    .pl-more { grid-column: 1 / -1; margin-top: 10px; border-top: 1px solid var(--border-color); padding-top: 9px; }
+    .pl-more > summary { list-style: none; cursor: pointer; font-size: 12px; font-weight: 700; color: var(--accent-blue, #2563eb); }
+    .pl-more > summary::-webkit-details-marker { display: none; }
+    .pl-more-body { margin-top: 10px; display: flex; flex-direction: column; gap: 10px; }
+    .pl-why { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 7px 16px; }
+    .pl-why li { font-size: 12px; }
+    .pl-why li.yes { color: var(--ok-text, #047857); font-weight: 700; }
+    .pl-why li.no { color: var(--text-muted); }
+    .pl-facts { display: flex; flex-wrap: wrap; gap: 8px 22px; }
+    .pl-facts span { font-size: 12px; color: var(--text-primary); }
+    .pl-facts b { display: block; font-size: 10px; font-weight: 800; text-transform: uppercase;
+        letter-spacing: .3px; color: var(--text-muted); }
+    .pl-summary { font-size: 12.5px; color: var(--text-secondary, var(--text-muted)); margin: 0; line-height: 1.55; }
+    .pl-more-go { align-self: flex-start; font-size: 12.5px; font-weight: 700; padding: 8px 15px;
+        border-radius: 9px; background: var(--accent-blue, #2563eb); color: #fff; text-decoration: none; }
+</style>
+@endpush
+
 @section('content')
 <div class="pl">
 
@@ -237,6 +257,54 @@
                 <div class="pl-lead-val">{{ $budget }}</div>
                 {{-- Named, so the pill cannot be mistaken for another stage. --}}
                 <span class="pl-prio" style="color:{{ $pc }};background:{{ $pbg }};">Priority: {{ $lead['priority'] }}</span>
+
+                {{-- Khadijah's 28 October screen opens a lead into its own
+                     detail with a priority score out of 100 under it.
+
+                     There is no score here. Nothing weighs these tests against
+                     each other, so a number out of 100 would be invented on the
+                     screen somebody uses to decide who to chase. The tests
+                     themselves are shown instead, because they are exactly what
+                     set the priority and a professional can check every one. --}}
+                <details class="pl-more">
+                    <summary>Why this priority</summary>
+                    <div class="pl-more-body">
+                        <ul class="pl-why">
+                            @foreach($lead['why'] as [$reason, $met])
+                                <li class="{{ $met ? 'yes' : 'no' }}">{{ $met ? 'Yes' : 'No' }}, {{ \Illuminate\Support\Str::lcfirst($reason) }}</li>
+                            @endforeach
+                        </ul>
+
+                        <div class="pl-facts">
+                            @if($lead['eventType'])
+                                <span><b>Event</b>{{ $lead['eventType'] }}</span>
+                            @endif
+                            @if($lead['guests'])
+                                <span><b>Guests</b>{{ number_format($lead['guests']) }}</span>
+                            @endif
+                            @if($lead['venue'])
+                                <span><b>Venue</b>{{ $lead['venue'] }}</span>
+                            @endif
+                            @if($lead['ageDays'] !== null)
+                                <span><b>Waiting</b>{{ $lead['ageDays'] }} {{ \Illuminate\Support\Str::plural('day', $lead['ageDays']) }}</span>
+                            @endif
+                        </div>
+
+                        @if($lead['services'])
+                            <div class="pl-facts">
+                                <span><b>Services asked for</b>{{ implode(', ', $lead['services']) }}</span>
+                            </div>
+                        @endif
+
+                        @if($lead['summary'])
+                            <p class="pl-summary">{{ $lead['summary'] }}</p>
+                        @endif
+
+                        @if($lead['eventId'])
+                            <a class="pl-more-go" href="{{ route('professional.bid.step', ['event' => $lead['eventId']]) }}">Open this request</a>
+                        @endif
+                    </div>
+                </details>
             </div>
         @empty
             <div class="pl-empty">No active leads yet. New marketplace opportunities and client requests will appear here automatically.</div>

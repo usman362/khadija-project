@@ -47,4 +47,43 @@ class ProfessionalClientsController extends Controller
             'show'    => $show,
         ]);
     }
+
+    /**
+     * Save this professional's own tags and note against one client.
+     *
+     * Only against somebody who has actually hired them: otherwise the form
+     * would let anyone attach a private note to any account on the site.
+     */
+    public function saveNote(Request $request, \App\Models\User $client): \Illuminate\Http\RedirectResponse
+    {
+        $me = $request->user();
+
+        $hired = \App\Models\Booking::where('supplier_id', $me->id)
+            ->where('client_id', $client->id)
+            ->exists();
+
+        if (! $hired) {
+            abort(404);
+        }
+
+        $data = $request->validate([
+            'tags' => ['nullable', 'string', 'max:160'],
+            'note' => ['nullable', 'string', 'max:400'],
+        ]);
+
+        $tags = collect(explode(',', (string) ($data['tags'] ?? '')))
+            ->map(fn ($t) => trim($t))
+            ->filter()
+            ->unique()
+            ->take(6)
+            ->values()
+            ->all();
+
+        \App\Models\ProfessionalClientNote::updateOrCreate(
+            ['supplier_id' => $me->id, 'client_id' => $client->id],
+            ['tags' => $tags ?: null, 'note' => $data['note'] ?: null],
+        );
+
+        return back()->with('status', 'Saved your note on ' . $client->name . '.');
+    }
 }

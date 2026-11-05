@@ -188,9 +188,130 @@ class ProfessionalDashboardController extends Controller
         $myServicesOnly = $request->boolean('my_services');
         $feed = OpportunityFeed::for($user, $myServicesOnly);
 
-        return view('professional.dashboard', compact(
+        /*
+         * Khadijah's 28 October dashboard carries three more panels.
+         *
+         * Her Visibility Score is not among them. Nothing on the platform
+         * measures how visible a professional is, so a score out of 100 would
+         * be a figure about their own business that nobody worked out. The
+         * setup bar below is the honest version of the same idea: it lists
+         * what is actually missing, and every line can be checked.
+         */
+        $setup   = $this->setup($user);
+        $goal    = $this->goal($user, $thisMonthNet);
+        $busiest = $this->busiest($user);
+
+        return view('professional.dashboard', compact('setup', 'goal', 'busiest', 
             'stats', 'recentBookings', 'todaySchedule', 'bidBreakdown', 'bidTotal', 'attention',
             'subscription', 'feed', 'myServicesOnly'
         ));
+    }
+
+    /**
+     * What a professional still has to do before the marketplace works for
+     * them, each line a thing they can go and finish.
+     *
+     * @return array{done:int, total:int, steps: array<int, array{label:string, done:bool, to:string}>}
+     */
+    private function setup(\App\Models\User $user): array
+    {
+        $services = $user->serviceCategories()
+            ->where('categories.kind', \App\Models\Category::SERVICE)
+            ->get();
+
+        $rules   = \App\Models\PricingRule::where('user_id', $user->id)->first();
+        $profile = $user->profile;
+
+        $steps = [
+            [
+                'label' => 'List the services you offer',
+                'done'  => $services->isNotEmpty(),
+                'to'    => route('professional.services.index'),
+            ],
+            [
+                'label' => 'Put a price on at least one',
+                'done'  => $services->contains(fn ($s) => $s->pivot->price !== null),
+                'to'    => route('professional.services.index'),
+            ],
+            [
+                'label' => 'Say how far you travel',
+                'done'  => $rules && ($rules->travel_free_miles !== null || $rules->travel_rate_per_mile !== null),
+                'to'    => route('professional.services.index', ['tab' => 'travel']),
+            ],
+            [
+                'label' => 'Publish a package',
+                'done'  => \App\Models\Package::where('user_id', $user->id)->where('status', 'active')->exists(),
+                'to'    => route('professional.packages.index'),
+            ],
+            [
+                'label' => 'Verify who you are',
+                'done'  => (bool) ($profile?->identity_verified_at),
+                'to'    => route('professional.profile.index'),
+            ],
+        ];
+
+        return [
+            'steps' => $steps,
+            'done'  => collect($steps)->where('done', true)->count(),
+            'total' => count($steps),
+        ];
+    }
+
+    /**
+     * This month against what they said they were aiming for.
+     *
+     * Null until they name a figure. A dashboard that invents a target and
+     * then reports somebody behind it is making up the thing it is measuring
+     * them against.
+     */
+    private function goal(\App\Models\User $user, float $thisMonth): ?array
+    {
+        $target = \App\Models\PricingRule::where('user_id', $user->id)->value('monthly_revenue_goal');
+
+        if (! $target || (float) $target <= 0) {
+            return null;
+        }
+
+        $target = (float) $target;
+
+        return [
+            'target'  => $target,
+            'earned'  => $thisMonth,
+            'percent' => (int) min(100, round($thisMonth / $target * 100)),
+        ];
+    }
+
+    /**
+     * The months their own work actually falls in.
+     *
+     * Needs a year or so of their own history to say anything, and returns
+     * null rather than a chart of ones and zeroes when it has less.
+     *
+     * @return array<int, array{label:string, count:int}>|null
+     */
+    private function busiest(\App\Models\User $user): ?array
+    {
+        $dates = \App\Models\Booking::where('supplier_id', $user->id)
+            ->whereIn('status', ['confirmed', 'in_progress', 'completed'])
+            ->with('event:id,starts_at')
+            ->get()
+            ->map(fn ($b) => $b->event?->starts_at)
+            ->filter();
+
+        if ($dates->count() < 6) {
+            return null;
+        }
+
+        $counts = $dates->groupBy(fn ($d) => $d->format('n'))->map->count();
+
+        $months = [];
+        for ($m = 1; $m <= 12; $m++) {
+            $months[] = [
+                'label' => \Illuminate\Support\Carbon::create(null, $m, 1)->format('M'),
+                'count' => (int) ($counts->get((string) $m) ?? 0),
+            ];
+        }
+
+        return $months;
     }
 }

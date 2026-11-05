@@ -126,7 +126,7 @@ class ProfessionalLeadController extends Controller
 
         $liveBookings = $base()->where('status', 'requested')
             ->with(['client:id,name', 'event:id,title,location,starts_at,budget,budget_min,budget_max,source'])
-            ->with('event.categories:id')
+            ->with('event.categories:id,name')
             ->latest()
             ->take(6)
             ->get();
@@ -225,13 +225,32 @@ class ProfessionalLeadController extends Controller
 
         // Priority: soon + high budget = High, else Medium, else Low.
         $daysOut = $date ? $now->diffInDays($date, false) : null;
-        if (($budget >= 5000) || ($daysOut !== null && $daysOut >= 0 && $date <= $soonCutoff)) {
+        $soon    = $daysOut !== null && $daysOut >= 0 && $date <= $soonCutoff;
+        $big     = $budget >= 5000;
+
+        if ($big || $soon) {
             $priority = 'High';
         } elseif ($budget >= 2500 || $daysOut === null) {
             $priority = 'Medium';
         } else {
             $priority = 'Low';
         }
+
+        /*
+         * Why it came out that way, in the same two tests that decided it.
+         *
+         * Khadijah's 28 October screen shows a priority score out of 100 with
+         * a list of reasons under it. The score is not here: nothing weighs
+         * these against each other, so a number out of 100 would be invented.
+         * The reasons are, because they are exactly what the branch above
+         * looked at, and a professional can check them.
+         */
+        $why = [
+            ['Budget is $5,000 or more', $big],
+            ['Event is within two weeks', $soon],
+            ['Has a budget on record', $budget > 0],
+            ['Has a date on record', $date !== null],
+        ];
 
         return [
             'name'      => $name ?: 'Prospective client',
@@ -249,6 +268,20 @@ class ProfessionalLeadController extends Controller
             // page's one shared "now" so every age on the screen is counted
             // from the same instant.
             'ageDays'   => $since ? (int) floor($since->diffInDays($now)) : null,
+
+            // What opening the row shows. All of it read from the request the
+            // client actually wrote.
+            'why'       => $why,
+            'eventType' => $event?->event_type,
+            'guests'    => $event?->guest_count,
+            'venue'     => $event?->venue,
+            'summary'   => $event?->description
+                ? \Illuminate\Support\Str::limit($event->description, 260)
+                : null,
+            'services'  => $event?->relationLoaded('categories')
+                ? $event->categories->pluck('name')->filter()->values()->all()
+                : [],
+            'eventId'   => $event?->id,
         ];
     }
 }

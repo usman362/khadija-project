@@ -73,7 +73,87 @@ class ProfessionalProposalController extends Controller
 
         $bookings = $query->paginate(12)->withQueryString();
 
-        return view('professional.proposals.index', compact('stats', 'bookings', 'tab'));
+        return view('professional.proposals.index', array_merge(
+            compact('stats', 'bookings', 'tab'),
+            ['detail' => $this->detailFor($user, $bookings->getCollection())],
+        ));
+    }
+
+    /**
+     * What opening a row shows, for the rows on this page only.
+     *
+     * Khadijah's 28 October screen expands a proposal into the client's last
+     * message, the services and prices behind the figure, when it closes, and
+     * a warning when the dates do not add up.
+     *
+     * Estimated margin is on her screen and is deliberately NOT here: nothing
+     * on the platform records what a job costs this professional to deliver,
+     * so a margin would be a number with nothing behind it on the screen
+     * somebody uses to decide whether to take the work.
+     *
+     * @param  \Illuminate\Support\Collection<int, Booking>  $bookings
+     * @return array<int, array<string, mixed>>
+     */
+    private function detailFor(User $user, $bookings): array
+    {
+        if ($bookings->isEmpty()) {
+            return [];
+        }
+
+        $eventIds = $bookings->pluck('event_id')->filter()->unique()->all();
+
+        // The bid this professional placed on each of those requests, where
+        // there is one. It carries the breakdown the client was shown.
+        $bids = \App\Models\Bid::where('supplier_id', $user->id)
+            ->whereIn('event_id', $eventIds)
+            ->get()
+            ->keyBy('event_id');
+
+        // The last thing the client said, per conversation.
+        $messages = \App\Models\Message::whereIn('booking_id', $bookings->pluck('id'))
+            ->where('sender_id', '!=', $user->id)
+            ->latest('created_at')
+            ->get()
+            ->unique('booking_id')
+            ->keyBy('booking_id');
+
+        $detail = [];
+
+        foreach ($bookings as $booking) {
+            $bid   = $bids->get($booking->event_id);
+            $event = $booking->event;
+
+            /*
+             * A proposal sent after the event had already happened.
+             *
+             * It sounds impossible and it is not: a request can sit unanswered
+             * past its own date, and a professional reading the list has no
+             * way to tell except by comparing two dates themselves.
+             */
+            $late = $event?->starts_at
+                && $booking->created_at
+                && $event->starts_at->lt($booking->created_at);
+
+            $detail[$booking->id] = [
+                'late'      => $late,
+                'event_at'  => $event?->starts_at,
+                'sent_at'   => $booking->created_at,
+                'closes_at' => $event?->proposal_deadline,
+                'message'   => $messages->get($booking->id),
+                'breakdown' => is_array($bid?->breakdown) ? $bid->breakdown : [],
+                'bid_amount' => $bid?->amount,
+                'next'      => match ($booking->status) {
+                    'requested'   => 'Waiting on the client. You can follow it up in messages.',
+                    'confirmed'   => 'Booked. Agree the paperwork and the day.',
+                    'in_progress' => 'Work is under way.',
+                    'completed'   => 'Finished. Ask the client for a review.',
+                    'cancelled'   => 'Cancelled.',
+                    default       => null,
+                },
+            ];
+        }
+
+        return $detail;
     }
 
     /**

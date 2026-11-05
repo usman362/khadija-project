@@ -155,6 +155,27 @@
     .pd-bid-rec-txt b { color: var(--text-primary); display: block; margin-bottom: 1px; }
     .pd-bid-rec-spark { flex-shrink: 0; align-self: center; }
 
+    /* ── Setup bar, goal and seasons ── */
+    .pd-setup { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px;
+        padding: 15px 17px; margin-bottom: 18px; }
+    .pd-setup-h { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; margin-bottom: 9px; }
+    .pd-setup-h b { font-size: 13.5px; font-weight: 800; color: var(--text-primary); }
+    .pd-setup-h span { font-size: 11.5px; color: var(--text-muted); }
+    .pd-setup-bar { height: 7px; border-radius: 4px; background: var(--border-color); overflow: hidden; }
+    .pd-setup-bar i { display: block; height: 100%; background: var(--accent-blue, #2563eb); }
+    .pd-setup-steps { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 11px; }
+    .pd-step { font-size: 11.5px; font-weight: 700; padding: 4px 10px; border-radius: 20px; text-decoration: none;
+        border: 1px solid var(--border-color); color: var(--accent-blue, #2563eb); }
+    .pd-step.done { color: var(--ok-text, #047857); border-color: currentColor; opacity: .75; }
+    .pd-goal { display: flex; align-items: baseline; gap: 8px; margin: 4px 0 9px; }
+    .pd-goal b { font-size: 23px; font-weight: 800; color: var(--text-primary); }
+    .pd-goal span { font-size: 12.5px; color: var(--text-muted); }
+    .pd-goal-note { font-size: 11.5px; color: var(--text-muted); margin: 10px 0 0; }
+    .pd-months { display: grid; grid-template-columns: repeat(12, 1fr); gap: 5px; align-items: end; height: 96px; }
+    .pd-month { display: flex; flex-direction: column; justify-content: flex-end; align-items: center; height: 100%; gap: 4px; }
+    .pd-month i { display: block; width: 100%; border-radius: 4px 4px 0 0; background: var(--accent-blue, #2563eb); }
+    .pd-month span { font-size: 9px; color: var(--text-muted); }
+
     /* ── Finance Hub ── */
     .pd-fin-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 9px; }
     .pd-fin-box { background: var(--bg-card-hover); border: 1px solid var(--border-color); border-radius: 10px; padding: 11px 10px; }
@@ -200,6 +221,32 @@
 @section('content')
 @include('partials._service_origin_prompt')
 <div class="pd">
+
+    {{-- What is still missing before the marketplace can work for them.
+
+         Khadijah's screen has a Visibility Score beside this. There is no
+         score here: nothing measures how visible a professional is, so a
+         number out of 100 would be a figure about their own business that
+         nobody worked out. This lists the things that are actually missing
+         instead, and every line opens the page that fixes it. --}}
+    @if ($setup['done'] < $setup['total'])
+        <div class="pd-setup">
+            <div class="pd-setup-h">
+                <b>Finish setting up</b>
+                <span>{{ $setup['done'] }} of {{ $setup['total'] }} done</span>
+            </div>
+            <div class="pd-setup-bar"><i style="width: {{ round($setup['done'] / $setup['total'] * 100) }}%;"></i></div>
+            <div class="pd-setup-steps">
+                @foreach ($setup['steps'] as $step)
+                    @if ($step['done'])
+                        <span class="pd-step done">{{ $step['label'] }}</span>
+                    @else
+                        <a class="pd-step" href="{{ $step['to'] }}">{{ $step['label'] }}</a>
+                    @endif
+                @endforeach
+            </div>
+        </div>
+    @endif
 
     {{-- ════════ 8 stat cards ════════ --}}
     <div class="pd-stats">
@@ -373,6 +420,48 @@
                  more than DJ-only packages. Nothing measured it, and a figure
                  about what wins work is one a professional prices against. --}}
         </div>
+
+        {{-- This month against what they said they were aiming for.
+
+             Hidden until they name a figure. A dashboard that invents a
+             target and then reports somebody behind it is making up the
+             thing it measures them against. --}}
+        @if ($goal)
+            <div class="pd-card">
+                <div class="pd-card-h">
+                    <span class="pd-card-title">This month against your goal</span>
+                    <a class="pd-card-link" href="{{ route('professional.services.index', ['tab' => 'rules']) }}">Change it</a>
+                </div>
+                <div class="pd-goal">
+                    <b>${{ number_format($goal['earned'], 2) }}</b>
+                    <span>of ${{ number_format($goal['target'], 2) }}</span>
+                </div>
+                <div class="pd-setup-bar"><i style="width: {{ $goal['percent'] }}%;"></i></div>
+                <p class="pd-goal-note">
+                    {{ $goal['percent'] }}% of the way there, counting what has been earned after fees.
+                </p>
+            </div>
+        @endif
+
+        {{-- The months their own work actually falls in. Shown only once
+             there is enough of their own history for it to mean anything. --}}
+        @if ($busiest)
+            <div class="pd-card">
+                <div class="pd-card-h">
+                    <span class="pd-card-title">When your work falls</span>
+                </div>
+                @php $pdMax = collect($busiest)->max('count') ?: 1; @endphp
+                <div class="pd-months">
+                    @foreach ($busiest as $m)
+                        <div class="pd-month" title="{{ $m['count'] }} {{ \Illuminate\Support\Str::plural('booking', $m['count']) }}">
+                            <i style="height: {{ max(3, round($m['count'] / $pdMax * 100)) }}%;"></i>
+                            <span>{{ $m['label'] }}</span>
+                        </div>
+                    @endforeach
+                </div>
+                <p class="pd-goal-note">Your own bookings, by the month the job happens in.</p>
+            </div>
+        @endif
 
         {{-- Finance Hub --}}
         <div class="pd-card">

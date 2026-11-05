@@ -102,6 +102,34 @@
 </style>
 @endpush
 
+@push('styles')
+<style>
+    .pr-more { margin-top: 12px; border-top: 1px solid var(--border-color); padding-top: 10px; }
+    .pr-more > summary { list-style: none; cursor: pointer; font-size: 12.5px; font-weight: 700;
+        color: var(--accent-blue, #2563eb); display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .pr-more > summary::-webkit-details-marker { display: none; }
+    .pr-warn { font-size: 10px; font-weight: 800; padding: 2px 7px; border-radius: 5px;
+        background: rgba(239,68,68,0.14); color: #b91c1c; }
+    .pr-more-body { margin-top: 11px; display: flex; flex-direction: column; gap: 11px; }
+    .pr-alert { border-left: 3px solid #ef4444; background: rgba(239,68,68,0.07); border-radius: 8px; padding: 10px 12px; }
+    .pr-alert b { display: block; font-size: 12.5px; font-weight: 800; color: #b91c1c; }
+    .pr-alert span { font-size: 11.5px; color: var(--text-secondary, var(--text-muted)); }
+    .pr-line { display: flex; justify-content: space-between; gap: 10px; font-size: 12.5px; color: var(--text-muted); }
+    .pr-line b { color: var(--text-primary); }
+    .pr-msg { background: var(--bg-page, var(--bg-card)); border: 1px solid var(--border-color);
+        border-radius: 9px; padding: 10px 12px; }
+    .pr-msg b { display: block; font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: .3px; }
+    .pr-msg span { display: block; font-size: 12.5px; color: var(--text-primary); margin: 4px 0 3px; }
+    .pr-msg i { font-style: normal; font-size: 10.5px; color: var(--text-muted); }
+    .pr-break b { display: block; font-size: 11px; font-weight: 800; color: var(--text-muted);
+        text-transform: uppercase; letter-spacing: .3px; margin-bottom: 5px; }
+    .pr-break-row { display: flex; justify-content: space-between; gap: 10px; font-size: 12.5px;
+        color: var(--text-secondary, var(--text-muted)); padding: 4px 0; border-bottom: 1px solid var(--border-color); }
+    .pr-break-row i { font-style: normal; font-weight: 700; color: var(--text-primary); }
+    .pr-break-sum { border-bottom: 0; font-weight: 800; color: var(--text-primary); }
+</style>
+@endpush
+
 @section('content')
     {{-- Header --}}
     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
@@ -274,6 +302,70 @@
                             <a href="{{ route('professional.gigs.show', $booking->event) }}" class="cl-btn cl-btn-ghost cl-btn-sm">View Gig</a>
                         @endif
                     </div>
+
+                    {{-- Khadijah's 28 October screen opens a proposal into its
+                         own detail. Everything below is read off records that
+                         exist: the client's own last message, the breakdown
+                         the client was shown, and the two dates.
+
+                         Estimated margin is on her screen and is not here.
+                         Nothing records what a job costs this professional to
+                         deliver, and a made up margin sits on the screen
+                         somebody uses to decide whether to take the work. --}}
+                    @php $d = $detail[$booking->id] ?? null; @endphp
+                    @if($d)
+                        <details class="pr-more">
+                            <summary>
+                                {{ $d['next'] ?? 'Details' }}
+                                @if($d['late']) <span class="pr-warn">Dates do not add up</span> @endif
+                            </summary>
+
+                            <div class="pr-more-body">
+                                @if($d['late'])
+                                    <div class="pr-alert">
+                                        <b>This was sent after the event date</b>
+                                        <span>
+                                            The event was {{ $d['event_at']->timezone(config('app.display_timezone'))->format('j M Y') }}
+                                            and this proposal was sent {{ $d['sent_at']->timezone(config('app.display_timezone'))->format('j M Y') }}.
+                                            Worth checking before you chase it.
+                                        </span>
+                                    </div>
+                                @endif
+
+                                @if($d['closes_at'])
+                                    <div class="pr-line">
+                                        <span>Client stops taking proposals</span>
+                                        <b>{{ $d['closes_at']->timezone(config('app.display_timezone'))->format('j M Y') }}</b>
+                                    </div>
+                                @endif
+
+                                @if($d['message'])
+                                    <div class="pr-msg">
+                                        <b>Last message from the client</b>
+                                        <span>{{ \Illuminate\Support\Str::limit($d['message']->body, 220) }}</span>
+                                        <i>{{ $d['message']->created_at->humanAgo() }}</i>
+                                    </div>
+                                @endif
+
+                                @if($d['breakdown'])
+                                    <div class="pr-break">
+                                        <b>What you quoted</b>
+                                        @foreach($d['breakdown'] as $label => $amount)
+                                            <span class="pr-break-row">
+                                                {{ is_string($label) ? $label : ($amount['label'] ?? 'Item') }}
+                                                <i>${{ number_format((float) (is_array($amount) ? ($amount['amount'] ?? 0) : $amount), 2) }}</i>
+                                            </span>
+                                        @endforeach
+                                        @if($d['bid_amount'])
+                                            <span class="pr-break-row pr-break-sum">
+                                                Total bid <i>${{ number_format((float) $d['bid_amount'], 2) }}</i>
+                                            </span>
+                                        @endif
+                                    </div>
+                                @endif
+                            </div>
+                        </details>
+                    @endif
                 </div>
             @endforeach
         </div>

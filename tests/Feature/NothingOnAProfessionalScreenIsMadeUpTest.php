@@ -359,7 +359,13 @@ class NothingOnAProfessionalScreenIsMadeUpTest extends TestCase
         $html = $this->page('professional.priority.index');
 
         $this->assertStringNotContainsString('LIVE EXAMPLE', $html);
-        $this->assertStringContainsString('>3</span>', $html);
+
+        /*
+         * The page became a list on 6 November, so there is no longer an
+         * example widget to miscount. The rule it was protecting still holds:
+         * with nothing waiting, the page says so rather than showing a figure.
+         */
+        $this->assertStringContainsString('Nothing is waiting on you right now.', $html);
     }
 
     /** The reader's own figures are still on the page, and still real. */
@@ -368,7 +374,10 @@ class NothingOnAProfessionalScreenIsMadeUpTest extends TestCase
         $this->job('requested');
         $html = $this->page('professional.priority.index');
 
-        $this->assertStringContainsString('1 awaiting you', $html);
+        // One real request, counted as one and named on its own row.
+        $this->assertStringContainsString('1 thing waiting on you', $html);
+        $this->assertStringContainsString('A client is waiting on your answer', $html);
+        $this->assertStringContainsString('Rivera Wedding', $html);
     }
 
     // ── Claims ───────────────────────────────────────────────
