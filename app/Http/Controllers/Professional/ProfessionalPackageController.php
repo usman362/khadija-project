@@ -158,17 +158,25 @@ class ProfessionalPackageController extends Controller
          * level-3 services this professional actually sells. Shown beside the
          * price, never substituted for the tags.
          */
-        $priced = auth()->user()?->serviceCategories()
+        $mine = auth()->user()?->serviceCategories()
             ->where('categories.kind', Category::SERVICE)
+            ->with('parent:id,name')
             ->orderBy('categories.name')
-            ->get()
-            ->filter(fn ($s) => $s->pivot->price !== null)
-            ->values() ?? collect();
+            ->get() ?? collect();
+
+        $priced = $mine->filter(fn ($s) => $s->pivot->price !== null)->values();
 
         return [
-            'categories'  => Category::getNestedDropdownList(),
+            // Not getNestedDropdownList(): under v2 the event types are roots
+            // too, so "Choose a category" offered 106 occasions and a package
+            // could be filed under "Halloween Party".
+            'categories'  => Category::packageCategoryGroups(),
             'serviceList' => PackageController::services(),
             'eventTypes'  => self::EVENT_TYPES,
+            // Step 1 picks from what this professional actually offers, which
+            // is what Khadijah's screen shows. The global catalogue stays as
+            // the fallback for a professional who has listed nothing yet.
+            'myServices'  => $mine,
             'myPrices'    => $priced,
             'myPriceSum'  => (float) $priced->sum(fn ($s) => (float) $s->pivot->price),
         ];
@@ -340,7 +348,24 @@ class ProfessionalPackageController extends Controller
             // One line saying what the package delivers — not the paragraph of
             // selling copy, which is `description`.
             'purpose'         => ['nullable', 'string', 'max:160'],
-            'category_id'     => ['nullable', 'exists:categories,id'],
+            /*
+             * An event type is not a category a package can belong to, and
+             * before this it passed.
+             *
+             * Stated as "not an occasion" rather than "one of these three
+             * kinds", because under v1 nothing has a kind at all and a
+             * whereIn would refuse every category there. The same reason
+             * User::serviceCategories() is written the way it is.
+             */
+            'category_id'     => [
+                'nullable',
+                'exists:categories,id',
+                function (string $attribute, $value, \Closure $fail) {
+                    if ($value && Category::whereKey($value)->where('kind', Category::EVENT_TYPE)->exists()) {
+                        $fail('A package is about a service, not an occasion.');
+                    }
+                },
+            ],
             'description'     => ['nullable', 'string', 'max:500'],
             'services'        => ['nullable', 'array'],
             'services.*'      => ['string', 'max:60'],

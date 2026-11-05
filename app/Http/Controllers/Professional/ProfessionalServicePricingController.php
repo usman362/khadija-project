@@ -33,16 +33,137 @@ class ProfessionalServicePricingController extends Controller
 
     public function index(Request $request): View
     {
-        $services = $request->user()->serviceCategories()
+        $user = $request->user();
+
+        $services = $user->serviceCategories()
             ->where('categories.kind', Category::SERVICE)
+            ->with('parent:id,name')
             ->orderBy('categories.name')
             ->get();
 
+        /*
+         * Which of them are already carrying a package.
+         *
+         * Packages store the service NAME, not its id, so this matches on the
+         * name. That is the shape the whole package side reads, and changing
+         * it is a migration rather than a page.
+         */
+        $inPackages = \App\Models\Package::where('user_id', $user->id)
+            ->pluck('services')
+            ->flatMap(fn ($list) => is_array($list) ? $list : [])
+            ->unique()
+            ->values();
+
+        $active   = $services->filter(fn ($s) => (bool) ($s->pivot->is_active ?? true));
+        $priced   = $services->filter(fn ($s) => $s->pivot->price !== null);
+
+        // Khadijah's screen groups the list under its parent categories rather
+        // than running it flat, so a professional with thirty services is not
+        // reading one long wall.
+        $groups = $services
+            ->groupBy(fn ($s) => $s->parent?->name ?: 'Other services')
+            ->sortKeys();
+
         return view('professional.services.index', [
-            'services' => $services,
-            'units'    => self::UNITS,
-            'priced'   => $services->filter(fn ($s) => $s->pivot->price !== null)->count(),
+            'services'   => $services,
+            'groups'     => $groups,
+            'units'      => self::UNITS,
+            'priced'     => $priced->count(),
+            'inPackages' => $inPackages,
+            'addable'    => $this->addable($services),
+            'counts'     => [
+                'total'    => $services->count(),
+                'active'   => $active->count(),
+                'inactive' => $services->count() - $active->count(),
+                'packaged' => $services->filter(fn ($s) => $inPackages->contains($s->name))->count(),
+                'quickbid' => $priced->count(),
+            ],
         ]);
+    }
+
+    /**
+     * Add a service to what this professional offers.
+     *
+     * Khadijah asked for this button on this page. Choosing services was only
+     * ever possible on the profile, which meant leaving the pricing screen to
+     * add the thing you came here to price.
+     */
+    public function add(Request $request): RedirectResponse
+    {
+        $data = $request->validate([
+            'category_id' => ['required', 'integer', 'exists:categories,id'],
+        ]);
+
+        $service = Category::where('id', $data['category_id'])
+            ->where('kind', Category::SERVICE)
+            ->first();
+
+        // Only a level 3 service can be offered. An event type or a category
+        // arriving here would put an occasion in somebody's services list.
+        if (! $service) {
+            return back()->withErrors(['category_id' => 'That is not a service you can offer.']);
+        }
+
+        $user = $request->user();
+
+        if ($user->serviceCategories()->where('categories.id', $service->id)->exists()) {
+            return back()->with('status', $service->name . ' is already on your list.');
+        }
+
+        $user->serviceCategories()->attach($service->id);
+
+        return back()->with('status', $service->name . ' added. Give it a price so it can answer a request.');
+    }
+
+    /** Rest a service, or put it back, without losing what it costs. */
+    public function toggle(Request $request): RedirectResponse
+    {
+        $data = $request->validate([
+            'category_id' => ['required', 'integer'],
+        ]);
+
+        $service = $request->user()->serviceCategories()
+            ->where('categories.id', (int) $data['category_id'])
+            ->first();
+
+        if (! $service) {
+            return back();
+        }
+
+        $nowActive = ! (bool) ($service->pivot->is_active ?? true);
+
+        $request->user()->serviceCategories()
+            ->updateExistingPivot($service->id, ['is_active' => $nowActive]);
+
+        return back()->with('status', $nowActive
+            ? $service->name . ' is active again and clients can see it.'
+            : $service->name . ' is resting. Its price is kept, and clients will not see it.');
+    }
+
+    /**
+     * The services they could add: every level 3 service they do not already
+     * offer, named with its category so two services called "Lighting" under
+     * different categories can be told apart.
+     *
+     * @param  \Illuminate\Support\Collection  $mine
+     * @return array<int, array{id:int, label:string}>
+     */
+    private function addable($mine): array
+    {
+        $have = $mine->pluck('id')->all();
+
+        return Category::where('kind', Category::SERVICE)
+            ->whereNotIn('id', $have)
+            ->with('parent:id,name')
+            ->orderBy('name')
+            ->get()
+            ->map(fn ($s) => [
+                'id'    => $s->id,
+                // No spaced dash in anything a user reads; this list is a
+                // dropdown they scroll through.
+                'label' => $s->parent ? $s->parent->name . ' / ' . $s->name : $s->name,
+            ])
+            ->all();
     }
 
     public function update(Request $request): RedirectResponse

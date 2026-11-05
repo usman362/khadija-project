@@ -73,13 +73,22 @@ class AProfessionalCanPriceTheirOwnServicesTest extends TestCase
             ->assertSee('Event Photography');
     }
 
-    public function test_a_service_they_do_not_offer_is_not_listed(): void
+    public function test_a_service_they_do_not_offer_is_not_in_their_list(): void
     {
         $other = $this->service('Catering', 'catering');
 
-        $this->actingAs($this->pro)->get(route('professional.services.index'))
-            ->assertSuccessful()
-            ->assertDontSee($other->name);
+        $page = $this->actingAs($this->pro)->get(route('professional.services.index'))
+            ->assertSuccessful();
+
+        /*
+         * It IS on the page, in the Add a service offering dropdown, which is
+         * the whole point of that control. What it must not be is a row in
+         * their own priced list.
+         */
+        $this->assertStringNotContainsString(
+            'data-name="' . strtolower($other->name) . '"',
+            $page->getContent()
+        );
     }
 
     public function test_a_price_is_saved_against_the_service(): void
@@ -166,5 +175,97 @@ class AProfessionalCanPriceTheirOwnServicesTest extends TestCase
 
         $this->actingAs($this->pro)->get(route('professional.services.index'))
             ->assertSee('1 of 2 services have a price');
+    }
+
+    // ── Khadijah's 28 October screen ──────────────────────────────
+
+    /** Adding a service was only possible on the profile. She asked for it here. */
+    public function test_a_service_can_be_added_from_this_page(): void
+    {
+        $extra = $this->service('Photo Booth Hire', 'photo-booth-hire');
+
+        $this->actingAs($this->pro)->post(route('professional.services.add'), [
+            'category_id' => $extra->id,
+        ])->assertRedirect();
+
+        $this->assertTrue(
+            $this->pro->fresh()->serviceCategories()->where('categories.id', $extra->id)->exists()
+        );
+    }
+
+    /** An event type is not a service, however it arrives. */
+    public function test_an_event_type_cannot_be_added_as_a_service(): void
+    {
+        $occasion = Category::create([
+            'name' => 'Halloween Party', 'slug' => 'halloween-party-add', 'kind' => Category::EVENT_TYPE,
+        ]);
+
+        $this->actingAs($this->pro)->post(route('professional.services.add'), [
+            'category_id' => $occasion->id,
+        ])->assertSessionHasErrors('category_id');
+
+        $this->assertFalse(
+            $this->pro->fresh()->serviceCategories()->where('categories.id', $occasion->id)->exists()
+        );
+    }
+
+    /**
+     * Resting keeps the price. Taking a service off the profile was the only
+     * way to stop offering it, and that threw away everything set on it.
+     */
+    public function test_resting_a_service_keeps_what_it_costs(): void
+    {
+        $this->actingAs($this->pro)->patch(route('professional.services.update'), [
+            'rows' => [$this->dj->id => ['price' => '1200', 'price_unit' => 'flat']],
+        ]);
+
+        $this->actingAs($this->pro)->post(route('professional.services.toggle'), [
+            'category_id' => $this->dj->id,
+        ])->assertRedirect();
+
+        $row = $this->pro->fresh()->serviceCategories()->where('categories.id', $this->dj->id)->first();
+
+        $this->assertFalse((bool) $row->pivot->is_active);
+        $this->assertSame(1200.0, (float) $row->pivot->price);
+
+        // And back again.
+        $this->actingAs($this->pro)->post(route('professional.services.toggle'), [
+            'category_id' => $this->dj->id,
+        ]);
+
+        $this->assertTrue(
+            (bool) $this->pro->fresh()->serviceCategories()->where('categories.id', $this->dj->id)->first()->pivot->is_active
+        );
+    }
+
+    /** Somebody else's service is not theirs to rest. */
+    public function test_a_service_they_do_not_offer_cannot_be_rested(): void
+    {
+        $other = $this->service('Somebody Elses Service', 'somebody-elses-service-rest');
+
+        $this->actingAs($this->pro)->post(route('professional.services.toggle'), [
+            'category_id' => $other->id,
+        ])->assertRedirect();
+
+        $this->assertDatabaseMissing('category_user', [
+            'user_id'     => $this->pro->id,
+            'category_id' => $other->id,
+        ]);
+    }
+
+    /** The list is grouped under its parent categories, not run flat. */
+    public function test_the_list_is_grouped_by_category(): void
+    {
+        $parent = Category::create([
+            'name' => 'Audio, Visual, Lighting & Staging',
+            'slug' => 'avl-staging-group-test',
+            'kind' => Category::SERVICE_CATEGORY,
+        ]);
+        $this->dj->update(['parent_id' => $parent->id]);
+
+        $this->actingAs($this->pro)->get(route('professional.services.index'))
+            ->assertOk()
+            ->assertSee('Audio, Visual, Lighting &amp; Staging', false)
+            ->assertSee('Grouped by category');
     }
 }

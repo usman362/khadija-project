@@ -261,6 +261,71 @@ class Category extends Model
         return $this->name;
     }
 
+
+    /**
+     * The service tree as a package's own category dropdown needs it:
+     * a heading per service category, then its services (level 3) and the
+     * specialties under each one (level 4).
+     *
+     * The package form used to be handed getNestedDropdownList(), which is
+     * every root and everything below it. Under v2 the event types are roots
+     * too, so "Choose a category" offered 106 occasions — a professional could
+     * file a package under "Halloween Party" and no service filter would ever
+     * find it. This lists only what a package can actually be about, and goes
+     * all the way down to level 4 so a client filtering on a specialty gets
+     * the packages that match it rather than the whole category.
+     *
+     * Headings are not selectable: a package belongs to a service or to one
+     * specialty of a service, never to the category above them.
+     *
+     * Returns: [['label' => 'Photography & Videography', 'options' => [
+     *     ['id' => 5, 'name' => 'Wedding Photography', 'depth' => 0], ...]], ...]
+     */
+    public static function packageCategoryGroups(): array
+    {
+        // v1 has no `kind`: there a root is a category and its children are
+        // the services, with nothing below. Same shape, one level shallower.
+        if (config('taxonomy.version', 'v1') !== 'v2') {
+            return self::whereNull('parent_id')
+                ->with(['children' => fn ($q) => $q->orderBy('name')])
+                ->orderBy('name')
+                ->get()
+                ->map(fn ($root) => [
+                    'label'   => $root->name,
+                    'options' => $root->children
+                        ->map(fn ($c) => ['id' => $c->id, 'name' => $c->name, 'depth' => 0])
+                        ->all(),
+                ])
+                ->filter(fn ($g) => $g['options'] !== [])
+                ->values()
+                ->all();
+        }
+
+        $services = self::ofKind(self::SERVICE)->orderBy('name')->get()->groupBy('parent_id');
+        $specials = self::ofKind(self::SERVICE_SPECIALTY)->orderBy('sort_order')->orderBy('name')
+            ->get()->groupBy('parent_id');
+
+        $groups = [];
+
+        foreach (self::ofKind(self::SERVICE_CATEGORY)->orderBy('name')->get() as $category) {
+            $options = [];
+
+            foreach ($services->get($category->id, collect()) as $service) {
+                $options[] = ['id' => $service->id, 'name' => $service->name, 'depth' => 0];
+
+                foreach ($specials->get($service->id, collect()) as $specialty) {
+                    $options[] = ['id' => $specialty->id, 'name' => $specialty->name, 'depth' => 1];
+                }
+            }
+
+            if ($options !== []) {
+                $groups[] = ['label' => $category->name, 'options' => $options];
+            }
+        }
+
+        return $groups;
+    }
+
     /**
      * Build a flat list of all categories with indentation for dropdowns.
      * Returns: [['id' => 1, 'name' => 'Wedding', 'indent' => ''], ['id' => 5, 'name' => 'Photography', 'indent' => '── '], ...]

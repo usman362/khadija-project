@@ -48,6 +48,10 @@
     .pa { --pa-blue: #2563eb; }
     .pa-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 20px 22px; }
 
+    /* Slim head: no drawing, no paragraph about the page itself. */
+    .pa-header-slim { align-items: center; gap: 13px; }
+    .pa-header-slim h1 { font-size: 22px; margin: 0; }
+    .pa-header-slim .tag { font-size: 13px; color: var(--text-muted); margin: 3px 0 0; }
     .pa-grid { display: grid; grid-template-columns: minmax(0,1fr) 320px; gap: 16px; align-items: start; }
 
     /* Header */
@@ -168,44 +172,17 @@
         <div>
             {{-- Header --}}
             <div class="pa-card" style="margin-bottom:16px;">
-                <div class="pa-header">
-                    <span class="pa-h-ico"><svg viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9z"/><path d="M13.73 21a2 2 0 0 1-3.46 0z"/></svg></span>
+                {{-- A compact head, not a banner.
+
+                     This opened with a title, a tagline, a paragraph about
+                     itself and a drawing of a clipboard, which together pushed
+                     the actual list of things needing attention below the fold.
+                     Khadijah's 28 October screen puts the list first. --}}
+                <div class="pa-header pa-header-slim">
+                    <span class="pa-h-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2 2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg></span>
                     <div>
                         <h1>Priority Actions</h1>
-                        <div class="tag">Your smart assistant for the most important offers and tasks.</div>
-                        <p>Priority Actions shows you the urgent things you need to look at right now so you never miss out on great opportunities.</p>
-                    </div>
-                    <span class="pa-h-spacer"></span>
-                    <div class="pa-h-art" aria-hidden="true">
-                        <svg viewBox="0 0 170 138" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <ellipse cx="92" cy="74" rx="74" ry="58" fill="#eef2ff"/>
-                            {{-- clip --}}
-                            <rect x="78" y="14" width="22" height="13" rx="3" fill="#64748b"/>
-                            <rect x="83" y="10" width="12" height="9" rx="3" fill="#94a3b8"/>
-                            {{-- clipboard --}}
-                            <rect x="50" y="22" width="78" height="96" rx="10" fill="#2563eb"/>
-                            <rect x="50" y="22" width="78" height="96" rx="10" fill="url(#pgrad)" opacity="0.25"/>
-                            <rect x="59" y="31" width="60" height="78" rx="6" fill="#ffffff"/>
-                            {{-- check rows --}}
-                            @php $rows = [44, 66, 88]; @endphp
-                            @foreach($rows as $ry)
-                                <rect x="66" y="{{ $ry }}" width="15" height="15" rx="4.5" fill="#10b981"/>
-                                <path d="M69.5 {{ $ry + 7.5 }}l2.6 2.6 4.4-5" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-                                <rect x="86" y="{{ $ry + 3 }}" width="26" height="3.4" rx="1.7" fill="#cbd5e1"/>
-                                <rect x="86" y="{{ $ry + 9 }}" width="18" height="3.4" rx="1.7" fill="#e2e8f0"/>
-                            @endforeach
-                            {{-- bell --}}
-                            <g transform="translate(108,84)">
-                                <path d="M30 22a11 11 0 0 0-22 0c0 12-4 15-4 15h30s-4-3-4-15z" fill="#f59e0b"/>
-                                <path d="M30 22a11 11 0 0 0-22 0c0 12-4 15-4 15h13V22a11 11 0 0 1 11-11c.7 0 1.4.06 2 .17A11 11 0 0 0 30 22z" fill="#fbbf24"/>
-                                <circle cx="19" cy="40" r="3.4" fill="#d97706"/>
-                            </g>
-                            {{-- sparkles --}}
-                            <path d="M156 28l2 6.5 6.5 2-6.5 2-2 6.5-2-6.5-6.5-2 6.5-2z" fill="#f59e0b"/>
-                            <path d="M28 30l1.6 4.4 4.4 1.6-4.4 1.6-1.6 4.4-1.6-4.4-4.4-1.6 4.4-1.6z" fill="#60a5fa"/>
-                            <path d="M150 96l1.3 3.6 3.6 1.3-3.6 1.3-1.3 3.6-1.3-3.6-3.6-1.3 3.6-1.3z" fill="#a78bfa"/>
-                            <defs><linearGradient id="pgrad" x1="50" y1="22" x2="128" y2="118"><stop stop-color="#fff"/><stop offset="1" stop-color="#1e40af"/></linearGradient></defs>
-                        </svg>
+                        <div class="tag">Everything waiting on you, in one place.</div>
                     </div>
                 </div>
 

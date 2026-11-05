@@ -42,6 +42,11 @@
     .pl-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 20px 22px; }
 
     /* ── Hero (funnel + title + feature row) ── */
+    .pl-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 16px; flex-wrap: wrap; margin-bottom: 18px; }
+    .pl-head h1 { font-size: 24px; font-weight: 800; color: var(--text-primary); margin: 0 0 4px; }
+    .pl-head p { font-size: 13px; color: var(--text-muted); margin: 0; }
+    .pl-head-btn { font-size: 13px; font-weight: 700; padding: 10px 18px; border-radius: 10px;
+        background: var(--accent-blue, #2563eb); color: #fff; text-decoration: none; }
     .pl-hero { display: grid; grid-template-columns: minmax(0,300px) minmax(0,1fr); gap: 22px; align-items: center; background: linear-gradient(135deg, rgba(37,99,235,0.05), rgba(139,92,246,0.04)); border: 1px solid var(--border-color); border-radius: 18px; padding: 26px 28px; margin-bottom: 20px; }
     .pl-funnel { display: flex; align-items: center; justify-content: center; }
     .pl-funnel svg { width: 100%; max-width: 280px; height: auto; }
@@ -159,59 +164,17 @@
 @section('content')
 <div class="pl">
 
-    {{-- ════════ Hero: funnel + title + feature row ════════ --}}
-    <div class="pl-hero">
-        <div class="pl-funnel">
-            <svg viewBox="0 0 240 210" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <defs>
-                    <linearGradient id="plf" x1="40" y1="60" x2="200" y2="150"><stop stop-color="#3b82f6"/><stop offset="1" stop-color="#1d4ed8"/></linearGradient>
-                    <linearGradient id="plp" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#60a5fa"/><stop offset="1" stop-color="#2563eb"/></linearGradient>
-                </defs>
-                {{-- funnel body --}}
-                <path d="M40 64 L200 64 L150 132 L150 184 Q150 192 142 190 L98 178 Q90 176 90 168 L90 132 Z" fill="url(#plf)"/>
-                <ellipse cx="120" cy="64" rx="80" ry="18" fill="#2563eb"/>
-                <ellipse cx="120" cy="62" rx="80" ry="16" fill="#60a5fa"/>
-                <ellipse cx="120" cy="62" rx="62" ry="11" fill="#1d4ed8" opacity="0.55"/>
-                {{-- people on the rim --}}
-                @php $ppl = [[88,40],[120,32],[152,40]]; @endphp
-                @foreach($ppl as [$cx,$cy])
-                    <circle cx="{{ $cx }}" cy="{{ $cy }}" r="9" fill="url(#plp)"/>
-                    <path d="M{{ $cx-13 }} {{ $cy+26 }} a13 14 0 0 1 26 0 z" fill="url(#plp)"/>
-                @endforeach
-                {{-- leads dropping out --}}
-                <circle cx="120" cy="202" r="7" fill="#2563eb"/>
-                <circle cx="48" cy="150" r="6" fill="#3b82f6"/><path d="M70 138 L52 148" stroke="#93c5fd" stroke-width="2" stroke-dasharray="3 3"/>
-                <circle cx="196" cy="150" r="6" fill="#3b82f6"/><path d="M172 138 L190 148" stroke="#93c5fd" stroke-width="2" stroke-dasharray="3 3"/>
-                <circle cx="30" cy="120" r="4" fill="#93c5fd"/>
-                <circle cx="212" cy="120" r="4" fill="#93c5fd"/>
-            </svg>
+
+    {{-- Khadijah's 28 October screen opens on the pipeline. The funnel and
+         the four "what this does" tiles are an explanation, and an explanation
+         is not what somebody came to this page for, so they moved below the
+         leads rather than above them. --}}
+    <div class="pl-head">
+        <div>
+            <h1>Leads CRM</h1>
+            <p>Track leads from first enquiry through to a booking.</p>
         </div>
-        <div class="pl-hero-r">
-            <h1>Lead Pipeline</h1>
-            <div class="sub">Track leads from inquiry to booking.</div>
-            <div class="pl-feats">
-                <div class="pl-feat">
-                    <span class="pl-feat-ico" style="background:rgba(37,99,235,0.12);color:var(--info-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
-                    <b>Remembers Every Customer</b>
-                    <p>Never forget an important lead.</p>
-                </div>
-                <div class="pl-feat">
-                    <span class="pl-feat-ico" style="background:rgba(16,185,129,0.12);color:var(--ok-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span>
-                    <b>Tracks Deal Progress</b>
-                    <p>See exactly where each lead stands.</p>
-                </div>
-                <div class="pl-feat">
-                    <span class="pl-feat-ico" style="background:rgba(239,68,68,0.12);color:var(--bad-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg></span>
-                    <b>Prioritizes Hot Leads</b>
-                    <p>Focus on the leads most likely to close.</p>
-                </div>
-                <div class="pl-feat">
-                    <span class="pl-feat-ico" style="background:rgba(139,92,246,0.12);color:var(--accent-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></span>
-                    <b>Organizes Sales Flow</b>
-                    <p>Visualize your path to monthly goals.</p>
-                </div>
-            </div>
-        </div>
+        <a class="pl-head-btn" href="{{ route('professional.bidding-board.index') }}">Browse open gigs</a>
     </div>
 
     {{-- ════════ Progress pipeline bar ════════ --}}
@@ -293,6 +256,61 @@
          tour of a page belongs somewhere other than the page, and a drawing
          of an interface shown inside the interface is the clearest sign there
          is of something drawn rather than built. --}}
+
+    {{-- ════════ Hero: funnel + title + feature row ════════ --}}
+    <div class="pl-hero">
+        <div class="pl-funnel">
+            <svg viewBox="0 0 240 210" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                    <linearGradient id="plf" x1="40" y1="60" x2="200" y2="150"><stop stop-color="#3b82f6"/><stop offset="1" stop-color="#1d4ed8"/></linearGradient>
+                    <linearGradient id="plp" x1="0" y1="0" x2="0" y2="1"><stop stop-color="#60a5fa"/><stop offset="1" stop-color="#2563eb"/></linearGradient>
+                </defs>
+                {{-- funnel body --}}
+                <path d="M40 64 L200 64 L150 132 L150 184 Q150 192 142 190 L98 178 Q90 176 90 168 L90 132 Z" fill="url(#plf)"/>
+                <ellipse cx="120" cy="64" rx="80" ry="18" fill="#2563eb"/>
+                <ellipse cx="120" cy="62" rx="80" ry="16" fill="#60a5fa"/>
+                <ellipse cx="120" cy="62" rx="62" ry="11" fill="#1d4ed8" opacity="0.55"/>
+                {{-- people on the rim --}}
+                @php $ppl = [[88,40],[120,32],[152,40]]; @endphp
+                @foreach($ppl as [$cx,$cy])
+                    <circle cx="{{ $cx }}" cy="{{ $cy }}" r="9" fill="url(#plp)"/>
+                    <path d="M{{ $cx-13 }} {{ $cy+26 }} a13 14 0 0 1 26 0 z" fill="url(#plp)"/>
+                @endforeach
+                {{-- leads dropping out --}}
+                <circle cx="120" cy="202" r="7" fill="#2563eb"/>
+                <circle cx="48" cy="150" r="6" fill="#3b82f6"/><path d="M70 138 L52 148" stroke="#93c5fd" stroke-width="2" stroke-dasharray="3 3"/>
+                <circle cx="196" cy="150" r="6" fill="#3b82f6"/><path d="M172 138 L190 148" stroke="#93c5fd" stroke-width="2" stroke-dasharray="3 3"/>
+                <circle cx="30" cy="120" r="4" fill="#93c5fd"/>
+                <circle cx="212" cy="120" r="4" fill="#93c5fd"/>
+            </svg>
+        </div>
+        <div class="pl-hero-r">
+            <h1>Lead Pipeline</h1>
+            <div class="sub">Track leads from inquiry to booking.</div>
+            <div class="pl-feats">
+                <div class="pl-feat">
+                    <span class="pl-feat-ico" style="background:rgba(37,99,235,0.12);color:var(--info-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></svg></span>
+                    <b>Remembers Every Customer</b>
+                    <p>Never forget an important lead.</p>
+                </div>
+                <div class="pl-feat">
+                    <span class="pl-feat-ico" style="background:rgba(16,185,129,0.12);color:var(--ok-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span>
+                    <b>Tracks Deal Progress</b>
+                    <p>See exactly where each lead stands.</p>
+                </div>
+                <div class="pl-feat">
+                    <span class="pl-feat-ico" style="background:rgba(239,68,68,0.12);color:var(--bad-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.153.433-2.294 1-3a2.5 2.5 0 0 0 2.5 2.5z"/></svg></span>
+                    <b>Prioritizes Hot Leads</b>
+                    <p>Focus on the leads most likely to close.</p>
+                </div>
+                <div class="pl-feat">
+                    <span class="pl-feat-ico" style="background:rgba(139,92,246,0.12);color:var(--accent-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></span>
+                    <b>Organizes Sales Flow</b>
+                    <p>Visualize your path to monthly goals.</p>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <div class="pl-sec-h"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91 0z"/><path d="M12 15l-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"/><path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5"/></svg><b>What each of these does</b></div>
     {{-- Was "Unlock powerful tools to convert more leads into bookings",

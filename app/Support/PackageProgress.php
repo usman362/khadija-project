@@ -13,9 +13,16 @@ use App\Models\Package;
  * step with the form — so it is read off the package itself: a package is ready
  * when every step of the wizard has what that step asks for.
  *
- * The four steps here are the four steps in create.blade.php, in order and by
- * the same names. If a step is added there it must be added here, or the
- * progress bar will report 100% on a package the form still considers unfinished.
+ * The four here are the four steps of create.blade.php that ask for something
+ * required, in that form's order and by its names. The form has six: Options &
+ * Add-ons is optional by definition and Review & Publish is the click at the
+ * end, so neither is measured. `n` is the step number in the form, which is
+ * why it runs 1, 2, 3, 5 — My Packages links straight to it, so renumbering
+ * here sends a professional to the wrong step.
+ *
+ * If a required step is added to the form it must be added here, or the
+ * progress bar will report 100% on a package the form still considers
+ * unfinished.
  */
 final class PackageProgress
 {
@@ -28,24 +35,24 @@ final class PackageProgress
 
         return [
             [
-                'n' => 1, 'label' => 'Package Details',
-                'done' => filled($package->title) && filled($package->description),
-                'missing' => filled($package->description) ? null : 'a description',
-            ],
-            [
-                'n' => 2, 'label' => 'Services & Deliverables',
+                'n' => 1, 'label' => 'Select Services',
                 // Two is the floor everywhere else — a package IS a bundle, and
                 // the store validator says min:2.
                 'done' => count($services) >= 2,
                 'missing' => count($services) >= 2 ? null : 'at least two services',
             ],
             [
-                'n' => 3, 'label' => 'Pricing & Add-Ons',
+                'n' => 2, 'label' => 'Package Details',
+                'done' => filled($package->title) && filled($package->description),
+                'missing' => filled($package->description) ? null : 'a description',
+            ],
+            [
+                'n' => 3, 'label' => 'Pricing & Discount',
                 'done' => (int) $package->price > 0,
                 'missing' => (int) $package->price > 0 ? null : 'a price',
             ],
             [
-                'n' => 4, 'label' => 'Availability & Terms',
+                'n' => 5, 'label' => 'Availability',
                 'done' => filled($package->coverage) || filled($package->availability),
                 'missing' => filled($package->coverage) || filled($package->availability)
                     ? null

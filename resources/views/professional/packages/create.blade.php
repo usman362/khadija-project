@@ -19,12 +19,14 @@
     $gMin = old('guest_min'); $gMax = old('guest_max');
 
     /*
-     * The five steps of the flow. Four of them are things to fill in and come
-     * straight from PackageProgress, so the readiness ring here and the
-     * progress bar on My Packages are one calculation and cannot disagree.
+     * The six steps of the flow, in Khadijah's 28 October order: services are
+     * chosen first, because the package is the bundle and everything after it
+     * describes that bundle. Four of them are things PackageProgress measures,
+     * so the readiness ring here and the progress bar on My Packages are one
+     * calculation and cannot disagree.
      *
-     * The fifth, Review & Publish, is not something to fill in — it is the
-     * click at the end — so it is drawn from the package's status.
+     * Options & Add-ons is optional by definition and Review & Publish is the
+     * click at the end, so neither is a ring step.
      *
      * No "Est. time" labels: the mockup carries them, but nobody has measured
      * how long any of these take and a made-up "15–20 min" is a promise about
@@ -35,11 +37,12 @@
     $published = ($p?->status ?? null) === 'active';
 
     $stepBlurb = [
-        1 => 'Tell clients what your package is about.',
-        2 => 'Define exactly what is included in this package.',
-        3 => 'Set your base price and build optional add-ons.',
-        4 => 'Set when you are available and where you serve.',
-        5 => 'Review every detail, preview it, and publish.',
+        1 => 'Choose 2 or more of your existing services.',
+        2 => 'Tell clients what your package is about.',
+        3 => 'Set the package price against what the parts cost.',
+        4 => 'Anything optional that comes with it.',
+        5 => 'Set when you are available and where you serve.',
+        6 => 'Review every detail, preview it, and publish.',
     ];
 @endphp
 
@@ -105,6 +108,39 @@
     .pc-svccount b { color: var(--text-primary); }
     .pc-svccount.bad b { color: var(--bad-text); }
 
+    /* Step 1 — the professional's own services as cards, per Khadijah's screen. */
+    .pc-svctools { display: grid; grid-template-columns: minmax(0,2fr) 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+    .pc-svcgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px,1fr)); gap: 12px; }
+    .pc-svccard { position: relative; border: 2px solid var(--border-color); border-radius: 12px; padding: 14px; cursor: pointer; display: block; }
+    .pc-svccard.on { border-color: var(--pc); background: color-mix(in srgb, var(--pc) 12%, transparent); }
+    .pc-svccard input { position: absolute; opacity: 0; pointer-events: none; }
+    .pc-svccard .tick { position: absolute; top: 10px; right: 10px; width: 20px; height: 20px; border-radius: 6px;
+        border: 1.5px solid var(--border-color); background: var(--bg-card); color: #fff;
+        display: flex; align-items: center; justify-content: center; }
+    .pc-svccard .tick svg { width: 12px; height: 12px; opacity: 0; }
+    .pc-svccard.on .tick { background: var(--pc); border-color: var(--pc); }
+    .pc-svccard.on .tick svg { opacity: 1; }
+    .pc-svccard b { display: block; font-size: 13.5px; font-weight: 800; color: var(--text-primary); padding-right: 26px; line-height: 1.25; }
+    .pc-svccard .cat { display: block; font-size: 11.5px; color: var(--text-muted); margin-top: 3px; }
+    .pc-svccard .price { display: block; font-size: 15px; font-weight: 800; color: var(--text-primary); margin-top: 9px; }
+    .pc-svccard .price i { display: block; font-style: normal; font-size: 11px; font-weight: 600; color: var(--text-muted); }
+    .pc-svcnone { font-size: 13px; color: var(--text-muted); padding: 16px 0; }
+
+    .pc-picked { list-style: none; padding: 0; margin: 0; }
+    .pc-picked li { display: flex; align-items: center; justify-content: space-between; gap: 10px;
+        padding: 10px 0; border-bottom: 1px solid var(--border-color); font-size: 13.5px; color: var(--text-primary); }
+    .pc-picked li:last-child { border-bottom: 0; }
+    .pc-picked li i { font-style: normal; font-weight: 800; }
+    .pc-picked li .none { font-weight: 600; color: var(--text-muted); font-size: 12px; }
+    .pc-picked-empty { font-size: 13px; color: var(--text-muted); }
+    /* display on the element itself would beat the hidden attribute, which is
+       how this row showed a $0 total with nothing selected. */
+    .pc-picked-sum:not([hidden]) { display: flex; align-items: center; justify-content: space-between; gap: 10px;
+        margin-top: 14px; padding-top: 13px; border-top: 2px solid var(--border-color); }
+    .pc-picked-sum span { font-size: 13px; font-weight: 700; color: var(--text-primary); }
+    .pc-picked-sum small { display: block; font-size: 11px; font-weight: 600; color: var(--text-muted); }
+    .pc-picked-sum b { font-size: 19px; font-weight: 900; color: var(--text-primary); }
+
     .pc-rep-item { display: flex; gap: 8px; margin-bottom: 8px; }
     .pc-rep-item input { flex: 1; }
     .pc-rep-del { border: 1px solid var(--border-color); background: var(--bg-card); border-radius: 9px; padding: 0 12px; color: var(--text-muted); cursor: pointer; }
@@ -136,7 +172,7 @@
     .pc-help a { font-size: 12.5px; font-weight: 800; color: var(--pc); text-decoration: none; }
 
     @media (max-width: 1080px) { .pc-grid { grid-template-columns: 1fr; } .pc-side { position: static; } .pc-step .lbl span { display: none; } }
-    @media (max-width: 640px) { .pc-two, .pc-typegrid { grid-template-columns: 1fr; } }
+    @media (max-width: 640px) { .pc-two, .pc-typegrid, .pc-svctools { grid-template-columns: 1fr; } }
 
     /* Multi-image gallery uploader */
     .pc-imgs { display: grid; grid-template-columns: repeat(auto-fill, minmax(128px, 1fr)); gap: 12px; margin: 12px 0; }
@@ -235,23 +271,128 @@
     </div>
 
     <div class="pc-stepper" id="pcStepper">
-        <div class="pc-step on" data-step="1"><span class="num">1</span><span class="lbl"><b>Package Details</b><span>Basic information</span></span></div>
+        <div class="pc-step on" data-step="1"><span class="num">1</span><span class="lbl"><b>Select Services</b><span>Choose from your services</span></span></div>
         <span class="bar"></span>
-        <div class="pc-step" data-step="2"><span class="num">2</span><span class="lbl"><b>Services &amp; Deliverables</b><span>What's included</span></span></div>
+        <div class="pc-step" data-step="2"><span class="num">2</span><span class="lbl"><b>Package Details</b><span>Name, description, photos</span></span></div>
         <span class="bar"></span>
-        <div class="pc-step" data-step="3"><span class="num">3</span><span class="lbl"><b>Pricing &amp; Add-Ons</b><span>Set pricing &amp; options</span></span></div>
+        <div class="pc-step" data-step="3"><span class="num">3</span><span class="lbl"><b>Pricing &amp; Discount</b><span>Set package price</span></span></div>
         <span class="bar"></span>
-        <div class="pc-step" data-step="4"><span class="num">4</span><span class="lbl"><b>Availability &amp; Terms</b><span>When &amp; where you serve</span></span></div>
+        <div class="pc-step" data-step="4"><span class="num">4</span><span class="lbl"><b>Options &amp; Add-ons</b><span>Enhance your package</span></span></div>
         <span class="bar"></span>
-        <div class="pc-step" data-step="5"><span class="num">5</span><span class="lbl"><b>Review &amp; Publish</b><span>Preview &amp; go live</span></span></div>
+        <div class="pc-step" data-step="5"><span class="num">5</span><span class="lbl"><b>Availability</b><span>Set date and service rules</span></span></div>
+        <span class="bar"></span>
+        <div class="pc-step" data-step="6"><span class="num">6</span><span class="lbl"><b>Review &amp; Publish</b><span>Confirm and publish</span></span></div>
     </div>
 
     <div class="pc-grid">
         <div>
-            {{-- STEP 1 --}}
+            {{-- STEP 1 — Select Services.
+
+                 Khadijah's 28 October screen opens on this, and it opens on
+                 the professional's OWN services rather than the site-wide
+                 catalogue: a package is a bundle of things this person
+                 already does, at prices they already set.
+
+                 The checkbox still submits the service NAME, which is what
+                 every package in the database holds and what the public page,
+                 the search filter and the matcher all read. Moving that to an
+                 id is a migration, not a form change. --}}
             <div class="pc-panel on" data-panel="1">
                 <div class="pc-card">
-                    <h3><span class="pc-stepdot">1</span> Package Details <small>{{ $stepBlurb[1] }}</small></h3>
+                    <h3><span class="pc-stepdot">1</span> Select Services <small>{{ $stepBlurb[1] }}</small></h3>
+
+                    @if(($myServices ?? collect())->isNotEmpty())
+                        <div class="pc-svctools">
+                            <input type="search" id="pcSvcSearch" class="pc-input" placeholder="Search your services..." oninput="pcSvcFilter()">
+                            <select id="pcSvcCat" class="pc-select" onchange="pcSvcFilter()">
+                                <option value="">All categories</option>
+                                @foreach($myServices->pluck('parent.name')->filter()->unique()->sort() as $catName)
+                                    <option value="{{ $catName }}">{{ $catName }}</option>
+                                @endforeach
+                            </select>
+                            <select id="pcSvcPriced" class="pc-select" onchange="pcSvcFilter()">
+                                <option value="">All services</option>
+                                <option value="priced">Priced services only</option>
+                            </select>
+                        </div>
+
+                        <div class="pc-svcgrid" id="pcSvcList">
+                            @foreach($myServices as $svc)
+                                @php
+                                    $svcPrice = $svc->pivot->price;
+                                    $svcOn    = in_array($svc->name, $pServices, true);
+                                @endphp
+                                <label class="pc-svccard {{ $svcOn ? 'on' : '' }}"
+                                       data-svccard
+                                       data-name="{{ Str::lower($svc->name) }}"
+                                       data-cat="{{ $svc->parent?->name }}"
+                                       data-priced="{{ $svcPrice !== null ? '1' : '0' }}">
+                                    <input type="checkbox" name="services[]" value="{{ $svc->name }}"
+                                           data-price="{{ $svcPrice !== null ? (float) $svcPrice : '' }}"
+                                           @checked($svcOn) onchange="pcSvcSync()">
+                                    <span class="tick" aria-hidden="true">
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg>
+                                    </span>
+                                    <b>{{ $svc->name }}</b>
+                                    <span class="cat">{{ $svc->parent?->name ?? 'Service' }}</span>
+                                    <span class="price">
+                                        @if($svcPrice !== null)
+                                            ${{ number_format((float) $svcPrice, 0) }}
+                                            <i>{{ $svc->pivot->price_unit ?: 'flat rate' }}</i>
+                                        @else
+                                            <i>No price set</i>
+                                        @endif
+                                    </span>
+                                </label>
+                            @endforeach
+                        </div>
+                        <div class="pc-svcnone" id="pcSvcNone" hidden>Nothing matches that. Clear the search to see the rest.</div>
+                    @else
+                        {{-- Nothing on their profile yet, so the site-wide list
+                             is all there is to pick from. The toggles are the
+                             older control, kept so this path still works. --}}
+                        <div class="hint" style="margin-bottom:14px;">
+                            You have not listed your own services yet, so these are the site's.
+                            <a href="{{ route('professional.services.index') }}">Add yours and price them</a> to pick from your own list.
+                        </div>
+                        <div id="pcSvcList">
+                            @foreach($serviceList as $svc)
+                                <label class="pc-svcrow {{ in_array($svc, $pServices) ? '' : 'off' }}" data-svcrow>
+                                    <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg></span>
+                                    <span class="meta"><b>{{ $svc }}</b><span>Included in this package</span></span>
+                                    <input type="checkbox" name="services[]" value="{{ $svc }}" style="display:none;" @checked(in_array($svc, $pServices)) onchange="pcSvcSync()">
+                                    <button type="button" class="pc-toggle {{ in_array($svc, $pServices) ? 'on' : '' }}" onclick="pcSvcToggle(this)" aria-pressed="{{ in_array($svc, $pServices) ? 'true' : 'false' }}"></button>
+                                </label>
+                            @endforeach
+                        </div>
+                    @endif
+
+                    <div class="pc-svccount" id="pcSvcCount">Total Services: <b>0</b> &middot; Minimum 2 required to appear in Package Search</div>
+                </div>
+
+                {{-- What they have picked, and what those parts cost booked one
+                     at a time. The discount on step 3 is measured against this
+                     number, so it is shown here before it is used there. --}}
+                <div class="pc-card" id="pcPicked">
+                    <h3 style="margin-bottom:12px;">Selected Services (<span id="pcPickedN">0</span>)</h3>
+                    <ul class="pc-picked" id="pcPickedList"></ul>
+                    <div class="pc-picked-empty" id="pcPickedEmpty">Nothing selected yet. A package needs at least two.</div>
+                    <div class="pc-picked-sum" id="pcPickedSum" hidden>
+                        <span>Booked separately<small>Total if each service is booked on its own</small></span>
+                        <b id="pcPickedTotal">$0</b>
+                    </div>
+                </div>
+
+                <div class="pc-actions">
+                    <a href="{{ route('professional.packages.index') }}" class="pc-btn pc-btn-ghost">Cancel</a>
+                    <button type="button" class="pc-btn pc-btn-primary" data-next="2">Save &amp; Continue to Package Details &rarr;</button>
+                </div>
+            </div>
+
+            {{-- STEP 2 — Package Details --}}
+            <div class="pc-panel" data-panel="2">
+                <div class="pc-card">
+                    <h3><span class="pc-stepdot">2</span> Package Details <small>{{ $stepBlurb[2] }}</small></h3>
 
                     <div class="pc-block">Package Identity</div>
                     <div class="pc-two">
@@ -264,21 +405,43 @@
                         </div>
                         <div class="pc-field">
                             <label for="pcCat">Package Category</label>
-                            {{-- The form has always been handed $categories and
-                                 never drawn them, so category_id was only ever
-                                 set by the seeder — and it is what picks the
-                                 stand-in hero image and the "more like this"
-                                 row on the public page. --}}
+                            {{-- Khadijah, 4 November: pick at the service level
+                                 and below, so a client filtering on a specialty
+                                 finds the packages that match it.
+
+                                 The list used to be every root and everything
+                                 under it. Under v2 the event types are roots as
+                                 well, so this offered 106 occasions as though a
+                                 package could be about "Halloween Party", and
+                                 nothing filtering on a service would ever find
+                                 one filed that way. The headings below are the
+                                 service categories and are not selectable. --}}
+                            @php
+                                $pcPicked  = (int) old('category_id', $p?->category_id);
+                                $pcOffered = collect($categories)
+                                    ->flatMap(fn ($g) => collect($g['options'])->pluck('id'))
+                                    ->contains($pcPicked);
+                            @endphp
                             <select name="category_id" id="pcCat" class="pc-select">
                                 <option value="">Choose a category</option>
-                                {{-- getNestedDropdownList() returns rows, not an
-                                     id => name map: each one carries the tree
-                                     depth as a prefix on `name`. --}}
-                                @foreach($categories as $cat)
-                                    <option value="{{ $cat['id'] }}" @selected((int) old('category_id', $p?->category_id) === (int) $cat['id'])>{{ $cat['name'] }}</option>
+
+                                {{-- A package saved against a top level category
+                                     keeps it until somebody changes it. Dropping
+                                     the option would blank the field the next
+                                     time this package was edited and saved. --}}
+                                @if($pcPicked && ! $pcOffered && $p?->category)
+                                    <option value="{{ $pcPicked }}" selected>{{ $p->category->name }} (current)</option>
+                                @endif
+
+                                @foreach($categories as $group)
+                                    <optgroup label="{{ $group['label'] }}">
+                                        @foreach($group['options'] as $option)
+                                            <option value="{{ $option['id'] }}" @selected($pcPicked === (int) $option['id'])>{{ $option['depth'] ? str_repeat("\u{00A0}", 4) . $option['name'] : $option['name'] }}</option>
+                                        @endforeach
+                                    </optgroup>
                                 @endforeach
                             </select>
-                            <div class="hint">Helps clients find your package.</div>
+                            <div class="hint">Helps clients find your package. Pick the closest match you offer.</div>
                         </div>
                     </div>
 
@@ -377,37 +540,14 @@
                 </div>
                 <div class="pc-actions">
                     <span></span>
-                    <button type="button" class="pc-btn pc-btn-primary" data-next="2">Save &amp; Continue to Services &amp; Deliverables →</button>
+                    <button type="button" class="pc-btn pc-btn-ghost" data-prev="1">&larr; Back</button>
+                    <button type="button" class="pc-btn pc-btn-primary" data-next="3">Save &amp; Continue to Pricing &rarr;</button>
                 </div>
             </div>
-
-            {{-- STEP 2 --}}
-            <div class="pc-panel" data-panel="2">
-                <div class="pc-card">
-                    <h3><span class="pc-stepdot">2</span> Services &amp; Deliverables <small>{{ $stepBlurb[2] }}</small></h3>
-                    <div class="hint" style="margin-bottom:14px;">Select 2 or more services included in this package. These power the client Service-Mix Matcher.</div>
-                    <div id="pcSvcList">
-                        @foreach($serviceList as $svc)
-                            <label class="pc-svcrow {{ in_array($svc, $pServices) ? '' : 'off' }}" data-svcrow>
-                                <span class="ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 6 9 17l-5-5"/></svg></span>
-                                <span class="meta"><b>{{ $svc }}</b><span>Included in this package</span></span>
-                                <input type="checkbox" name="services[]" value="{{ $svc }}" style="display:none;" @checked(in_array($svc, $pServices)) onchange="pcSvcSync()">
-                                <button type="button" class="pc-toggle {{ in_array($svc, $pServices) ? 'on' : '' }}" onclick="pcSvcToggle(this)" aria-pressed="{{ in_array($svc, $pServices) ? 'true' : 'false' }}"></button>
-                            </label>
-                        @endforeach
-                    </div>
-                    <div class="pc-svccount" id="pcSvcCount">Total Services: <b>0</b> · Minimum 2 required to appear in Package Search</div>
-                </div>
-                <div class="pc-actions">
-                    <button type="button" class="pc-btn pc-btn-ghost" data-prev="1">← Back</button>
-                    <button type="button" class="pc-btn pc-btn-primary" data-next="3">Save &amp; Continue to Pricing &amp; Add-Ons →</button>
-                </div>
-            </div>
-
-            {{-- STEP 3 --}}
+            {{-- STEP 3 — Pricing & Discount --}}
             <div class="pc-panel" data-panel="3">
                 <div class="pc-card">
-                    <h3><span class="pc-stepdot">3</span> Pricing &amp; Add-Ons <small>{{ $stepBlurb[3] }}</small></h3>
+                    <h3><span class="pc-stepdot">3</span> Pricing &amp; Discount <small>{{ $stepBlurb[3] }}</small></h3>
                     <div class="pc-two">
                         <div class="pc-field">
                             <label>Total Package Price <span class="req">*</span></label>
@@ -456,6 +596,19 @@
                             <input type="text" name="duration" class="pc-input" maxlength="60" value="{{ old('duration', $p?->duration) }}" placeholder="Full day">
                         </div>
                     </div>
+                </div>
+                <div class="pc-actions">
+                    <button type="button" class="pc-btn pc-btn-ghost" data-prev="2">&larr; Back</button>
+                    <button type="button" class="pc-btn pc-btn-primary" data-next="4">Save &amp; Continue to Options &amp; Add-ons &rarr;</button>
+                </div>
+            </div>
+
+            {{-- STEP 4 — Options & Add-ons. Split off pricing on 5 November:
+                 the price and the extras were one step, and the extras are
+                 optional while the price is not. --}}
+            <div class="pc-panel" data-panel="4">
+                <div class="pc-card">
+                    <h3><span class="pc-stepdot">4</span> Options &amp; Add-ons <small>{{ $stepBlurb[4] }}</small></h3>
                     <div class="pc-field">
                         <label>What's Included</label>
                         <div id="pcIncludes">
@@ -469,15 +622,14 @@
                     </div>
                 </div>
                 <div class="pc-actions">
-                    <button type="button" class="pc-btn pc-btn-ghost" data-prev="2">← Back</button>
-                    <button type="button" class="pc-btn pc-btn-primary" data-next="4">Save &amp; Continue to Availability &amp; Terms →</button>
+                    <button type="button" class="pc-btn pc-btn-ghost" data-prev="3">&larr; Back</button>
+                    <button type="button" class="pc-btn pc-btn-primary" data-next="5">Save &amp; Continue to Availability &rarr;</button>
                 </div>
             </div>
-
-            {{-- STEP 4 --}}
-            <div class="pc-panel" data-panel="4">
+            {{-- STEP 5 — Availability --}}
+            <div class="pc-panel" data-panel="5">
                 <div class="pc-card">
-                    <h3><span class="pc-stepdot">4</span> Availability &amp; Terms <small>{{ $stepBlurb[4] }}</small></h3>
+                    <h3><span class="pc-stepdot">5</span> Availability <small>{{ $stepBlurb[5] }}</small></h3>
                     <div class="pc-two">
                         <div class="pc-field">
                             <label>Event Coverage</label>
@@ -509,18 +661,17 @@
                     </div>
                 </div>
                 <div class="pc-actions">
-                    <button type="button" class="pc-btn pc-btn-ghost" data-prev="3">← Back</button>
-                    <button type="button" class="pc-btn pc-btn-primary" data-next="5">Save &amp; Continue to Review →</button>
+                    <button type="button" class="pc-btn pc-btn-ghost" data-prev="4">&larr; Back</button>
+                    <button type="button" class="pc-btn pc-btn-primary" data-next="6">Save &amp; Continue to Review &rarr;</button>
                 </div>
             </div>
-
-            {{-- STEP 5 — Review & Publish.
+            {{-- STEP 6 — Review & Publish.
                  Everything on it is read from the form as it stands, so it
                  cannot show a tidy summary of a package the form does not
                  actually hold. Publishing is the only button that publishes. --}}
-            <div class="pc-panel" data-panel="5">
+            <div class="pc-panel" data-panel="6">
                 <div class="pc-card">
-                    <h3><span class="pc-stepdot">5</span> Review &amp; Publish <small>{{ $stepBlurb[5] }}</small></h3>
+                    <h3><span class="pc-stepdot">6</span> Review &amp; Publish <small>{{ $stepBlurb[6] }}</small></h3>
 
                     <div class="pc-review" id="pcReview">
                         <div class="pc-rev"><span>Package name</span><b data-rev="title">—</b></div>
@@ -550,7 +701,7 @@
                     </div>
                 </div>
                 <div class="pc-actions">
-                    <button type="button" class="pc-btn pc-btn-ghost" data-prev="4">← Back</button>
+                    <button type="button" class="pc-btn pc-btn-ghost" data-prev="5">&larr; Back</button>
                     <button type="submit" name="is_active" value="1" class="pc-btn pc-btn-primary">{{ $editing ? 'Save &amp; Publish' : 'Publish Package' }} ✓</button>
                 </div>
             </div>
@@ -757,10 +908,10 @@
     // Mirrors PackageProgress::steps(). Same order, same conditions.
     function pcSteps(s) {
         return [
-            { n: 1, label: 'Package Details',        done: !!s.title && !!s.description, missing: 'a description' },
-            { n: 2, label: 'Services & Deliverables', done: s.services.length >= 2,       missing: 'at least two services' },
-            { n: 3, label: 'Pricing & Add-Ons',       done: s.price > 0,                  missing: 'a price' },
-            { n: 4, label: 'Availability & Terms',    done: !!s.coverage || !!s.availability, missing: 'coverage or availability' }
+            { n: 1, label: 'Select Services',    done: s.services.length >= 2,       missing: 'at least two services' },
+            { n: 2, label: 'Package Details',    done: !!s.title && !!s.description, missing: 'a description' },
+            { n: 3, label: 'Pricing & Discount', done: s.price > 0,                  missing: 'a price' },
+            { n: 5, label: 'Availability',       done: !!s.coverage || !!s.availability, missing: 'coverage or availability' }
         ];
     }
 
@@ -881,13 +1032,90 @@
         pcSvcSync();
     };
     window.pcSvcSync = function () {
-        var n = document.querySelectorAll('#pcSvcList input[type=checkbox]:checked').length;
+        var picked = Array.prototype.slice.call(
+            document.querySelectorAll('#pcSvcList input[type=checkbox]:checked'));
+        var n = picked.length;
+
         var box = document.getElementById('pcSvcCount');
-        box.innerHTML = 'Total Services: <b>' + n + '</b> · Minimum 2 required to appear in Package Search';
+        box.innerHTML = 'Total Services: <b>' + n + '</b> \u00b7 Minimum 2 required to appear in Package Search';
         box.classList.toggle('bad', n < 2);
         document.getElementById('pcPrevSvcCount').textContent = n;
+
+        // The card border follows the checkbox rather than the click, so a
+        // card selected from old() on a failed submit is drawn selected too.
+        document.querySelectorAll('[data-svccard]').forEach(function (card) {
+            card.classList.toggle('on', card.querySelector('input[type=checkbox]').checked);
+        });
+
+        /*
+         * Selected Services, and what those parts cost booked one at a time.
+         *
+         * Only services carrying a price are added up, and the ones without
+         * say so rather than counting as zero: a total that quietly treats an
+         * unpriced service as free is a number the professional would set
+         * their discount against.
+         */
+        var list  = document.getElementById('pcPickedList');
+        var empty = document.getElementById('pcPickedEmpty');
+        var sumEl = document.getElementById('pcPickedSum');
+        if (!list) { pcSummary(); return; }
+
+        var total = 0, unpriced = 0;
+        list.innerHTML = '';
+
+        picked.forEach(function (c) {
+            var raw = c.dataset.price;
+            var has = raw !== undefined && raw !== '';
+            if (has) { total += parseFloat(raw) || 0; } else { unpriced++; }
+
+            var li = document.createElement('li');
+            var name = document.createElement('span');
+            name.textContent = c.value;
+            var amount = document.createElement(has ? 'i' : 'span');
+            if (!has) { amount.className = 'none'; }
+            amount.textContent = has ? ('$' + (parseFloat(raw) || 0).toLocaleString()) : 'No price set';
+            li.appendChild(name);
+            li.appendChild(amount);
+            list.appendChild(li);
+        });
+
+        var nEl = document.getElementById('pcPickedN');
+        if (nEl) { nEl.textContent = n; }
+        if (empty) { empty.hidden = n > 0; }
+        if (sumEl) {
+            sumEl.hidden = total <= 0;
+            var totalEl = document.getElementById('pcPickedTotal');
+            if (totalEl) {
+                totalEl.textContent = '$' + total.toLocaleString();
+                totalEl.title = unpriced > 0
+                    ? unpriced + ' of the services you picked have no price, so they are not in this total.'
+                    : '';
+            }
+        }
+
         pcSummary();
     };
+
+    /* Search and the two dropdowns, all three narrowing the same grid. */
+    window.pcSvcFilter = function () {
+        var q    = (document.getElementById('pcSvcSearch') || {}).value || '';
+        var cat  = (document.getElementById('pcSvcCat') || {}).value || '';
+        var only = (document.getElementById('pcSvcPriced') || {}).value || '';
+        q = q.trim().toLowerCase();
+
+        var shown = 0;
+        document.querySelectorAll('[data-svccard]').forEach(function (card) {
+            var ok = (!q   || card.dataset.name.indexOf(q) !== -1)
+                  && (!cat || card.dataset.cat === cat)
+                  && (only !== 'priced' || card.dataset.priced === '1');
+            card.hidden = !ok;
+            if (ok) { shown++; }
+        });
+
+        var none = document.getElementById('pcSvcNone');
+        if (none) { none.hidden = shown > 0; }
+    };
+
     pcSvcSync();
 
     window.pcAdd = function (id, name, ph) {

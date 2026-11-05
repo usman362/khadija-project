@@ -10,7 +10,7 @@ use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
 
 /**
- * Create a Package — the five-step flow.
+ * Create a Package — the six-step flow.
  *
  * The mockup's own annotations ask for two things to be settled before this
  * ships: what the readiness percentage is actually counting, and whether "Save
@@ -56,15 +56,115 @@ class CreatePackageFlowTest extends TestCase
         ], $over);
     }
 
-    public function test_the_form_offers_the_five_steps(): void
+    /** Khadijah's 28 October screen: six steps, services chosen first. */
+    public function test_the_form_offers_the_six_steps(): void
     {
         $this->actingAs($this->pro())->get(route('professional.packages.create'))
             ->assertOk()
+            ->assertSee('Select Services')
             ->assertSee('Package Details')
-            ->assertSee('Services &amp; Deliverables', false)
-            ->assertSee('Pricing &amp; Add-Ons', false)
-            ->assertSee('Availability &amp; Terms', false)
-            ->assertSee('Review &amp; Publish', false);
+            ->assertSee('Pricing &amp; Discount', false)
+            ->assertSee('Options &amp; Add-ons', false)
+            ->assertSee('Availability')
+            ->assertSee('Review &amp; Publish', false)
+            // Services first is the point of the reorder, not a detail of it.
+            ->assertSeeInOrder(['Select Services', 'Package Details', 'Review &amp; Publish'], false);
+    }
+
+    /**
+     * Step 1 picks from the professional's OWN services, not the site-wide
+     * catalogue. Khadijah's screen is explicit about it, and a package built
+     * from services this person does not offer is a package they cannot
+     * deliver.
+     */
+    public function test_step_one_offers_this_professionals_own_services(): void
+    {
+        $pro = $this->pro();
+
+        $parent = \App\Models\Category::create([
+            'name' => 'Catering & Food Services',
+            'slug' => 'catering-food-services-step-one',
+            'kind' => \App\Models\Category::SERVICE_CATEGORY,
+        ]);
+        $mine = \App\Models\Category::create([
+            'name' => 'Buffet Catering',
+            'slug' => 'buffet-catering-step-one',
+            'kind' => \App\Models\Category::SERVICE,
+            'parent_id' => $parent->id,
+        ]);
+        \App\Models\Category::create([
+            'name' => 'Somebody Elses Service',
+            'slug' => 'somebody-elses-service-step-one',
+            'kind' => \App\Models\Category::SERVICE,
+            'parent_id' => $parent->id,
+        ]);
+
+        $pro->serviceCategories()->attach($mine->id, ['price' => 1200, 'price_unit' => 'flat rate']);
+
+        $page = $this->actingAs($pro->fresh())->get(route('professional.packages.create'))->assertOk();
+
+        $page->assertSee('Buffet Catering')
+            ->assertSee('Catering &amp; Food Services', false)
+            // The price they already set is what the card shows, so the
+            // discount on step 3 is measured against something real.
+            ->assertSee('$1,200');
+
+        // The grid is theirs. A service they have not listed is not in it.
+        $this->assertStringNotContainsString(
+            'data-name="somebody elses service"',
+            $page->getContent()
+        );
+    }
+
+    /**
+     * The Package Category dropdown is the service tree, and only that.
+     *
+     * It was every root and everything under it. Under v2 the event types are
+     * roots as well, so it offered 106 occasions as though a package could be
+     * about "Halloween Party", and nothing filtering on a service would ever
+     * find one filed that way.
+     */
+    public function test_the_category_dropdown_is_services_not_occasions(): void
+    {
+        $category = \App\Models\Category::create([
+            'name' => 'Photography & Videography', 'slug' => 'photo-video-cat-drop',
+            'kind' => \App\Models\Category::SERVICE_CATEGORY,
+        ]);
+        $service = \App\Models\Category::create([
+            'name' => 'Wedding Photography', 'slug' => 'wedding-photography-cat-drop',
+            'kind' => \App\Models\Category::SERVICE, 'parent_id' => $category->id,
+        ]);
+        \App\Models\Category::create([
+            'name' => 'Drone Coverage', 'slug' => 'drone-coverage-cat-drop',
+            'kind' => \App\Models\Category::SERVICE_SPECIALTY, 'parent_id' => $service->id,
+        ]);
+        \App\Models\Category::create([
+            'name' => 'Halloween Party', 'slug' => 'halloween-party-cat-drop',
+            'kind' => \App\Models\Category::EVENT_TYPE,
+        ]);
+
+        $page = $this->actingAs($this->pro())->get(route('professional.packages.create'))->assertOk();
+
+        // The service and its level 4 are both pickable.
+        $page->assertSee('Wedding Photography')
+             ->assertSee('Drone Coverage')
+             // The category is a heading, not an option.
+             ->assertSee('<optgroup label="Photography &amp; Videography">', false);
+
+        $this->assertStringNotContainsString('Halloween Party', $page->getContent());
+    }
+
+    /** And an occasion is refused even if one is posted by hand. */
+    public function test_an_event_type_cannot_be_saved_as_the_package_category(): void
+    {
+        $occasion = \App\Models\Category::create([
+            'name' => 'Halloween Party', 'slug' => 'halloween-party-post',
+            'kind' => \App\Models\Category::EVENT_TYPE,
+        ]);
+
+        $this->actingAs($this->pro())
+            ->post(route('professional.packages.store'), $this->payload(['category_id' => $occasion->id]))
+            ->assertSessionHasErrors('category_id');
     }
 
     // ── The fields the flow gained ───────────────────────────────

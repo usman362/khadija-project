@@ -1225,6 +1225,11 @@ Route::middleware('auth')->group(function () {
         // My Calendar (schedule home — agenda + month grid + availability)
         Route::get('/calendar', [\App\Http\Controllers\Professional\ProfessionalCalendarController::class, 'index'])->name('professional.calendar.index');
 
+        // Availability & Resources — which days they can work, and what they can bring
+        Route::get('/availability', [\App\Http\Controllers\Professional\ProfessionalAvailabilityController::class, 'index'])->name('professional.availability.index');
+        Route::post('/availability/day', [\App\Http\Controllers\Professional\ProfessionalAvailabilityController::class, 'markDay'])->name('professional.availability.day');
+        Route::post('/availability/range', [\App\Http\Controllers\Professional\ProfessionalAvailabilityController::class, 'markRange'])->name('professional.availability.range');
+
         // Bid Intelligence (bid pipeline performance — invited→submitted→viewed→won/lost)
         Route::get('/bid-intelligence', [\App\Http\Controllers\Professional\ProfessionalBidIntelligenceController::class, 'index'])->name('professional.bid-intelligence.index');
 
@@ -1286,6 +1291,10 @@ Route::middleware('auth')->group(function () {
             ->name('professional.services.index');
         Route::patch('/services', [\App\Http\Controllers\Professional\ProfessionalServicePricingController::class, 'update'])
             ->name('professional.services.update');
+        Route::post('/services/add', [\App\Http\Controllers\Professional\ProfessionalServicePricingController::class, 'add'])
+            ->name('professional.services.add');
+        Route::post('/services/toggle', [\App\Http\Controllers\Professional\ProfessionalServicePricingController::class, 'toggle'])
+            ->name('professional.services.toggle');
 
         // Before /gigs/{event}, or "export" is read as an event id.
         Route::get('/gigs/export', [ProfessionalGigController::class, 'export'])

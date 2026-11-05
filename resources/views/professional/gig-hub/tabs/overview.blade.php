@@ -77,37 +77,14 @@
     .pg-banner a svg { width: 15px; height: 15px; }
 
     @media (max-width: 1200px) { .pg-top { grid-template-columns: 1fr; } }
+    /* Below the gigs it is one column of explanation, not a side panel. */
+    .pg-top-after { grid-template-columns: 1fr; margin-top: 20px; }
     @media (max-width: 760px) { .pg-scores { grid-template-columns: 1fr; } }
 </style>
 @endpush
 <div class="pg">
 
     {{-- ════════ Top: intro + gig snapshot ════════ --}}
-    <div class="pg-top">
-        <div class="pg-intro">
-            <div class="pg-art">
-                <svg viewBox="0 0 120 110" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <ellipse cx="62" cy="60" rx="54" ry="44" fill="#eef2ff"/>
-                    <rect x="26" y="44" width="72" height="50" rx="9" fill="#2563eb"/>
-                    <rect x="26" y="44" width="72" height="50" rx="9" fill="url(#bg)" opacity="0.25"/>
-                    <rect x="48" y="34" width="28" height="16" rx="5" fill="#1d4ed8"/>
-                    <rect x="52" y="38" width="20" height="9" rx="3" fill="#3b82f6"/>
-                    <rect x="26" y="62" width="72" height="5" fill="rgba(255,255,255,0.35)"/>
-                    <rect x="56" y="66" width="12" height="9" rx="2.5" fill="#fff"/>
-                    <path d="M150 30" /><path d="M104 40l1.4 4 4 1.4-4 1.4-1.4 4-1.4-4-4-1.4 4-1.4z" fill="#f59e0b"/>
-                    <path d="M20 36l1.2 3.4 3.4 1.2-3.4 1.2-1.2 3.4-1.2-3.4-3.4-1.2 3.4-1.2z" fill="#60a5fa"/>
-                    <defs><linearGradient id="bg" x1="26" y1="44" x2="98" y2="94"><stop stop-color="#fff"/><stop offset="1" stop-color="#1e40af"/></linearGradient></defs>
-                </svg>
-            </div>
-            <h1>Gig Operations Hub</h1>
-            <div class="tag">Manage all your gigs in one place.</div>
-            <p>Your centralized control center to track jobs, monitor earnings, manage staffing, and organize communications, all in one powerful dashboard.</p>
-            <div class="pg-feat x1"><span class="pg-feat-ico" style="background:rgba(139,92,246,0.14);color:var(--accent-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19.5 12.5l-7 7a2 2 0 0 1-2.8 0l-7-7a2 2 0 0 1 0-2.8l7-7a2 2 0 0 1 2.8 0l7 7a2 2 0 0 1 0 2.8z"/></svg></span><div><b>Stops Confusion</b><p>Gathers scattered details into one view.</p></div></div>
-            <div class="pg-feat x2"><span class="pg-feat-ico" style="background:rgba(16,185,129,0.14);color:var(--ok-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v12M9 9.5a2.5 2.5 0 0 1 5 0M9 14.5a2.5 2.5 0 0 0 5 0"/></svg></span><div><b>Tracks Money</b><p>Shows exactly how much each job pays.</p></div></div>
-            <div class="pg-feat x3"><span class="pg-feat-ico" style="background:rgba(249,115,22,0.14);color:var(--brand-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg></span><div><b>Manages Teams</b><p>Helps verify that enough workers are assigned to every event.</p></div></div>
-            <div class="pg-feat x4"><span class="pg-feat-ico" style="background:rgba(37,99,235,0.14);color:var(--info-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span><div><b>One place</b><p>Your gigs, their money and their messages on one screen.</p></div></div>
-        </div>
-
         <div class="pg-card">
             <div class="pg-hub-h">
                 <span class="pg-hub-ico"><svg viewBox="0 0 32 28" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="9" width="26" height="17" rx="3.5" fill="#2563eb"/><rect x="3" y="9" width="26" height="17" rx="3.5" fill="url(#hbg)" opacity="0.22"/><rect x="11" y="3.5" width="10" height="6.5" rx="2" fill="#1d4ed8"/><rect x="13" y="5.5" width="6" height="3.2" rx="1.4" fill="#3b82f6"/><rect x="3" y="15" width="26" height="2" fill="rgba(255,255,255,0.4)"/><rect x="13.5" y="16" width="5" height="3.6" rx="1.5" fill="#fff"/><defs><linearGradient id="hbg" x1="3" y1="9" x2="29" y2="26"><stop stop-color="#fff"/><stop offset="1" stop-color="#1e40af"/></linearGradient></defs></svg></span>
@@ -146,6 +123,35 @@
                 <div class="pg-empty">No gigs yet. Win a gig from Live Opportunities to see it here.</div>
             @endforelse
             <a href="{{ route('professional.gig-hub.index', ['tab' => 'gigs']) }}" class="pg-viewall">View All Gigs →</a>
+        </div>
+
+    {{-- The explanation sat beside the gigs at half width, so somebody
+         opening this page read about the page before they could read their
+         own jobs. Khadijah's screen puts the work first, so it moved under
+         them. --}}
+    <div class="pg-top pg-top-after">
+        <div class="pg-intro">
+            <div class="pg-art">
+                <svg viewBox="0 0 120 110" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <ellipse cx="62" cy="60" rx="54" ry="44" fill="#eef2ff"/>
+                    <rect x="26" y="44" width="72" height="50" rx="9" fill="#2563eb"/>
+                    <rect x="26" y="44" width="72" height="50" rx="9" fill="url(#bg)" opacity="0.25"/>
+                    <rect x="48" y="34" width="28" height="16" rx="5" fill="#1d4ed8"/>
+                    <rect x="52" y="38" width="20" height="9" rx="3" fill="#3b82f6"/>
+                    <rect x="26" y="62" width="72" height="5" fill="rgba(255,255,255,0.35)"/>
+                    <rect x="56" y="66" width="12" height="9" rx="2.5" fill="#fff"/>
+                    <path d="M150 30" /><path d="M104 40l1.4 4 4 1.4-4 1.4-1.4 4-1.4-4-4-1.4 4-1.4z" fill="#f59e0b"/>
+                    <path d="M20 36l1.2 3.4 3.4 1.2-3.4 1.2-1.2 3.4-1.2-3.4-3.4-1.2 3.4-1.2z" fill="#60a5fa"/>
+                    <defs><linearGradient id="bg" x1="26" y1="44" x2="98" y2="94"><stop stop-color="#fff"/><stop offset="1" stop-color="#1e40af"/></linearGradient></defs>
+                </svg>
+            </div>
+            <h1>Gig Operations Hub</h1>
+            <div class="tag">Manage all your gigs in one place.</div>
+            <p>Your centralized control center to track jobs, monitor earnings, manage staffing, and organize communications, all in one powerful dashboard.</p>
+            <div class="pg-feat x1"><span class="pg-feat-ico" style="background:rgba(139,92,246,0.14);color:var(--accent-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19.5 12.5l-7 7a2 2 0 0 1-2.8 0l-7-7a2 2 0 0 1 0-2.8l7-7a2 2 0 0 1 2.8 0l7 7a2 2 0 0 1 0 2.8z"/></svg></span><div><b>Stops Confusion</b><p>Gathers scattered details into one view.</p></div></div>
+            <div class="pg-feat x2"><span class="pg-feat-ico" style="background:rgba(16,185,129,0.14);color:var(--ok-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v12M9 9.5a2.5 2.5 0 0 1 5 0M9 14.5a2.5 2.5 0 0 0 5 0"/></svg></span><div><b>Tracks Money</b><p>Shows exactly how much each job pays.</p></div></div>
+            <div class="pg-feat x3"><span class="pg-feat-ico" style="background:rgba(249,115,22,0.14);color:var(--brand-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg></span><div><b>Manages Teams</b><p>Helps verify that enough workers are assigned to every event.</p></div></div>
+            <div class="pg-feat x4"><span class="pg-feat-ico" style="background:rgba(37,99,235,0.14);color:var(--info-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span><div><b>One place</b><p>Your gigs, their money and their messages on one screen.</p></div></div>
         </div>
     </div>
 

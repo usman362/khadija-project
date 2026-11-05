@@ -430,7 +430,7 @@ class User extends Authenticatable implements MustVerifyEmail
                 ->orWhere('categories.kind', '!=', Category::SERVICE_SPECIALTY))
             // What they charge for it. Read wherever a price is shown, so the
             // pivot has to carry it rather than each caller joining for it.
-            ->withPivot(['price', 'price_unit', 'duration_hours', 'extra_hour_price'])
+            ->withPivot(['price', 'price_unit', 'duration_hours', 'extra_hour_price', 'is_active'])
             ->withTimestamps();
     }
 

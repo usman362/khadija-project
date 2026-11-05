@@ -96,6 +96,63 @@
         </div>
     </div>
 
+    {{-- What the tier costs, in this account's own money.
+
+         The four totals above are what arrives after commission and said
+         nothing about the rate that produced them. Every figure here is this
+         professional's own gross through App\Support\Commission, so the band
+         and the rows below cannot report different arithmetic. --}}
+    <div class="cl-card" style="margin-bottom: 20px;">
+        <div style="display:grid; grid-template-columns:repeat(auto-fit,minmax(190px,1fr)); gap:18px; align-items:start;">
+            <div>
+                <div class="cl-stat-label">Your current tier</div>
+                <div style="font-size:19px; font-weight:800; color:var(--text-primary); margin-top:3px;">
+                    {{ $tier['label'] }} ({{ rtrim(rtrim(number_format($tier['rate'], 2), '0'), '.') }}%)
+                </div>
+                <div style="font-size:11.5px; color:var(--text-muted); margin-top:3px;">Taken at payout, on every completed booking.</div>
+            </div>
+            <div>
+                <div class="cl-stat-label">Billed through this account</div>
+                <div style="font-size:19px; font-weight:800; color:var(--text-primary); margin-top:3px;">${{ number_format($tier['gross'], 2) }}</div>
+                <div style="font-size:11.5px; color:var(--text-muted); margin-top:3px;">Everything clients have been charged.</div>
+            </div>
+            <div>
+                <div class="cl-stat-label">Platform fees</div>
+                <div style="font-size:19px; font-weight:800; color:var(--bad-text, #b91c1c); margin-top:3px;">&minus;${{ number_format($tier['fees'], 2) }}</div>
+                <div style="font-size:11.5px; color:var(--text-muted); margin-top:3px;">At your rate, on that amount.</div>
+            </div>
+            <div>
+                <div class="cl-stat-label">Yours after fees</div>
+                <div style="font-size:19px; font-weight:800; color:var(--ok-text, #047857); margin-top:3px;">${{ number_format($tier['net'], 2) }}</div>
+                @if ($tier['saving'])
+                    <div style="font-size:11.5px; color:var(--text-muted); margin-top:3px;">
+                        On {{ $tier['saving']['label'] }} the same work would have kept ${{ number_format($tier['saving']['amount'], 2) }} more.
+                    </div>
+                @elseif ($tier['lowest'])
+                    <div style="font-size:11.5px; color:var(--text-muted); margin-top:3px;">This is the lowest rate we charge.</div>
+                @else
+                    <div style="font-size:11.5px; color:var(--text-muted); margin-top:3px;">Fees start once a booking is completed and paid.</div>
+                @endif
+            </div>
+        </div>
+
+        {{-- The other tiers' rates only once there is money for them to be
+             measured against. On an account with nothing billed, "Pro 3%"
+             sits beside four zeros and reads like a figure of this
+             professional's own. --}}
+        @if ($tier['gross'] > 0)
+        <div style="display:flex; gap:10px; flex-wrap:wrap; margin-top:16px; padding-top:14px; border-top:1px solid var(--border-color);">
+            @foreach ($tier['ladder'] as $step)
+                <span style="font-size:11.5px; font-weight:700; padding:5px 11px; border-radius:20px;
+                             border:1px solid {{ $step['current'] ? 'var(--accent-blue, #2563eb)' : 'var(--border-color)' }};
+                             color:{{ $step['current'] ? 'var(--accent-blue, #2563eb)' : 'var(--text-muted)' }};">
+                    {{ $step['label'] }} {{ rtrim(rtrim(number_format($step['rate'], 2), '0'), '.') }}%{{ $step['current'] ? ' (you)' : '' }}
+                </span>
+            @endforeach
+        </div>
+        @endif
+    </div>
+
     {{-- Search + Filter --}}
     <div class="cl-card" style="margin-bottom: 20px;">
         <form method="GET" action="{{ route('professional.earnings.index') }}" style="display: flex; gap: 12px; align-items: flex-end; flex-wrap: wrap;">

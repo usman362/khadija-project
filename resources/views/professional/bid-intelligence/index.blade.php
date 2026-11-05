@@ -105,6 +105,8 @@
     .bi-banner a svg { width: 17px; height: 17px; }
 
     @media (max-width: 1200px) { .bi-hero, .bi-hero-l { grid-template-columns: 1fr; } .bi-cc { grid-template-columns: repeat(2, minmax(0,1fr)); } }
+    /* One column each, stacked, now that they are no longer side by side. */
+    .bi-hero-top, .bi-hero-why { grid-template-columns: 1fr; }
     @media (max-width: 760px) { .bi-cc { grid-template-columns: 1fr; } .bi-donut-wrap { grid-template-columns: 1fr; } }
 </style>
 @endpush
@@ -116,7 +118,30 @@
     <div class="bi-crumb"><a href="{{ route('professional.dashboard') }}">Dashboard</a><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg><span>Bid Intelligence</span></div>
 
     {{-- ════════ Hero ════════ --}}
-    <div class="bi-hero">
+    {{-- The bid numbers come first.
+
+         This page opened with a drawing and four tiles explaining what bid
+         intelligence is, with the professional's own figures beside them at
+         half width. Khadijah's 28 October screen leads on the numbers, so the
+         explanation moved below them. --}}
+    <div class="bi-hero bi-hero-top">
+        {{-- donut card --}}
+        <div class="bi-donut-card">
+            <div class="bi-donut-wrap">
+                <div class="bi-donut" style="background: conic-gradient({{ $donutGradient }});">
+                    <div class="bi-donut-c"><b>{{ $stats['total'] }}</b><span>Total Bids</span></div>
+                </div>
+                <div class="bi-leg">
+                    @foreach($segments as $seg)
+                        <div class="bi-leg-row"><span class="bi-leg-dot" style="background:{{ $seg['color'] }};"></span><span class="bi-leg-nm">{{ $seg['name'] }}</span><span class="bi-leg-ct">{{ $seg['count'] }}</span></div>
+                    @endforeach
+                </div>
+            </div>
+            <a href="{{ route('professional.proposals.index') }}" class="bi-pipe-btn">View Full Pipeline <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+        </div>
+    </div>
+
+    <div class="bi-hero bi-hero-why">
         <div class="bi-hero-l">
             <div class="bi-art">
                 <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -157,21 +182,6 @@
                 <div class="bi-feat"><span class="bi-feat-ico" style="background:rgba(16,185,129,0.12);color:var(--ok-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-10 5L2 7"/></svg></span><div><b>Organizes Follow-Ups</b><p>Know who to call or email and when.</p></div></div>
                 <div class="bi-feat"><span class="bi-feat-ico" style="background:rgba(249,115,22,0.12);color:var(--brand-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span><div><b>Saves Energy</b><p>Focus your time on the bids that have the best chance.</p></div></div>
             </div>
-        </div>
-
-        {{-- donut card --}}
-        <div class="bi-donut-card">
-            <div class="bi-donut-wrap">
-                <div class="bi-donut" style="background: conic-gradient({{ $donutGradient }});">
-                    <div class="bi-donut-c"><b>{{ $stats['total'] }}</b><span>Total Bids</span></div>
-                </div>
-                <div class="bi-leg">
-                    @foreach($segments as $seg)
-                        <div class="bi-leg-row"><span class="bi-leg-dot" style="background:{{ $seg['color'] }};"></span><span class="bi-leg-nm">{{ $seg['name'] }}</span><span class="bi-leg-ct">{{ $seg['count'] }}</span></div>
-                    @endforeach
-                </div>
-            </div>
-            <a href="{{ route('professional.proposals.index') }}" class="bi-pipe-btn">View Full Pipeline <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
         </div>
     </div>
 
