@@ -32,7 +32,9 @@ class EventTypesMobileOrderTest extends TestCase
         // The rail is first in the DOM for the desktop layout, so the single
         // column has to reorder it. Without this the list is what a phone meets
         // first.
-        $this->assertStringContainsString('.et-rail-card { position: static; order: 2; }', $html,
+        // Renamed with the rebuild to the design file: .et-rail-card is
+        // .et-rail now. The rule it carries is the same one.
+        $this->assertStringContainsString('.et-rail { position: static; order: 2; }', $html,
             'The shortcut rail is not moved below the cards on a narrow screen.');
         $this->assertStringContainsString('.et-browse > div { order: 1; }', $html,
             'The cards are not moved above the shortcut rail.');
@@ -81,9 +83,19 @@ class EventTypesMobileOrderTest extends TestCase
 
         $html = $this->get(route('public.event-types'))->assertSuccessful()->getContent();
 
-        // OA-111 (Sep 12): the number is the per-event recommended count.
-        $this->assertStringContainsString('The number is how many service categories are recommended for that event', $html);
+        /*
+         * OA-111 asked for the number to be explained. The design file does
+         * not put a number on these rows at all, so since 2026-11-06 there
+         * is none to explain: the count rides on the row's title, where it
+         * is a sentence rather than a bare figure. The rule the row must
+         * still keep is that a figure never appears unexplained.
+         */
         $this->assertStringContainsString('service categories recommended for a Bachelor Party', $html);
+        $this->assertDoesNotMatchRegularExpression(
+            '/<span>Bachelor Party<\/span>\s*<b>\d+<\/b>/',
+            $html,
+            'A bare number is back on the rail row with nothing to explain it.',
+        );
 
         // A list of ten must not call itself all of them.
         $this->assertStringNotContainsString('<h4>All Event Types</h4>', $html);
@@ -104,9 +116,15 @@ class EventTypesMobileOrderTest extends TestCase
     {
         $html = $this->get(route('public.event-types'))->assertSuccessful()->getContent();
 
-        $this->assertStringNotContainsString('.et-all-img { height: 120px', $html);
-        $this->assertStringNotContainsString('.et-all-img { height: 118px', $html);
-        $this->assertStringContainsString('.et-all-img { height: 144px', $html);
+        /*
+         * The height was 144px while the card was 1.94:1. The design file's
+         * card is 3.23:1 and its picture 81 of its own pixels tall, so the
+         * figure could not survive the rebuild on 2026-11-06 and the rule is
+         * checked by what it was for instead: one height for every card, and
+         * the crop taken off the bottom.
+         */
+        $this->assertStringNotContainsString('object-position: center top', $html);
+        $this->assertStringNotContainsString('object-position: top', $html);
 
         // What is left to crop comes off the bottom, not off the top.
         $this->assertStringContainsString('object-position: center 35%', $html);
@@ -121,10 +139,11 @@ class EventTypesMobileOrderTest extends TestCase
     {
         $html = $this->get(route('public.event-types'))->assertSuccessful()->getContent();
 
-        preg_match_all('/\.et-all-img\s*\{[^}]*height:\s*(\d+)px/', $html, $m);
+        // One rule, one height, whatever the number in it happens to be.
+        preg_match_all('/\.et-card \.pic\s*\{[^}]*height:\s*([^;]+);/', $html, $m);
 
         $this->assertNotEmpty($m[1]);
-        $this->assertCount(1, array_unique($m[1]),
+        $this->assertCount(1, array_unique(array_map('trim', $m[1])),
             'The rule appears more than once with different heights, so the cards will not line up.');
     }
 }

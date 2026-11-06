@@ -61,8 +61,11 @@ class EventTypeSearchTest extends TestCase
             ->assertSuccessful()
             ->getContent();
 
-        $from = strpos($html, 'class="et-all"');
-        $to   = strpos($html, 'class="et-all-foot"', $from ?: 0);
+        // The wall and its footer were renamed when the page was rebuilt to
+        // the design file on 2026-11-06: et-all -> et-grid, et-all-foot ->
+        // et-foot. What is being sliced out is the same block.
+        $from = strpos($html, 'class="et-grid"');
+        $to   = strpos($html, 'class="et-foot"', $from ?: 0);
 
         return $from === false ? '' : substr($html, $from, ($to ?: strlen($html)) - $from);
     }
