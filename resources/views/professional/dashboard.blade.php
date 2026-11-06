@@ -56,8 +56,8 @@
 
     /* ── two 3-column rows ── */
     .pd-row { display: grid; gap: 14px; margin-bottom: 14px; align-items: start; }
-    .pd-row-1 { grid-template-columns: minmax(0,1.1fr) minmax(0,1fr); }
-    .pd-row-2 { grid-template-columns: minmax(0,1fr) minmax(0,1fr) minmax(0,1.15fr); }
+    .pd-row-1 { grid-template-columns: minmax(0,1.15fr) minmax(0,1.15fr) minmax(0,1fr); }
+    .pd-row-2 { grid-template-columns: minmax(0,1fr) minmax(0,1.2fr); }
     .pd-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; padding: 16px 17px; min-width: 0; }
     .pd-card-head { display: flex; align-items: center; gap: 9px; margin-bottom: 14px; }
     .pd-card-ico { width: 30px; height: 30px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
@@ -166,7 +166,7 @@
     .pd-sumnote { display: block; font-size: 11.5px; font-weight: 700; color: var(--bad-text, #b91c1c); margin-top: 3px; }
 
     /* ── Needs your attention ── */
-    .pd-row-attn { display: grid; grid-template-columns: minmax(0,1.55fr) minmax(0,1fr); gap: 16px;
+    .pd-row-attn { display: grid; grid-template-columns: minmax(0,1.5fr) minmax(0,1.1fr) minmax(0,1fr); gap: 16px;
         align-items: start; margin-bottom: 16px; }
     .pd-stack { display: flex; flex-direction: column; gap: 16px; }
     .pd-attn-row { display: grid; grid-template-columns: minmax(0,1fr) auto auto; gap: 11px; align-items: center;
@@ -190,6 +190,10 @@
     @media (max-width: 1100px) { .pd-sum { grid-template-columns: repeat(2, minmax(0,1fr)); }
         .pd-row-attn { grid-template-columns: 1fr; } }
     @media (max-width: 620px) { .pd-attn-row { grid-template-columns: 1fr; } }
+
+    .pd-goalset { display: inline-block; margin-top: 11px; font-size: 12.5px; font-weight: 700;
+        padding: 9px 15px; border-radius: 9px; background: var(--accent-blue, #2563eb);
+        color: #fff; text-decoration: none; }
 
     /* ── Setup bar, goal and seasons ── */
     .pd-setup { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px;
@@ -367,19 +371,93 @@
 
             {{-- Measured from the last time this page was opened, not from the
                  last request made, or the answer would always be nothing. --}}
-            @if($sinceLast)
-                <div class="pd-card">
-                    <div class="pd-card-head">
-                        <span class="pd-card-ico c-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>
-                        <span class="pd-card-title">Since you were last here</span>
-                    </div>
+            <div class="pd-card">
+                <div class="pd-card-head">
+                    <span class="pd-card-ico c-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>
+                    <span class="pd-card-title">Since you were last here</span>
+                </div>
+                @if($sinceLast)
                     <div class="pd-new">
                         @foreach($sinceLast as $row)
                             <div><b>{{ $row['count'] }}</b><span>{{ $row['label'] }}</span></div>
                         @endforeach
                     </div>
+                @else
+                    <p class="pd-quiet">Nothing has changed since you last opened this page.</p>
+                @endif
+            </div>
+        </div>
+
+        {{-- The third column of Khadijah's second row.
+
+             Both cards used to sit at the bottom of the page and disappear
+             when they had nothing to say, so the column was not there at
+             all. They stay now and name what is missing instead: a goal
+             nobody has set is an invitation, not an empty space. --}}
+        <div class="pd-stack">
+        {{-- This month against what they said they were aiming for.
+
+             No target is ever invented. A dashboard that makes one up and
+             then reports somebody behind it is making up the thing it
+             measures them against. Where none has been set the card says so
+             and offers to take one, rather than disappearing and leaving a
+             hole in the row. --}}
+        @if ($goal)
+            <div class="pd-card">
+                <div class="pd-card-h">
+                    <span class="pd-card-title">This month against your goal</span>
+                    <a class="pd-card-link" href="{{ route('professional.services.index', ['tab' => 'rules']) }}">Change it</a>
                 </div>
-            @endif
+                <div class="pd-goal">
+                    <b>${{ number_format($goal['earned'], 2) }}</b>
+                    <span>of ${{ number_format($goal['target'], 2) }}</span>
+                </div>
+                <div class="pd-setup-bar"><i style="width: {{ $goal['percent'] }}%;"></i></div>
+                <p class="pd-goal-note">
+                    {{ $goal['percent'] }}% of the way there, counting what has been earned after fees.
+                </p>
+            </div>
+        @else
+            <div class="pd-card">
+                <div class="pd-card-h">
+                    <span class="pd-card-title">Monthly goal</span>
+                </div>
+                <p class="pd-goal-note" style="margin-top:0;">
+                    You have not set one. Name a figure and this card shows how the month is going against it.
+                </p>
+                <a class="pd-goalset" href="{{ route('professional.services.index', ['tab' => 'rules']) }}">Set a monthly goal</a>
+            </div>
+        @endif
+
+        {{-- The months their own work actually falls in. Shown only once
+             there is enough of their own history for it to mean anything. --}}
+        @if ($busiest)
+            <div class="pd-card">
+                <div class="pd-card-h">
+                    <span class="pd-card-title">When your work falls</span>
+                </div>
+                @php $pdMax = collect($busiest)->max('count') ?: 1; @endphp
+                <div class="pd-months">
+                    @foreach ($busiest as $m)
+                        <div class="pd-month" title="{{ $m['count'] }} {{ \Illuminate\Support\Str::plural('booking', $m['count']) }}">
+                            <i style="height: {{ max(3, round($m['count'] / $pdMax * 100)) }}%;"></i>
+                            <span>{{ $m['label'] }}</span>
+                        </div>
+                    @endforeach
+                </div>
+                <p class="pd-goal-note">Your own bookings, by the month the job happens in.</p>
+            </div>
+        @else
+            <div class="pd-card">
+                <div class="pd-card-h">
+                    <span class="pd-card-title">When your work falls</span>
+                </div>
+                <p class="pd-goal-note" style="margin-top:0;">
+                    Not enough of your own bookings yet. A handful of jobs does not make a season, so this
+                    waits rather than drawing one.
+                </p>
+            </div>
+        @endif
         </div>
     </div>
 
@@ -451,6 +529,33 @@
             </div>
             <div class="pd-ghub-foot"><a href="{{ route('professional.gig-hub.index') }}">Manage All Gigs <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a></div>
         </div>
+        {{-- Today's Schedule --}}
+        <div class="pd-card">
+            <div class="pd-card-head">
+                <span class="pd-card-ico c-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>
+                <span class="pd-card-title">Today's Schedule</span>
+                <a href="{{ route('professional.calendar.index') }}" class="pd-card-link">View Calendar <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
+            </div>
+            <div class="pd-sch-list">
+                @forelse($todaySchedule as $__t)
+                    <div class="pd-sch-row">
+                        <span class="pd-sch-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>
+                        <span class="pd-sch-time">{{ $__t->event?->starts_at?->format('g:i A') ?? '' }}</span>
+                        <span class="pd-sch-body"><span class="pd-sch-name">{{ $__t->event?->title ?? 'Untitled event' }}</span></span>
+                        <span class="pd-sch-dur">{{ $__t->event?->ends_at?->format('g:i A') ?? '' }}</span>
+                    </div>
+                @empty
+                    <p style="font-size:12px;color:var(--text-muted);margin:0;padding:4px 0;">Nothing booked for today.</p>
+                @endforelse
+            </div>
+            <a href="{{ route('professional.calendar.index') }}" class="pd-sch-open">Open Full Calendar →</a>
+            {{-- A drawn map with two pins, "84°F Partly Cloudy", "20% Rain"
+                 and "Traffic is light · 25 min to venue" stood here. None of
+                 it came from anywhere: there is no map or weather provider
+                 connected, which is one of the open items with Sir Peter.
+                 Put it back when there is something real behind it. --}}
+            </div>
+        </div>
     </div>
 
     {{-- ════════ Row 2 ════════ --}}
@@ -498,47 +603,6 @@
             @endif
         </div>
 
-        {{-- This month against what they said they were aiming for.
-
-             Hidden until they name a figure. A dashboard that invents a
-             target and then reports somebody behind it is making up the
-             thing it measures them against. --}}
-        @if ($goal)
-            <div class="pd-card">
-                <div class="pd-card-h">
-                    <span class="pd-card-title">This month against your goal</span>
-                    <a class="pd-card-link" href="{{ route('professional.services.index', ['tab' => 'rules']) }}">Change it</a>
-                </div>
-                <div class="pd-goal">
-                    <b>${{ number_format($goal['earned'], 2) }}</b>
-                    <span>of ${{ number_format($goal['target'], 2) }}</span>
-                </div>
-                <div class="pd-setup-bar"><i style="width: {{ $goal['percent'] }}%;"></i></div>
-                <p class="pd-goal-note">
-                    {{ $goal['percent'] }}% of the way there, counting what has been earned after fees.
-                </p>
-            </div>
-        @endif
-
-        {{-- The months their own work actually falls in. Shown only once
-             there is enough of their own history for it to mean anything. --}}
-        @if ($busiest)
-            <div class="pd-card">
-                <div class="pd-card-h">
-                    <span class="pd-card-title">When your work falls</span>
-                </div>
-                @php $pdMax = collect($busiest)->max('count') ?: 1; @endphp
-                <div class="pd-months">
-                    @foreach ($busiest as $m)
-                        <div class="pd-month" title="{{ $m['count'] }} {{ \Illuminate\Support\Str::plural('booking', $m['count']) }}">
-                            <i style="height: {{ max(3, round($m['count'] / $pdMax * 100)) }}%;"></i>
-                            <span>{{ $m['label'] }}</span>
-                        </div>
-                    @endforeach
-                </div>
-                <p class="pd-goal-note">Your own bookings, by the month the job happens in.</p>
-            </div>
-        @endif
 
         {{-- Finance Hub --}}
         <div class="pd-card">
@@ -566,33 +630,6 @@
             </div>
         </div>
 
-        {{-- Today's Schedule --}}
-        <div class="pd-card">
-            <div class="pd-card-head">
-                <span class="pd-card-ico c-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>
-                <span class="pd-card-title">Today's Schedule</span>
-                <a href="{{ route('professional.calendar.index') }}" class="pd-card-link">View Calendar <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
-            </div>
-            <div class="pd-sch-list">
-                @forelse($todaySchedule as $__t)
-                    <div class="pd-sch-row">
-                        <span class="pd-sch-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>
-                        <span class="pd-sch-time">{{ $__t->event?->starts_at?->format('g:i A') ?? '' }}</span>
-                        <span class="pd-sch-body"><span class="pd-sch-name">{{ $__t->event?->title ?? 'Untitled event' }}</span></span>
-                        <span class="pd-sch-dur">{{ $__t->event?->ends_at?->format('g:i A') ?? '' }}</span>
-                    </div>
-                @empty
-                    <p style="font-size:12px;color:var(--text-muted);margin:0;padding:4px 0;">Nothing booked for today.</p>
-                @endforelse
-            </div>
-            <a href="{{ route('professional.calendar.index') }}" class="pd-sch-open">Open Full Calendar →</a>
-            {{-- A drawn map with two pins, "84°F Partly Cloudy", "20% Rain"
-                 and "Traffic is light · 25 min to venue" stood here. None of
-                 it came from anywhere: there is no map or weather provider
-                 connected, which is one of the open items with Sir Peter.
-                 Put it back when there is something real behind it. --}}
-            </div>
-        </div>
     </div>
 </div>
 @endsection

@@ -244,9 +244,12 @@ class TheRestOfTheProfessionalScreensTest extends TestCase
     {
         $this->assertNull($this->pro->dashboard_seen_at);
 
+        // The card holds its place in the column, and says plainly that it
+        // has nothing to report rather than counting every record as new.
         $this->actingAs($this->pro)->get(route('professional.dashboard'))
             ->assertOk()
-            ->assertDontSee('Since you were last here');
+            ->assertSee('Since you were last here')
+            ->assertSee('Nothing has changed since you last opened this page.');
 
         // The visit is recorded, so the next one has something to compare to.
         $this->assertNotNull($this->pro->fresh()->dashboard_seen_at);
@@ -264,6 +267,22 @@ class TheRestOfTheProfessionalScreensTest extends TestCase
         $this->assertStringNotContainsString('>Priority Actions<', $html);
     }
 
+    /**
+     * The third column of the design holds its place whether or not it has
+     * anything to report. It used to vanish, taking the column with it.
+     */
+    public function test_the_goal_and_seasons_cards_hold_their_place(): void
+    {
+        $this->actingAs($this->pro)->get(route('professional.dashboard'))
+            ->assertOk()
+            // No goal set: the card is there, and it offers to take one.
+            ->assertSee('Monthly goal')
+            ->assertSee('Set a monthly goal')
+            // Not enough history: the card says why rather than drawing a chart.
+            ->assertSee('When your work falls')
+            ->assertSee('A handful of jobs does not make a season');
+    }
+
     /** Two bookings do not make a season. */
     public function test_the_months_chart_waits_for_enough_history(): void
     {
@@ -273,8 +292,9 @@ class TheRestOfTheProfessionalScreensTest extends TestCase
             'status' => 'completed', 'price' => 900,
         ]);
 
+        // The card is there; the chart inside it is not.
         $this->actingAs($this->pro)->get(route('professional.dashboard'))
             ->assertOk()
-            ->assertDontSee('When your work falls');
+            ->assertSee('A handful of jobs does not make a season');
     }
 }
