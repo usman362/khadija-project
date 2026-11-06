@@ -70,12 +70,10 @@
     .et-chip.on b { background: rgba(255,255,255,.26); color: #fff; }
     .et-chip svg { width: calc(12 * var(--u)); height: calc(12 * var(--u)); }
     .et-extra { display: none; }
-    .et-note { font-size: calc(12.5 * var(--u)); color: #5a6679; text-align: center;
-        margin: calc(8 * var(--u)) 0 0; }
 
     /* ── Rail and wall ────────────────────────────────────────── */
     .et-browse { display: grid; grid-template-columns: calc(246 * var(--u)) minmax(0, 1fr);
-        gap: calc(21 * var(--u)); align-items: start; margin-top: calc(10 * var(--u)); }
+        gap: calc(21 * var(--u)); align-items: start; margin-top: calc(14 * var(--u)); }
     .et-rail { background: #fff; border: 1px solid #e7eef8; border-radius: calc(13 * var(--u));
         padding: calc(13 * var(--u)) calc(15 * var(--u)) calc(11 * var(--u)); position: sticky; top: calc(88 * var(--u)); }
     .et-rail h4 { font-size: calc(17 * var(--u)); font-weight: 800; color: #0b1340; margin: 0; }
@@ -235,7 +233,6 @@
         @endif
     </div>
 
-    <p class="et-note">Numbers show how many event types are in each group, {{ $chips->sum() }} in all.</p>
 
     <div class="et-browse">
         <aside class="et-rail">
@@ -264,6 +261,9 @@
 
         <div>
             <h2 class="et-wall-h">Browse <span>Event Types</span></h2>
+            {{-- What the chip counts mean is the second half of this line on
+                 the design file, not a centred sentence of its own above the
+                 two columns. --}}
             <p class="et-wall-p">
                 @if($q !== '')
                     {{ $wall->total() }} {{ \Illuminate\Support\Str::plural('event type', $wall->total()) }}
@@ -271,6 +271,7 @@
                     <a href="{{ route('public.event-types', array_filter(['group' => $group])) }}">Clear search</a>
                 @else
                     Choose an event type to start planning.
+                    Numbers show how many event types are in each group, {{ $chips->sum() }} in all.
                 @endif
             </p>
 
