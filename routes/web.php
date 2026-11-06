@@ -1224,6 +1224,7 @@ Route::middleware('auth')->group(function () {
          */
         Route::get('/clients', [\App\Http\Controllers\Professional\ProfessionalClientsController::class, 'index'])->name('professional.clients.index');
         Route::get('/clients/export', [\App\Http\Controllers\Professional\ProfessionalClientsController::class, 'export'])->name('professional.clients.export');
+        Route::post('/clients/tag', [\App\Http\Controllers\Professional\ProfessionalClientsController::class, 'tag'])->name('professional.clients.tag');
         Route::post('/clients/{client}/note', [\App\Http\Controllers\Professional\ProfessionalClientsController::class, 'saveNote'])->name('professional.clients.note');
 
         // My Calendar (schedule home — agenda + month grid + availability)

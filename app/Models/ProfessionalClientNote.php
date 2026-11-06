@@ -14,11 +14,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class ProfessionalClientNote extends Model
 {
-    protected $fillable = ['supplier_id', 'client_id', 'tags', 'note', 'requirements'];
+    protected $fillable = ['supplier_id', 'client_id', 'tags', 'note', 'requirements',
+                           'wants_insurance', 'invoice_terms'];
 
     protected function casts(): array
     {
-        return ['tags' => 'array'];
+        return ['tags' => 'array', 'wants_insurance' => 'boolean'];
     }
 
     public function supplier(): BelongsTo

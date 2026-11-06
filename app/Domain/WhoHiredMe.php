@@ -196,7 +196,9 @@ final class WhoHiredMe
             // The professional's own words. Never shown to the client.
             'tags' => $notes->get($clientId)?->tags ?: [],
             'note' => $notes->get($clientId)?->note,
-            'requirements' => $notes->get($clientId)?->requirements,
+            'requirements'    => $notes->get($clientId)?->requirements,
+            'wants_insurance' => $notes->get($clientId)?->wants_insurance,
+            'invoice_terms'   => $notes->get($clientId)?->invoice_terms,
 
             /*
              * Repeat, one-time or past, by the same rules the screen prints
@@ -213,8 +215,9 @@ final class WhoHiredMe
 
             // How long since either of them did anything. Null is not a long
             // time; it means there has never been any contact at all.
-            'days_quiet' => self::lastContact($last, $conversations->get($clientId))
-                ?->diffInDays(now()),
+            'days_quiet' => ($quietSince = self::lastContact($last, $conversations->get($clientId)))
+                ? (int) floor($quietSince->diffInDays(now()))
+                : null,
 
             /*
              * Books at the same time every year.
@@ -225,7 +228,15 @@ final class WhoHiredMe
              * pattern this client has actually repeated. The other two would
              * be guesses about somebody's intention, so they are not here.
              */
-            'annual' => self::booksAnnually($completed),
+            /*
+             * The month they book in, and the next year it falls due.
+             *
+             * Only where they have actually repeated it: the same calendar
+             * month in two different years. Khadijah's column also offers
+             * "Possible" and "Not Likely", which are guesses about somebody's
+             * intention, so neither is here.
+             */
+            'annual' => self::annualPattern($completed),
 
             'last_type' => $last?->event?->event_type,
         ];
@@ -236,19 +247,32 @@ final class WhoHiredMe
      *
      * @param  Collection<int, Booking>  $completed
      */
-    private static function booksAnnually(Collection $completed): bool
+    private static function annualPattern(Collection $completed): ?array
     {
         $byMonth = $completed
             ->filter(fn (Booking $b) => $b->event?->starts_at)
             ->groupBy(fn (Booking $b) => $b->event->starts_at->format('n'));
 
-        foreach ($byMonth as $inMonth) {
-            if ($inMonth->map(fn (Booking $b) => $b->event->starts_at->format('Y'))->unique()->count() >= 2) {
-                return true;
+        foreach ($byMonth as $month => $inMonth) {
+            $years = $inMonth->map(fn (Booking $b) => (int) $b->event->starts_at->format('Y'))->unique();
+
+            if ($years->count() < 2) {
+                continue;
             }
+
+            // The next time that month comes round after the last one they
+            // booked. Not a prediction that they will: a statement of when
+            // the month they have twice chosen next falls.
+            $next = (int) $years->max() + 1;
+
+            return [
+                'month' => \Illuminate\Support\Carbon::create(null, (int) $month, 1)->format('M'),
+                'year'  => $next,
+                'times' => $years->count(),
+            ];
         }
 
-        return false;
+        return null;
     }
 
     /**

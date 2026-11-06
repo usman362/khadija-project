@@ -37,9 +37,17 @@ class ProfessionalClientsController extends Controller
             ? (string) $request->query('show')
             : 'all';
 
-        $q = trim((string) $request->query('q', ''));
+        $q   = trim((string) $request->query('q', ''));
+        $rel = (string) $request->query('relationship', '');
+        $tag = (string) $request->query('tag', '');
+        $state = (string) $request->query('state', '');
 
         $shown = $this->only($rows, $tab)
+            ->when($rel !== '', fn ($list) => $list->where('relationship', $rel))
+            ->when($tag !== '', fn ($list) => $list->filter(fn (array $r) => in_array($tag, $r['tags'], true)))
+            ->when($state !== '', fn ($list) => $list->filter(
+                fn (array $r) => str_contains((string) $r['client']['where'], $state)
+            ))
             ->when($q !== '', fn ($list) => $list->filter(function (array $r) use ($q) {
                 $hay = mb_strtolower(implode(' ', array_filter([
                     $r['client']['name'], $r['client']['where'], implode(' ', $r['tags']),
@@ -54,6 +62,11 @@ class ProfessionalClientsController extends Controller
             'summary' => WhoHiredMe::summary($rows),
             'show'    => $tab,
             'q'       => $q,
+            'rel'     => $rel,
+            'tag'     => $tag,
+            'state'   => $state,
+            'allTags' => $rows->flatMap(fn (array $r) => $r['tags'])->unique()->sort()->values()->all(),
+            'places'  => $rows->pluck('client.where')->filter()->unique()->sort()->values()->all(),
             'tabs'    => [
                 'all'      => ['Everyone',      $rows->count()],
                 'repeat'   => ['Came back',     $this->only($rows, 'repeat')->count()],
@@ -80,12 +93,15 @@ class ProfessionalClientsController extends Controller
         $data = $request->validate([
             'tags'         => ['nullable', 'string', 'max:160'],
             'note'         => ['nullable', 'string', 'max:400'],
-            'requirements' => ['nullable', 'string', 'max:300'],
+            'requirements'    => ['nullable', 'string', 'max:300'],
+            'wants_insurance' => ['nullable', 'in:yes,no,unknown'],
+            'invoice_terms'   => ['nullable', 'string', 'max:40'],
         ]);
 
         // Each field is optional and a form may carry only some of them, so
         // an absent one means "not given" rather than "clear it".
-        $data += ['tags' => null, 'note' => null, 'requirements' => null];
+        $data += ['tags' => null, 'note' => null, 'requirements' => null,
+                  'wants_insurance' => 'unknown', 'invoice_terms' => null];
 
         $tags = collect(explode(',', (string) ($data['tags'] ?? '')))
             ->map(fn ($t) => trim($t))
@@ -100,11 +116,73 @@ class ProfessionalClientsController extends Controller
             [
                 'tags'         => $tags ?: null,
                 'note'         => $data['note'] ?: null,
-                'requirements' => $data['requirements'] ?: null,
+                'requirements'    => $data['requirements'] ?: null,
+                // Unknown is a third answer, not a no. Not knowing whether a
+                // client wants a certificate is different from knowing they
+                // do not, and the column has to be able to say so.
+                'wants_insurance' => match ($data['wants_insurance']) {
+                    'yes'   => true,
+                    'no'    => false,
+                    default => null,
+                },
+                'invoice_terms'   => $data['invoice_terms'] ?: null,
             ],
         );
 
         return back()->with('status', 'Saved your note on ' . $client->name . '.');
+    }
+
+    /**
+     * Put one tag on several clients at once.
+     *
+     * Only clients who have actually hired this professional, and only their
+     * own tags. Six is the cap per client wherever tags are written, so a
+     * client already carrying six is skipped rather than quietly losing one.
+     */
+    public function tag(Request $request): RedirectResponse
+    {
+        $me = $request->user();
+
+        $data = $request->validate([
+            'ids' => ['required', 'string', 'max:2000'],
+            'tag' => ['required', 'string', 'max:30'],
+        ]);
+
+        $wanted = collect(explode(',', $data['ids']))
+            ->map(fn ($id) => (int) trim($id))
+            ->filter()
+            ->unique();
+
+        $theirs = Booking::where('supplier_id', $me->id)
+            ->whereIn('client_id', $wanted)
+            ->pluck('client_id')
+            ->unique();
+
+        $tag     = trim($data['tag']);
+        $applied = 0;
+
+        foreach ($theirs as $clientId) {
+            $note = ProfessionalClientNote::firstOrNew(
+                ['supplier_id' => $me->id, 'client_id' => $clientId],
+            );
+
+            $tags = collect($note->tags ?: []);
+
+            if ($tags->contains($tag) || $tags->count() >= 6) {
+                continue;
+            }
+
+            $note->supplier_id = $me->id;
+            $note->client_id   = $clientId;
+            $note->tags        = $tags->push($tag)->values()->all();
+            $note->save();
+
+            $applied++;
+        }
+
+        return back()->with('status', $applied === 0
+            ? 'Nothing to change: they already carry that tag, or they are full at six.'
+            : 'Tagged ' . $applied . ' ' . \Illuminate\Support\Str::plural('client', $applied) . '.');
     }
 
     /** The clients as they are filtered on screen, as a file. */
@@ -132,7 +210,7 @@ class ProfessionalClientsController extends Controller
                     $r['earned'],
                     $r['last']['at']?->format('Y-m-d'),
                     $r['days_quiet'],
-                    $r['annual'] ? 'yes' : 'no',
+                    $r['annual'] ? $r['annual']['month'] . ' ' . $r['annual']['year'] : '',
                     implode(', ', $r['tags']),
                     $r['requirements'],
                     $r['note'],
@@ -155,7 +233,7 @@ class ProfessionalClientsController extends Controller
             // there has been no contact at all. Never is not recent.
             'quiet'    => $rows->filter(fn (array $r) => $r['days_quiet'] === null
                 || $r['days_quiet'] >= self::QUIET_DAYS),
-            'annual'   => $rows->where('annual', true),
+            'annual'   => $rows->filter(fn (array $r) => $r['annual'] !== null),
             default    => $rows,
         })->values();
     }
