@@ -46,10 +46,10 @@ class ThePayoutPageNamesTheRateItAppliedTest extends TestCase
         $this->actingAs($this->pro())
             ->get(route('professional.earnings.index'))
             ->assertOk()
-            ->assertSee('Your current tier')
+            ->assertSee('Your Current Tier')
             // No subscription means Starter terms, and the page should say so
             // rather than leave the rate unstated.
-            ->assertSee('Starter (5%)');
+            ->assertSee('Starter Tier (5%)');
     }
 
     /**
@@ -63,7 +63,10 @@ class ThePayoutPageNamesTheRateItAppliedTest extends TestCase
             ->get(route('professional.earnings.index'))
             ->assertOk()
             ->assertDontSee('This is the lowest rate we charge')
-            ->assertSee('Fees start once a booking is completed and paid.');
+            ->assertDontSee('You are on the lowest rate')
+            // With nothing completed there is no fee to compare, and the page
+            // says that rather than quoting a saving measured on nothing.
+            ->assertSee('Nothing completed in this period');
     }
 
     public function test_the_fees_shown_are_the_fees_commission_would_take(): void
@@ -97,11 +100,11 @@ class ThePayoutPageNamesTheRateItAppliedTest extends TestCase
         $this->actingAs($pro)
             ->get(route('professional.earnings.index'))
             ->assertOk()
-            ->assertSee('Platform fees')
+            ->assertSee('Total platform fees')
             ->assertSee($expected)
-            // With money billed, the other tiers are worth naming. On an
-            // empty account they are not, and the guard in
-            // AnEmptyProfessionalSeesNoFiguresTest holds them back.
-            ->assertSee('Pro 3%');
+            // With money billed, the cheaper tier is worth naming. On an
+            // empty account it is not, and the guard in
+            // AnEmptyProfessionalSeesNoFiguresTest holds it back.
+            ->assertSee('Next Tier: Elite (1.5%)');
     }
 }

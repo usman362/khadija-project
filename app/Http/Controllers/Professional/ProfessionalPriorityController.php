@@ -29,7 +29,8 @@ class ProfessionalPriorityController extends Controller
     public function index(Request $request): View
     {
         $me  = $request->user();
-        $tab = (string) $request->query('tab', 'all');
+        $tab  = (string) $request->query('tab', 'all');
+        $span = $request->query('span') === 'week' ? 'week' : 'today';
 
         $all  = PriorityActions::forProfessional($me);
         $tabs = PriorityActions::tabs($all);
@@ -44,6 +45,7 @@ class ProfessionalPriorityController extends Controller
             'urgent'     => $all->where('tone', 'urgent'),
             'soon'       => $all->where('tone', 'soon'),
             'clients'    => $all->where('group', 'clients'),
+            'payments'   => $all->where('group', 'payments'),
             'agreements' => $all->where('group', 'agreements'),
             default      => $all,
         })->values();
@@ -53,7 +55,8 @@ class ProfessionalPriorityController extends Controller
             'tabs'     => $tabs,
             'tab'      => $tab,
             'total'    => $all->count(),
-            'today'    => $this->today($me),
+            'span'     => $span,
+            'today'    => $this->today($me, $span),
             'deadlines' => $all->filter(fn ($i) => $i['due'] !== null)->take(5)->values(),
             'snapshot' => $this->snapshot($me),
         ]);
@@ -65,11 +68,13 @@ class ProfessionalPriorityController extends Controller
      * Read in the timezone the rest of the site displays in, not the one the
      * database stores in, or a late evening job shows up on the wrong day.
      */
-    private function today($me): array
+    private function today($me, string $span = 'today'): array
     {
         $zone  = config('app.display_timezone', config('app.timezone'));
         $start = Carbon::today($zone)->startOfDay()->utc();
-        $end   = Carbon::today($zone)->endOfDay()->utc();
+        $end   = $span === 'week'
+            ? Carbon::today($zone)->addDays(7)->endOfDay()->utc()
+            : Carbon::today($zone)->endOfDay()->utc();
 
         $gigs = Booking::where('supplier_id', $me->id)
             ->whereIn('status', ['confirmed', 'in_progress'])
@@ -107,15 +112,54 @@ class ProfessionalPriorityController extends Controller
         $since = now()->subDays(30);
         $money = Earnings::forProfessional($me);
 
+        $before = now()->subDays(60);
+
+        /*
+         * Each figure beside the one before it.
+         *
+         * Khadijah's snapshot carries an arrow and a percentage on every row.
+         * This is the only honest version of that: this professional's own
+         * last thirty days against their own thirty before. Null where there
+         * was nothing to compare against, because everything is not an
+         * infinite improvement on nothing.
+         */
+        $change = function (int $now, int $was): ?int {
+            if ($was === 0) {
+                return null;
+            }
+
+            return (int) round(($now - $was) / $was * 100);
+        };
+
+        $requests = Booking::where('supplier_id', $me->id)->where('created_at', '>=', $since)->count();
+        $wasRequests = Booking::where('supplier_id', $me->id)
+            ->whereBetween('created_at', [$before, $since])->count();
+
+        $bids = Bid::where('supplier_id', $me->id)->where('created_at', '>=', $since)->count();
+        $wasBids = Bid::where('supplier_id', $me->id)->whereBetween('created_at', [$before, $since])->count();
+
+        $won = Booking::where('supplier_id', $me->id)
+            ->whereIn('status', ['confirmed', 'in_progress', 'completed'])
+            ->where('updated_at', '>=', $since)->count();
+        $wasWon = Booking::where('supplier_id', $me->id)
+            ->whereIn('status', ['confirmed', 'in_progress', 'completed'])
+            ->whereBetween('updated_at', [$before, $since])->count();
+
+        // An average only means something once there is more than one bid.
+        $average = Bid::where('supplier_id', $me->id)
+            ->where('created_at', '>=', $since)->avg('amount');
+
         return [
-            'requests' => Booking::where('supplier_id', $me->id)
-                ->where('created_at', '>=', $since)->count(),
-            'bids'     => Bid::where('supplier_id', $me->id)
-                ->where('created_at', '>=', $since)->count(),
-            'won'      => Booking::where('supplier_id', $me->id)
-                ->whereIn('status', ['confirmed', 'in_progress', 'completed'])
-                ->where('updated_at', '>=', $since)->count(),
+            'requests' => $requests,
+            'bids'     => $bids,
+            'won'      => $won,
             'earned'   => (float) ($money['earned'] ?? 0),
+            'average'  => $average ? (float) $average : null,
+            'change'   => [
+                'requests' => $change($requests, $wasRequests),
+                'bids'     => $change($bids, $wasBids),
+                'won'      => $change($won, $wasWon),
+            ],
         ];
     }
 }

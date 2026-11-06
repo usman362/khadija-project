@@ -57,13 +57,66 @@ class ProfessionalGigHubController extends Controller
         // requested. Both words now have one definition.
         $counted = GigStats::forProfessional($user);
 
+        /*
+         * Khadijah's three cards at the top: what is coming, what paperwork
+         * is outstanding, and who is waiting to hear from you. Each one is a
+         * count of real rows, and each carries the one line underneath that
+         * says which of them matters most.
+         */
+        $upcoming = Booking::where('supplier_id', $user->id)
+            ->whereIn('status', ['confirmed', 'in_progress'])
+            ->whereHas('event', fn ($q) => $q->where('starts_at', '>=', $now))
+            ->with('event:id,title,starts_at')
+            ->get()
+            ->sortBy(fn (Booking $b) => $b->event?->starts_at);
+
+        $nextEvent = $upcoming->first()?->event?->starts_at;
+
+        // Paperwork that is not finished: anything neither side has rejected
+        // and this professional has not accepted.
+        $contracts = \App\Models\Agreement::whereHas('booking',
+                fn ($q) => $q->where('supplier_id', $user->id))
+            ->whereNull('rejected_at')
+            ->get();
+
+        $needsMySignature = $contracts
+            ->filter(fn ($a) => $a->supplier_accepted_at === null)
+            ->count();
+
+        /*
+         * Threads waiting on a reply.
+         *
+         * Nothing on a message records whether it was read, so "unread" is
+         * not a question this platform can answer. What it can answer is
+         * whether the last word in a thread was the client's, which is the
+         * thing that actually needs the professional.
+         */
+        $threads = Conversation::whereHas('booking',
+                fn ($q) => $q->where('supplier_id', $user->id))
+            ->with(['messages' => fn ($q) => $q->latest('created_at')->limit(1)])
+            ->get();
+
+        $waiting = $threads->filter(function ($c) use ($user) {
+            $last = $c->messages->first();
+
+            return $last && $last->sender_id !== $user->id;
+        });
+
         $stats = [
             'active'      => $counted['active'],
             'in_progress' => $counted['inProgress'],
             'completed'   => $counted['completed'],
+            'upcoming'    => $upcoming->count(),
+            'next_event'  => $nextEvent,
+            'contracts'   => $contracts->count(),
+            'to_sign'     => $needsMySignature,
+            'waiting'        => $waiting->count(),
+            'waiting_threads' => $threads->count(),
         ];
 
-        $gigs = $base()->whereIn('status', ['confirmed', 'requested', 'completed'])
+        // in_progress belongs here: a gig being worked on right now was the
+        // one state missing from "Recent Gigs & Contracts".
+        $gigs = $base()->whereIn('status', ['confirmed', 'in_progress', 'requested', 'completed'])
             ->with(['event:id,title,starts_at,ends_at,location,budget', 'event.categories:id,name', 'client:id,name'])
             ->latest()
             ->take(5)

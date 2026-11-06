@@ -156,6 +156,91 @@ class ProfessionalBidIntelligenceController extends Controller
          */
         $bids = \App\Support\BidPerformance::bids($user);
 
+        /*
+         * Her filter bar. Each one narrows the same set of bids, and each
+         * list is built from what this professional's own bids actually
+         * carry, so no filter can empty the page on its own.
+         */
+        $filters = [
+            'period'  => (string) $request->query('period', '90'),
+            'service' => (string) $request->query('service', ''),
+            'type'    => (string) $request->query('type', ''),
+            'place'   => (string) $request->query('place', ''),
+            'band'    => (string) $request->query('band', ''),
+        ];
+
+        $options = [
+            'services' => $bids->map(fn ($b) => $b->category?->name)->filter()->unique()->sort()->values()->all(),
+            'types'    => $bids->map(fn ($b) => $b->event?->event_type)->filter()->unique()->sort()->values()->all(),
+            'places'   => $bids->map(fn ($b) => $b->event?->state)->filter()->unique()->sort()->values()->all(),
+            'bands'    => ['Under $1,000', '$1,000 to $2,500', '$2,500 to $5,000', 'Over $5,000'],
+            'periods'  => ['30' => 'Last 30 Days', '90' => 'Last 90 Days', '365' => 'Last 12 Months', 'all' => 'All Time'],
+        ];
+
+        // Nothing to filter means no filter bar: an account that has never
+        // bid should not be shown price bands and a clock.
+        $hasAnyBids = $bids->isNotEmpty();
+
+        $since = $filters['period'] === 'all' ? null : now()->subDays((int) $filters['period'] ?: 90);
+
+        $bids = $bids->filter(function ($b) use ($filters, $since) {
+            $at = $b->submitted_at ?? $b->created_at;
+
+            return (! $since || ($at && $at->gte($since)))
+                && (! $filters['service'] || $b->category?->name === $filters['service'])
+                && (! $filters['type']    || $b->event?->event_type === $filters['type'])
+                && (! $filters['place']   || $b->event?->state === $filters['place'])
+                && (! $filters['band']    || self::band((float) $b->amount) === $filters['band']);
+        })->values();
+
+        /*
+         * The same window again, ending where this one starts.
+         *
+         * Her tiles each carry an arrow and a percentage "vs. previous 90
+         * days". This is the only honest version of that: this professional
+         * against themselves over the span before. Null where there was
+         * nothing to compare against, because everything is not an infinite
+         * improvement on nothing.
+         */
+        $days  = $filters['period'] === 'all' ? null : ((int) $filters['period'] ?: 90);
+        $prior = collect();
+
+        if ($days) {
+            $from = now()->subDays($days * 2);
+            $to   = now()->subDays($days);
+
+            $prior = \App\Support\BidPerformance::bids($user)->filter(function ($b) use ($from, $to) {
+                $at = $b->submitted_at ?? $b->created_at;
+
+                return $at && $at->gte($from) && $at->lt($to);
+            });
+        }
+
+        $change = function (int $now, int $was): ?int {
+            if ($was === 0) {
+                return null;
+            }
+
+            return (int) round(($now - $was) / $was * 100);
+        };
+
+        $priorRecord = \App\Support\BidPerformance::record($prior);
+
+        $trend = [
+            'submitted' => $days ? $change($bids->count(), $priorRecord['placed']) : null,
+            'accepted'  => $days ? $change(
+                $bids->whereIn('status', \App\Support\BidPerformance::WON)->count(),
+                $priorRecord['won'],
+            ) : null,
+            'open'      => $days ? $change(
+                $bids->count()
+                    - $bids->whereIn('status', \App\Support\BidPerformance::WON)->count()
+                    - $bids->whereIn('status', \App\Support\BidPerformance::LOST)->count(),
+                $priorRecord['open'],
+            ) : null,
+            'span'      => $days ? 'vs. previous ' . $days . ' days' : null,
+        ];
+
         $performance = [
             'record'  => \App\Support\BidPerformance::record($bids),
             'byEvent' => \App\Support\BidPerformance::splitBy(
@@ -170,10 +255,50 @@ class ProfessionalBidIntelligenceController extends Controller
             'byPrice' => \App\Support\BidPerformance::byPrice($bids),
             'lost'    => \App\Support\BidPerformance::lost($bids),
             'season'  => \App\Support\BidPerformance::season($bids),
+            'funnel'  => \App\Support\BidPerformance::funnel($user, $bids),
+            'timing'  => \App\Support\BidPerformance::timing($bids),
+            'trend'   => \App\Support\BidPerformance::trend($bids),
+            'quality' => \App\Support\BidPerformance::quality($bids),
         ];
 
+        /*
+         * Open requests this professional has not bid on, matched to the
+         * services they sell. Her screen calls these Smart Recommendations
+         * and scores each one; there is no model behind a score, so these are
+         * simply the open requests they could still answer.
+         */
+        $mine = $user->serviceCategories()->pluck('categories.id');
+
+        $open = Event::where('is_published', true)
+            ->whereIn('status', ['pending', 'published'])
+            ->whereNull('supplier_id')
+            ->whereDoesntHave('bids', fn ($q) => $q->where('supplier_id', $user->id))
+            ->when($mine->isNotEmpty(), fn ($q) => $q
+                ->whereHas('categories', fn ($c) => $c->whereIn('categories.id', $mine)))
+            ->with('categories:id,name')
+            ->latest('published_at')
+            ->take(4)
+            ->get();
+
+        // Everything still waiting on this professional, from the one list
+        // the whole portal reads, so this card and Priority Actions cannot
+        // disagree about what is outstanding.
+        $waiting = collect(\App\Support\PriorityActions::forProfessional($user))->take(4);
+
         return view('professional.bid-intelligence.index', compact(
-            'stats', 'segments', 'donutGradient', 'responseTimes', 'pricing', 'performance'
+            'stats', 'segments', 'donutGradient', 'responseTimes', 'pricing', 'performance',
+            'filters', 'options', 'open', 'waiting', 'hasAnyBids', 'trend'
         ));
+    }
+
+    /** Which price band an amount falls in, named as byPrice names them. */
+    private static function band(float $amount): string
+    {
+        return match (true) {
+            $amount < 1000 => 'Under $1,000',
+            $amount < 2500 => '$1,000 to $2,500',
+            $amount < 5000 => '$2,500 to $5,000',
+            default        => 'Over $5,000',
+        };
     }
 }

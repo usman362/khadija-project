@@ -83,6 +83,10 @@ class ProfessionalServicePricingController extends Controller
             'tab'        => $this->tab($request),
             'rules'      => $rules,
             'addons'     => $addons,
+            // The filter offers only the categories this professional's own
+            // services sit in, so it can never narrow the page to nothing.
+            'categories' => $services->map(fn ($s) => $s->parent?->name)
+                ->filter()->unique()->sort()->values()->all(),
             'counts'     => [
                 'total'    => $services->count(),
                 'active'   => $active->count(),
@@ -96,7 +100,10 @@ class ProfessionalServicePricingController extends Controller
     /** Which tab is open. Anything unrecognised falls back to the services. */
     private function tab(Request $request): string
     {
-        $tabs = ['services', 'addons', 'rules', 'travel', 'quickbid'];
+        // Her six. Templates holds the reusable text a Quick Bid goes out
+        // with; Quick Bid Settings holds the switch and the floor. One
+        // record, two tabs, because they are two different decisions.
+        $tabs = ['services', 'rules', 'addons', 'travel', 'templates', 'quickbid'];
 
         return in_array($request->query('tab'), $tabs, true)
             ? (string) $request->query('tab')

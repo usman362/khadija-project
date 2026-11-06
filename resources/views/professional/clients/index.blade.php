@@ -131,19 +131,19 @@
     <form method="GET" action="{{ route('professional.clients.index') }}" class="mc-tools">
         @if($show !== 'all')<input type="hidden" name="show" value="{{ $show }}">@endif
         <input type="search" class="mc-in" name="q" value="{{ $q }}" placeholder="Search by name, place or tag">
-        <select class="mc-in" name="relationship">
+        <select class="mc-in" name="relationship" aria-label="Relationship">
             <option value="">Any relationship</option>
             @foreach($relationship as $key => [$label, $colour])
                 <option value="{{ $key }}" @selected($rel === $key)>{{ $label }}</option>
             @endforeach
         </select>
-        <select class="mc-in" name="state">
+        <select class="mc-in" name="state" aria-label="State">
             <option value="">Anywhere</option>
             @foreach($places as $place)
                 <option value="{{ $place }}" @selected($state === $place)>{{ $place }}</option>
             @endforeach
         </select>
-        <select class="mc-in" name="tag">
+        <select class="mc-in" name="tag" aria-label="Tag">
             <option value="">Any tag</option>
             @foreach($allTags as $t)
                 <option value="{{ $t }}" @selected($tag === $t)>{{ $t }}</option>
@@ -244,6 +244,12 @@
                 </td>
                 <td>
                     @if($r['last'])
+                        {{-- The job itself, not only its date: "20 Oct" does
+                             not tell a professional which piece of work the
+                             client is in front of them about. --}}
+                        @if($r['last']['title'])
+                            <span style="display:block;font-weight:700;">{{ $r['last']['title'] }}</span>
+                        @endif
                         {{ $r['last']['at']?->format('j M Y') ?: 'Undated' }}
                         @if($r['last_type'])<span class="mc-muted" style="display:block;font-size:10.5px;">{{ $r['last_type'] }}</span>@endif
                     @else
@@ -317,7 +323,7 @@
                         </div>
                         <div>
                             <label>Wants an insurance certificate</label>
-                            <select name="wants_insurance" class="mc-in">
+                            <select name="wants_insurance" class="mc-in" aria-label="Insurance wanted">
                                 <option value="unknown" @selected($r['wants_insurance'] === null)>Not noted</option>
                                 <option value="yes" @selected($r['wants_insurance'] === true)>Yes</option>
                                 <option value="no" @selected($r['wants_insurance'] === false)>No</option>

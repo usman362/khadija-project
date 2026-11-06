@@ -27,55 +27,182 @@ class ProfessionalProposalController extends Controller
         // one number here and another there for the same set of gigs.
         $counted = GigStats::forProfessional($user);
 
+        /*
+         * Archived proposals are out of every count except their own tab.
+         *
+         * That makes All here smaller than the Gig Operations Hub's total,
+         * and it should be: archiving is this list's own tidying, and a row a
+         * professional has put away should not keep being counted at them.
+         */
+        $all      = Booking::where('supplier_id', $user->id)->whereNull('archived_at');
+        $replied0 = \App\Models\Message::whereIn('booking_id', (clone $all)->pluck('id'))
+            ->where('sender_id', '!=', $user->id)
+            ->pluck('booking_id')
+            ->unique();
+
         $stats = [
-            'all'         => $counted['total'],
+            'all'         => (clone $all)->count(),
+            // The client has come back and it is this professional's move.
+            'mine'        => (clone $all)->where('status', 'requested')->whereIn('id', $replied0)->count(),
+            // Sent, and nobody has said anything back yet.
+            'theirs'      => (clone $all)->where('status', 'requested')
+                ->whereNotIn('id', $replied0->isEmpty() ? [0] : $replied0)->count(),
+            'accepted'    => (clone $all)->whereIn('status', ['confirmed', 'in_progress', 'completed'])->count(),
+            'completed'   => (clone $all)->where('status', 'completed')->count(),
+            'declined'    => (clone $all)->where('status', 'cancelled')->count(),
+            'withdrawn'   => (clone $all)->whereIn('event_id',
+                \App\Models\Bid::where('supplier_id', $user->id)->where('status', 'withdrawn')->pluck('event_id')
+            )->count(),
+            'archived'    => Booking::where('supplier_id', $user->id)->whereNotNull('archived_at')->count(),
+            'expired'     => (clone $all)->where('status', 'requested')
+                ->whereHas('event', fn ($q) => $q
+                    ->whereNotNull('proposal_deadline')
+                    ->where('proposal_deadline', '<', now()))
+                ->count(),
+            // Kept for anything still reading the old names.
             'pending'     => $counted['pending'],
-            'accepted'    => $counted['booked'],
             'in_progress' => $counted['inProgress'],
-            'completed'   => $counted['completed'],
             'cancelled'   => $counted['cancelled'],
         ];
 
         // Build query with filters
         $query = Booking::where('supplier_id', $user->id)
-            ->with(['event:id,title,starts_at,ends_at', 'event.categories:id,name', 'supplier:id,name', 'client:id,name'])
+            // proposal_deadline and guest_count are read by the table; a column
+            // left out of the select comes back null, and the page then says
+            // "no closing date" about a request that has one.
+            ->with(['event:id,title,starts_at,ends_at,proposal_deadline,guest_count,event_type,location',
+                    'event.categories:id,name', 'supplier:id,name', 'client:id,name'])
             ->latest();
 
-        // Status tab filter
+        /*
+         * Khadijah's tabs, which group by what is actually owed rather than
+         * by the raw status: a proposal the client has replied to needs this
+         * professional, and one nobody has answered needs the client.
+         */
+        $replied = \App\Models\Message::whereIn(
+                'booking_id',
+                Booking::where('supplier_id', $user->id)->pluck('id')
+            )
+            ->where('sender_id', '!=', $user->id)
+            ->pluck('booking_id')
+            ->unique();
+
         $tab = $request->string('tab')->toString() ?: 'all';
-        switch ($tab) {
-            case 'pending':
-                $query->where('status', 'requested');
-                break;
-            case 'accepted':
-                $query->where('status', 'confirmed');
-                break;
-            case 'in_progress':
-                $query->where('status', 'confirmed')
-                    ->whereHas('event', fn ($q) => $q->where('starts_at', '<=', now())->where('ends_at', '>=', now()));
-                break;
-            case 'completed':
-                $query->where('status', 'completed');
-                break;
-            case 'cancelled':
-                $query->where('status', 'cancelled');
-                break;
+
+        $withdrawnEvents = \App\Models\Bid::where('supplier_id', $user->id)
+            ->where('status', 'withdrawn')
+            ->pluck('event_id');
+
+        match ($tab) {
+            'mine'      => $query->where('status', 'requested')->whereIn('id', $replied),
+            'theirs'    => $query->where('status', 'requested')->whereNotIn('id', $replied->isEmpty() ? [0] : $replied),
+            'accepted'  => $query->whereIn('status', ['confirmed', 'in_progress', 'completed']),
+            'declined'  => $query->where('status', 'cancelled'),
+            // Still open on this side, but the client stopped taking
+            // proposals, so nothing more is going to happen to it.
+            'expired'   => $query->where('status', 'requested')
+                ->whereHas('event', fn ($q) => $q
+                    ->whereNotNull('proposal_deadline')
+                    ->where('proposal_deadline', '<', now())),
+            // Taken off the table by this professional, which is a different
+            // thing from the client declining it.
+            'withdrawn' => $query->whereIn('event_id', $withdrawnEvents->isEmpty() ? [0] : $withdrawnEvents),
+            default     => null,
+        };
+
+        // Archived rows are out of the list but never out of the record, so
+        // they are hidden everywhere except the tab that asks for them.
+        if ($tab !== 'archived') {
+            $query->whereNull('archived_at');
+        } else {
+            $query->whereNotNull('archived_at');
+        }
+
+        /*
+         * Khadijah's four dropdowns. Each one filters something the platform
+         * actually records: an event type, where the proposal stands, whether
+         * the client has said anything, and how far back to look.
+         */
+        if ($request->filled('status')) {
+            match ($request->string('status')->toString()) {
+                'pending'     => $query->where('status', 'requested')
+                    ->whereNotIn('id', $replied->isEmpty() ? [0] : $replied),
+                'negotiation' => $query->where('status', 'requested')->whereIn('id', $replied),
+                'accepted'    => $query->whereIn('status', ['confirmed', 'in_progress']),
+                'completed'   => $query->where('status', 'completed'),
+                'declined'    => $query->where('status', 'cancelled'),
+                default       => null,
+            };
+        }
+
+        if ($request->filled('activity')) {
+            match ($request->string('activity')->toString()) {
+                'replied'  => $query->whereIn('id', $replied->isEmpty() ? [0] : $replied),
+                'silent'   => $query->whereNotIn('id', $replied->isEmpty() ? [0] : $replied),
+                'accepted' => $query->whereIn('status', ['confirmed', 'in_progress', 'completed']),
+                'declined' => $query->where('status', 'cancelled'),
+                default    => null,
+            };
+        }
+
+        // "All Time" is the default, so a period only ever narrows the list.
+        $days = match ($request->string('period')->toString()) {
+            '7'   => 7,
+            '30'  => 30,
+            '90'  => 90,
+            '365' => 365,
+            default => null,
+        };
+
+        if ($days) {
+            $query->where('bookings.created_at', '>=', now()->subDays($days));
         }
 
         // Search
+        if ($request->filled('type')) {
+            $wanted = $request->string('type')->toString();
+            $query->whereHas('event', fn ($e) => $e->where('event_type', $wanted));
+        }
+
         if ($request->filled('search')) {
             $search = $request->string('search')->toString();
             $query->where(function ($q) use ($search) {
-                $q->whereHas('event', fn ($eq) => $eq->where('title', 'like', "%{$search}%"));
+                // Event name, client, or location: the three the box offers.
+                $q->whereHas('event', fn ($eq) => $eq
+                    ->where('title', 'like', "%{$search}%")
+                    ->orWhere('location', 'like', "%{$search}%")
+                    ->orWhere('city', 'like', "%{$search}%"));
                 $q->orWhereHas('client', fn ($cq) => $cq->where('name', 'like', "%{$search}%"));
             });
         }
 
-        $bookings = $query->paginate(12)->withQueryString();
+        // The footer offers a page size, so the page has to honour it.
+        $perPage = (int) $request->integer('per', 6);
+        $perPage = in_array($perPage, [6, 12, 24, 48], true) ? $perPage : 6;
+
+        $bookings = $query->paginate($perPage)->withQueryString();
 
         return view('professional.proposals.index', array_merge(
             compact('stats', 'bookings', 'tab'),
-            ['detail' => $this->detailFor($user, $bookings->getCollection())],
+            [
+                'detail'  => $this->detailFor($user, $bookings->getCollection()),
+                'replied' => $replied0,
+                'search'  => (string) $request->query('search', ''),
+                'types'   => Booking::where('supplier_id', $user->id)
+                    ->with('event:id,event_type')
+                    ->get()
+                    ->map(fn (Booking $b) => $b->event?->event_type)
+                    ->filter()->unique()->sort()->values()->all(),
+                'type'    => (string) $request->query('type', ''),
+                'status'  => (string) $request->query('status', ''),
+                'activity'=> (string) $request->query('activity', ''),
+                'period'  => (string) $request->query('period', ''),
+                'perPage' => $perPage,
+                // "More Filters (3)" on her screen counts the ones in use, so
+                // a professional can see at a glance that a list is narrowed.
+                'applied' => collect(['type', 'status', 'activity', 'period'])
+                    ->filter(fn ($k) => $request->filled($k))->count(),
+            ],
         ));
     }
 
@@ -134,26 +261,235 @@ class ProfessionalProposalController extends Controller
                 && $booking->created_at
                 && $event->starts_at->lt($booking->created_at);
 
+            /*
+             * What the client has actually done, which is the honest version
+             * of her "Client Activity" column. Nothing records whether a
+             * proposal was opened, so the two things that are known are used:
+             * whether they have written back, and whether they settled it.
+             */
+            $activity = match (true) {
+                $booking->status === 'cancelled'                         => ['Declined', '#ef4444'],
+                in_array($booking->status, ['confirmed', 'in_progress', 'completed'], true)
+                                                                         => ['Accepted', '#10b981'],
+                $messages->has($booking->id)                             => ['Replied', '#2563eb'],
+                default                                                  => ['No reply yet', '#64748b'],
+            };
+
+            /*
+             * Services and what each was quoted at. The bid breakdown is the
+             * only place a per-service figure is actually written down; where
+             * there is none, the services are still named but no money is
+             * invented against them.
+             */
+            $lines = [];
+
+            if (is_array($bid?->breakdown)) {
+                foreach ($bid->breakdown as $label => $amount) {
+                    $lines[] = [
+                        'label'  => is_string($label) ? $label : ($amount['label'] ?? 'Item'),
+                        'amount' => is_array($amount) ? ($amount['amount'] ?? null) : $amount,
+                    ];
+                }
+            }
+
+            $services = $event?->categories?->pluck('name')->filter()->values()->all() ?? [];
+
+            if ($lines === []) {
+                $lines = array_map(fn ($name) => ['label' => $name, 'amount' => null], $services);
+            }
+
+            /*
+             * How this proposal came about. Her screen tags every row, and the
+             * three cases are all recorded: an emergency request, a bid this
+             * professional placed on the board, or a request sent straight to
+             * them.
+             */
+            $source = match (true) {
+                $event?->source === 'esr'         => 'Emergency Request',
+                $event?->source === 'virtual_hub' => 'Virtual Event',
+                $bid !== null                     => 'Bid Response',
+                default                           => 'Direct Request',
+            };
+
+            /*
+             * Versions. Nothing keeps a history of past proposals, but a bid
+             * edited after it was first written down is a revision, and the
+             * two timestamps say so. So one revision is version 2, and the
+             * history panel lists only entries with a real date behind them.
+             */
+            $revised = $bid && $bid->created_at && $bid->updated_at
+                && $bid->updated_at->gt($bid->created_at->copy()->addMinute());
+
+            $history = [];
+
+            if ($bid) {
+                if ($revised) {
+                    $history[] = ['v' => 2, 'at' => $bid->updated_at, 'amount' => $bid->amount,
+                                  'note' => 'Revised proposal', 'current' => true];
+                }
+
+                $history[] = ['v' => 1, 'at' => $bid->submitted_at ?? $bid->created_at,
+                              'amount' => $revised ? null : $bid->amount,
+                              'note' => 'Original proposal', 'current' => ! $revised];
+            } elseif ($booking->created_at) {
+                $history[] = ['v' => 1, 'at' => $booking->created_at, 'amount' => $booking->price,
+                              'note' => 'Original proposal', 'current' => true];
+            }
+
+            $closes = $event?->proposal_deadline;
+            $past   = $event?->starts_at && $event->starts_at->isPast();
+
+            /*
+             * The one thing to do next, in the words of the person who has to
+             * do it. Red where the window has gone, amber where it is about
+             * to, blue where there is simply a move to make.
+             */
+            $next = match (true) {
+                $booking->status === 'cancelled' => ['View decline reason', 'Client declined', 'red'],
+                $booking->status === 'completed' => ['Ask for a review', 'The work is finished.', 'blue'],
+                in_array($booking->status, ['confirmed', 'in_progress'], true)
+                    => ['Open the Gig Hub', 'Booked. Agree the paperwork and the day.', 'blue'],
+                $past
+                    => ['Event already occurred, consider withdrawing.', null, 'red'],
+                $closes && $closes->isPast()
+                    => ['The closing date has passed.', 'Nothing more will happen to this one.', 'red'],
+                $closes && $closes->lte(now()->addDay())
+                    => ['Follow up, this proposal expires tomorrow.', null, 'amber'],
+                $messages->has($booking->id)
+                    => ['Review the client reply and send a revision.', null, 'blue'],
+                default
+                    => ['Send a follow-up', 'No reply since you submitted it.', 'blue'],
+            };
+
             $detail[$booking->id] = [
+                'activity'   => $activity,
+                // What became of it, in the words the list uses.
+                'last_what'  => match (true) {
+                    $booking->status === 'cancelled' => 'Client declined',
+                    $booking->status === 'completed' => 'Work finished',
+                    in_array($booking->status, ['confirmed', 'in_progress'], true) => 'Client accepted',
+                    $messages->has($booking->id)     => 'Client replied',
+                    default                          => 'Proposal submitted',
+                },
+                // The platform's own cut, which is the one deduction that is
+                // actually known. Not a margin: nothing records what the job
+                // costs this professional to deliver.
+                'net'        => $booking->price
+                    ? \App\Support\Commission::netOf((float) $booking->price, $user)
+                    : null,
+                'rate'       => \App\Support\Commission::rateFor($user),
+                'services'   => $services,
+                'lines'      => $lines,
+                'source'     => $source,
+                'version'    => $revised ? 2 : 1,
+                'history'    => $history,
+                'next'       => $next[0],
+                'next_note'  => $next[1],
+                'next_tone'  => $next[2],
+                'past'       => $past,
                 'late'      => $late,
                 'event_at'  => $event?->starts_at,
                 'sent_at'   => $booking->created_at,
-                'closes_at' => $event?->proposal_deadline,
+                'closes_at' => $closes,
                 'message'   => $messages->get($booking->id),
                 'breakdown' => is_array($bid?->breakdown) ? $bid->breakdown : [],
                 'bid_amount' => $bid?->amount,
-                'next'      => match ($booking->status) {
-                    'requested'   => 'Waiting on the client. You can follow it up in messages.',
-                    'confirmed'   => 'Booked. Agree the paperwork and the day.',
-                    'in_progress' => 'Work is under way.',
-                    'completed'   => 'Finished. Ask the client for a review.',
-                    'cancelled'   => 'Cancelled.',
-                    default       => null,
-                },
             ];
         }
 
         return $detail;
+    }
+
+    /**
+     * Put proposals away, or take them back out.
+     *
+     * Archiving tidies this professional's own list and changes nothing the
+     * client can see. It is not a delete and not a withdrawal.
+     */
+    public function archive(Request $request): RedirectResponse
+    {
+        $data = $request->validate([
+            'ids'  => ['required', 'string', 'max:2000'],
+            'undo' => ['nullable', 'boolean'],
+        ]);
+
+        $ids = collect(explode(',', $data['ids']))
+            ->map(fn ($id) => (int) trim($id))
+            ->filter();
+
+        $changed = Booking::where('supplier_id', $request->user()->id)
+            ->whereIn('id', $ids)
+            ->update(['archived_at' => $request->boolean('undo') ? null : now()]);
+
+        return back()->with('status', $request->boolean('undo')
+            ? $changed . ' ' . \Illuminate\Support\Str::plural('proposal', $changed) . ' put back.'
+            : $changed . ' ' . \Illuminate\Support\Str::plural('proposal', $changed) . ' archived.');
+    }
+
+    /**
+     * Take a live offer off the table.
+     *
+     * Only one the client has not answered: once they have accepted or
+     * declined, withdrawing is not this professional's to do.
+     */
+    public function withdraw(Request $request): RedirectResponse
+    {
+        $data = $request->validate(['ids' => ['required', 'string', 'max:2000']]);
+
+        $ids = collect(explode(',', $data['ids']))
+            ->map(fn ($id) => (int) trim($id))
+            ->filter();
+
+        $open = Booking::where('supplier_id', $request->user()->id)
+            ->whereIn('id', $ids)
+            ->where('status', 'requested')
+            ->get();
+
+        foreach ($open as $booking) {
+            $booking->update(['status' => 'cancelled']);
+
+            \App\Models\Bid::where('supplier_id', $request->user()->id)
+                ->where('event_id', $booking->event_id)
+                ->whereIn('status', ['submitted', 'pending'])
+                ->update(['status' => 'withdrawn']);
+        }
+
+        return back()->with('status', $open->count() === 0
+            ? 'Nothing to withdraw: those have already been answered.'
+            : $open->count() . ' ' . \Illuminate\Support\Str::plural('proposal', $open->count()) . ' withdrawn.');
+    }
+
+    /** The proposals as they are filtered on screen, as a file. */
+    public function export(Request $request): \Symfony\Component\HttpFoundation\StreamedResponse
+    {
+        $user = $request->user();
+
+        $rows = Booking::where('supplier_id', $user->id)
+            ->with(['event:id,title,starts_at,proposal_deadline', 'client:id,name'])
+            ->latest()
+            ->get();
+
+        return response()->streamDownload(function () use ($rows, $user) {
+            $out = fopen('php://output', 'wb');
+
+            fputcsv($out, ['Event', 'Client', 'Status', 'Your proposal',
+                           'Yours after fees', 'Event date', 'Closes', 'Sent']);
+
+            foreach ($rows as $b) {
+                fputcsv($out, [
+                    $b->event?->title,
+                    $b->client?->name,
+                    $b->status,
+                    $b->price,
+                    $b->price ? \App\Support\Commission::netOf((float) $b->price, $user) : null,
+                    $b->event?->starts_at?->format('Y-m-d'),
+                    $b->event?->proposal_deadline?->format('Y-m-d'),
+                    $b->created_at?->format('Y-m-d'),
+                ]);
+            }
+
+            fclose($out);
+        }, 'proposals-' . now()->format('Y-m-d') . '.csv', ['Content-Type' => 'text/csv']);
     }
 
     /**

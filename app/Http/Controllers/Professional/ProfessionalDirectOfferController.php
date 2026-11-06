@@ -5,40 +5,73 @@ namespace App\Http\Controllers\Professional;
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
 use App\Models\Event;
+use App\Models\RequestAttachment;
+use App\Models\Review;
 use App\Support\Commission;
+use App\Support\VerifiedBadge;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
 
 /**
- * Professional — Direct Offer Received.
+ * Professional — Direct Request Details.
  *
- * A client sends a targeted, NON-bidding Direct Offer to a specific pro
+ * A client sends a targeted, NON-bidding Direct Request to one professional
  * (an Event with source 'direct_offer', supplier_id = this pro, unpublished).
- * This page shows the real offer and lets the pro Accept (→ confirmed booking)
- * or Decline (→ cancelled). Falls back to a representative sample only when the
- * pro has no real offers yet, so the layout still demos.
+ * This page shows that request and lets the professional accept it, which
+ * creates a confirmed booking, or decline it.
+ *
+ * Khadijah's 28 October screen calls the response "Send a Quick Bid". There is
+ * no bidding on a direct request on this platform and there is not meant to
+ * be: a Direct Request goes to one professional and is accepted or declined,
+ * which is what keeps it different from a board post. The panel keeps her name
+ * and her shape; the buttons do what the platform does.
+ *
+ * What her screen shows that nothing here records, and so is not invented:
+ *   parking, indoor/outdoor, a venue TYPE rather than a venue, a per-service
+ *   budget breakdown, and per-service quantities. Each says it is not stated
+ *   rather than carrying a figure nobody gave.
  */
 class ProfessionalDirectOfferController extends Controller
 {
     public function show(Request $request, ?string $id = null): View
     {
-        $query = Event::where('source', 'direct_offer')
-            ->where('supplier_id', $request->user()->id)
-            ->with(['client:id,name', 'categories:id,name']);
+        $user = $request->user();
 
+        $query = Event::where('source', 'direct_offer')
+            ->where('supplier_id', $user->id)
+            ->with(['client:id,name,created_at', 'client.profile', 'categories:id,name,parent_id', 'categories.parent:id,name']);
+
+        /*
+         * An open request first, because that is the one needing an answer.
+         * Failing that, the most recent of any state: a professional who has
+         * just declined something should still be able to read what they
+         * declined rather than be told they have nothing.
+         */
         $event = is_numeric($id)
             ? (clone $query)->find((int) $id)
-            : (clone $query)->whereIn('status', ['pending', 'confirmed'])->latest()->first();
+            : ((clone $query)->whereIn('status', ['pending', 'confirmed'])->latest()->first()
+                ?: (clone $query)->latest()->first());
 
-        $offer = $event ? $this->mapEvent($event) : $this->sampleOffer($id);
+        /*
+         * No invented request.
+         *
+         * This page used to fall back to a made-up one, complete with a client
+         * name, a budget and a deadline, so a professional with nothing
+         * waiting was shown an offer that did not exist and could act on it.
+         */
+        if (! $event) {
+            return view('professional.direct-offers.show', ['offer' => null, 'ladder' => []]);
+        }
 
         return view('professional.direct-offers.show', [
-            'offer' => $offer,
-            // Rule R61: no tier gate on who receives an offer, so the ladder
-            // carries the membership argument instead — this offer's own
+            'offer'  => $this->mapEvent($event, $user),
+            // Rule R61: no tier gate on who receives a request, so the ladder
+            // carries the membership argument instead — this request's own
             // amount at each published commission rate.
-            'ladder' => Commission::ladderFor((float) $offer['offer_max'], $request->user()),
+            'ladder' => Commission::ladderFor(
+                (float) ($event->budget_max ?: $event->budget ?: 0), $user,
+            ),
         ]);
     }
 
@@ -78,129 +111,105 @@ class ProfessionalDirectOfferController extends Controller
         return back()->with('status', 'Direct Request declined.');
     }
 
-    /** Build the view payload from a real Direct Offer event. */
-    private function mapEvent(Event $event): array
+    /** Build the view payload from a real Direct Request event. */
+    private function mapEvent(Event $event, \App\Models\User $pro): array
     {
-        $services = $event->categories->pluck('name')->all();
-        $status = match ($event->status) {
-            'confirmed' => 'Accepted',
-            'cancelled' => 'Declined',
-            default     => 'Awaiting Your Response',
+        $client   = $event->client;
+        $services = $event->categories;
+
+        [$status, $statusTone, $statusNote] = match ($event->status) {
+            'confirmed' => ['Accepted', 'ok', 'You accepted this request. It is a booking now.'],
+            'cancelled' => ['Declined', 'bad', 'You declined this request.'],
+            default     => ['Open', 'warn', 'This client has not yet had an answer from you.'],
         };
 
+        /*
+         * When an answer is due. The client sets a deadline on the request;
+         * without one there is no date to count down to, and inventing one
+         * from the event date would put a professional under a clock nobody
+         * set.
+         */
+        $deadline = $event->proposal_deadline;
+        $daysLeft = $deadline ? (int) ceil(now()->diffInHours($deadline) / 24) : null;
+
+        // What this client is like to work with, from what is recorded.
+        $reviews = $client
+            ? Review::where('reviewee_id', $client->id)->where('is_hidden', false)->get()
+            : collect();
+
+        $past = $client
+            ? Booking::where('client_id', $client->id)->where('status', 'completed')->count()
+            : 0;
+
         return [
-            'id'            => 'DO-' . $event->id,
+            'id'            => 'DR-' . $event->id,
             'event_id'      => $event->id,
+            'event'         => $event,
             'status'        => $status,
+            'status_tone'   => $statusTone,
+            'status_note'   => $statusNote,
             'is_open'       => $event->status === 'pending',
-            'title'         => $event->title,
-            'request_type'  => count($services) >= 2 ? 'MSR' : 'SSR',
-            'request_label' => count($services) >= 2 ? 'Multiple Service Request' : 'Single Service Request',
-            'received_at'   => $event->created_at?->format('M j, Y \a\t g:i A'),
-            'response_deadline' => $event->starts_at?->copy()->subDays(3)->format('M j, Y') ?? '—',
-            'days_remaining'    => $event->starts_at ? max(0, (int) round(now()->diffInDays($event->starts_at, false))) : 0,
-            'offer_min'     => (int) ($event->budget ?? 0),
-            'offer_max'     => (int) ($event->budget ?? 0),
-            'budget_note'   => $event->budget ? 'Client budget' : 'Budget not specified',
+
+            'title'         => 'Direct Request: ' . ($client?->name ?: 'Client'),
+            'subtitle'      => collect([
+                $event->organization_type === 'individual' ? 'Private Event' : ucfirst((string) $event->organization_type),
+                $event->event_type,
+            ])->filter()->implode(" • "),
+
+            'where'         => trim(($event->location ?: $event->city ?: '')
+                . ($event->location_zip ? ' (' . $event->location_zip . ')' : '')) ?: null,
+            'when'          => $event->starts_at,
+            'ends'          => $event->ends_at,
+            'guests'        => $event->guest_count,
+            'received_at'   => $event->created_at,
+
+            'deadline'      => $deadline,
+            'days_left'     => $daysLeft,
 
             'client' => [
-                'name'      => $event->client?->name ?? 'Client',
-                'verified'  => true,
-                'tier'      => 'Client',
-                'completed' => 0,
+                'name'      => $client?->name ?: 'Client',
+                'initials'  => \Illuminate\Support\Str::of($client?->name ?: 'C')->explode(' ')
+                    ->map(fn ($w) => \Illuminate\Support\Str::upper(\Illuminate\Support\Str::substr($w, 0, 1)))
+                    ->take(2)->implode(''),
+                // OA-165: check-marks are off across the site until a
+                // verification feature is defined, so the badge is withheld
+                // rather than shown from a column nobody checked.
+                'verified'  => VerifiedBadge::shown() && VerifiedBadge::licenceVerified($client?->profile),
+                'since'     => $client?->created_at,
+                'past'      => $past,
+                'rating'    => $reviews->count() ? round($reviews->avg('rating'), 1) : null,
+                'reviews'   => $reviews->count(),
             ],
 
-            'overview' => [
-                'Priority / Urgency' => 'Normal',
+            // One figure for everything, which is what the client gave. The
+            // design breaks it down per service; nothing records that.
+            'budget_min'    => $event->budget_min ? (float) $event->budget_min : null,
+            'budget_max'    => $event->budget_max ? (float) $event->budget_max : ($event->budget ? (float) $event->budget : null),
+
+            'summary'       => $event->description,
+            'chips'         => collect([$event->event_type])
+                ->merge($services->pluck('name'))
+                ->filter()->unique()->values()->all(),
+
+            'services'      => $services->map(fn ($c) => [
+                'name'   => $c->name,
+                'group'  => $c->parent?->name,
+                'detail' => null,  // nothing records a per-service brief
+            ])->all(),
+
+            'details' => [
+                'Event Type'    => $event->event_type,
+                'Event Date'    => $event->starts_at?->format('l, M j, Y'),
+                'Event Time'    => $event->timeLabel(),
+                'Guest Count'   => $event->guest_count ? 'Approximately ' . number_format($event->guest_count) . ' guests' : null,
+                'Location'      => trim(($event->location ?: '') . ' ' . ($event->location_zip ?: '')) ?: null,
+                'Venue'         => $event->venue,
+                'Format'        => $event->event_format === 'virtual' ? 'Virtual' : null,
             ],
 
-            'event' => array_filter([
-                'Event Name'  => $event->title,
-                'Event Date'  => $event->starts_at?->format('M j, Y'),
-                'Guest Count' => $event->guest_count ? $event->guest_count . ' Guests' : null,
-                'Venue'       => $event->location,
-            ]),
-
-            'services'      => $services ?: ['Service details to follow'],
-            'service_notes' => $event->description ?: 'No additional notes provided.',
-            'equipment'     => 'As required for the services above.',
-            'quantity'      => $event->guest_count ? $event->guest_count . ' guests' : '—',
-            'venue_notes'   => [],
-            'attachments'   => [],
-            'client_note'   => $event->description ?: 'The client is inviting you directly for this event.',
-
-            'planning' => [
-                'target_margin'  => '—',
-                'staff'          => 'Available',
-                'conflicts'      => 'None Detected',
-                'subcontractors' => [],
-            ],
+            'attachments'   => RequestAttachment::where('event_id', $event->id)->get(),
+            'client_note'   => $event->schedule_note,
         ];
     }
 
-    private function sampleOffer(?string $id): array
-    {
-        return [
-            'id'            => $id ?: 'DO-1058',
-            'event_id'      => null,
-            'status'        => 'Awaiting Your Response',
-            'is_open'       => false,
-            'title'         => 'Luxury Wedding (Floral & Decor Services)',
-            'request_type'  => 'MSR',
-            'request_label' => 'Multiple Service Request',
-            'received_at'   => 'May 6, 2025 at 10:15 AM',
-            'response_deadline' => 'May 10, 2025',
-            'days_remaining'    => 4,
-            'offer_min'     => 7000,
-            'offer_max'     => 8500,
-            'budget_note'   => 'Flexible Budget',
-
-            'client' => [
-                'name'      => 'Sarah Johnson',
-                'verified'  => true,
-                'tier'      => 'Premium Member',
-                'completed' => 4,
-            ],
-
-            'overview' => [
-                'Priority / Urgency' => 'Normal',
-            ],
-
-            'event' => [
-                'Event Name'    => 'Luxury Wedding Reception',
-                'Event Type'    => 'Wedding Ceremony & Reception',
-                'Event Date'    => 'June 15, 2025',
-                'Event Time'    => '5:00 PM – 11:00 PM',
-                'Guest Count'   => '150 Guests',
-                'Venue'         => 'The Grand Garden Estate, 1234 Garden Lane, Baltimore, MD 21201',
-            ],
-
-            'services' => [
-                'Floral & Decor Services (Primary)',
-                'Ceremony Setup & Decor',
-                'Reception Decor & Styling',
-                'Uplighting (Wireless LED)',
-                'Photography',
-                'Delivery, setup, breakdown & pickup',
-            ],
-
-            'service_notes' => 'We need floral arrangements for 10 tables, ceremony arch, sweetheart table, and entry table.',
-            'equipment'     => 'Please provide all decor items, floral supplies, lighting, and installation tools.',
-            'quantity'      => 'Medium (100 – 200 Guests)',
-            'venue_notes'   => ['Loading dock clearance required (12ft max).'],
-
-            'attachments' => [
-                'Inspiration Board.pdf', 'Venue Layout.pdf', 'Timeline & Schedule.pdf',
-            ],
-
-            'client_note' => 'We loved your work from Sarah & Michael\'s wedding last year and would love to work with you again!',
-
-            'planning' => [
-                'target_margin'   => '30% – 40%',
-                'staff'           => 'Available',
-                'conflicts'       => 'None Detected',
-                'subcontractors'  => [],
-            ],
-        ];
-    }
 }

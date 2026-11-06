@@ -55,8 +55,15 @@ class ProfessionalWordingIsRulesBasedTest extends TestCase
             file_get_contents(resource_path('views/professional/bid-intelligence/index.blade.php'))
         );
 
-        $this->assertStringContainsString('Follow-Up Reminder', $page);
+        /*
+         * The follow-up card became "Action Needed" when the page was rebuilt
+         * to Khadijah's screen on 6 November. The rule it protects is
+         * unchanged: the page points at what is waiting, and sends nothing on
+         * the professional's behalf.
+         */
+        $this->assertStringContainsString('Action Needed', $page);
         $this->assertStringNotContainsString('Send Follow-Up Email', $page, 'nothing is sent for them');
+        $this->assertStringNotContainsString('Send Reminder', $page, 'nothing is sent for them');
     }
 
     public function test_the_message_helper_is_called_a_template(): void

@@ -71,6 +71,30 @@ class ProfessionalPackageController extends Controller
 
         $shown = $tab === 'all' ? $all : $byState->get($tab, collect());
 
+        /*
+         * The two filters that do not fit on the bar, behind her Filters
+         * button. Both read real columns: a price nobody has set is not
+         * swept into a range, and the occasion list is built from what this
+         * professional's own packages actually carry rather than from the
+         * full catalogue of occasions they have never used.
+         */
+        $min = $request->filled('min') ? (float) $request->query('min') : null;
+        $max = $request->filled('max') ? (float) $request->query('max') : null;
+
+        if ($min !== null) {
+            $shown = $shown->filter(fn ($p) => (float) $p->price >= $min);
+        }
+
+        if ($max !== null) {
+            $shown = $shown->filter(fn ($p) => (float) $p->price > 0 && (float) $p->price <= $max);
+        }
+
+        $occasion = (string) $request->query('occasion', '');
+
+        if ($occasion !== '') {
+            $shown = $shown->filter(fn ($p) => in_array($occasion, (array) ($p->event_types ?: []), true));
+        }
+
         if ($q !== '') {
             $needle = Str::lower($q);
             $shown = $shown->filter(fn ($p) => str_contains(Str::lower($p->title), $needle)
@@ -101,7 +125,16 @@ class ProfessionalPackageController extends Controller
             'packages' => $packages,
             'counts'   => $counts,
             'shelf'    => self::SHELF,
-            'filters'  => ['q' => $q, 'tab' => $tab, 'sort' => $sort],
+            'filters'  => [
+                'q' => $q, 'tab' => $tab, 'sort' => $sort,
+                'min' => $request->query('min', ''), 'max' => $request->query('max', ''),
+                'occasion' => $occasion,
+            ],
+            // Only the occasions this professional has actually used: a list
+            // of twenty they have never touched is a filter that only ever
+            // empties the page.
+            'occasions' => $all->flatMap(fn ($p) => (array) ($p->event_types ?: []))
+                ->filter()->unique()->sort()->values()->all(),
             // The rail's "Duplicate a Package" needs something to duplicate.
             'duplicatable' => $all->sortByDesc('created_at')->take(8)->values(),
         ]);

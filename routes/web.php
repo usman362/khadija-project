@@ -1335,12 +1335,16 @@ Route::middleware('auth')->group(function () {
         Route::get('/direct-offers/{id?}', [\App\Http\Controllers\Professional\ProfessionalDirectOfferController::class, 'show'])->middleware('permission:bookings.view_any')->name('professional.direct-offers.show');
 
         Route::get('/proposals', [ProfessionalProposalController::class, 'index'])->middleware('permission:bookings.view_any')->name('professional.proposals.index');
+        Route::get('/proposals/export', [\App\Http\Controllers\Professional\ProfessionalProposalController::class, 'export'])->name('professional.proposals.export');
+        Route::post('/proposals/archive', [\App\Http\Controllers\Professional\ProfessionalProposalController::class, 'archive'])->name('professional.proposals.archive');
+        Route::post('/proposals/withdraw', [\App\Http\Controllers\Professional\ProfessionalProposalController::class, 'withdraw'])->name('professional.proposals.withdraw');
         Route::post('/proposals/send/{event}', [ProfessionalProposalController::class, 'sendProposal'])->middleware('permission:bookings.create')->name('professional.proposals.send');
         Route::patch('/proposals/{booking}/status', [ProfessionalProposalController::class, 'updateStatus'])->middleware('permission:bookings.update')->name('professional.proposals.update-status');
         Route::post('/proposals/{booking}/reply', [ProfessionalProposalController::class, 'reply'])->middleware('permission:bookings.view_any')->name('professional.proposals.reply');
 
         // Earnings
         Route::get('/earnings', [ProfessionalEarningsController::class, 'index'])->name('professional.earnings.index');
+        Route::get('/earnings/export', [ProfessionalEarningsController::class, 'export'])->name('professional.earnings.export');
 
         // Messages (Chat)
         Route::get('/messages', [ProfessionalChatController::class, 'index'])->middleware('permission:messages.view_any')->name('professional.chat.index');

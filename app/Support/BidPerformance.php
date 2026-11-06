@@ -27,14 +27,21 @@ use Illuminate\Support\Collection;
  */
 final class BidPerformance
 {
-    private const WON  = ['won', 'accepted'];
-    private const LOST = ['lost', 'declined', 'rejected', 'expired'];
+    // Public: the Bid Intelligence controller counts the same two sets when
+    // it compares this period with the one before, and a second copy of the
+    // lists is how the two would come to disagree.
+    public const WON  = ['won', 'accepted'];
+    public const LOST = ['lost', 'declined', 'rejected', 'expired'];
 
     /** Every bid this professional has placed, with its event. */
     public static function bids(User $me): Collection
     {
         return Bid::where('supplier_id', $me->id)
-            ->with(['event:id,title,event_type,state,city,starts_at,budget,budget_max,status', 'category:id,name'])
+            // published_at is read by timing(): a column left out of the
+            // select comes back null, and the page then reports that nothing
+            // can be timed when everything can.
+            ->with(['event:id,title,event_type,state,city,starts_at,published_at,budget,budget_max,status',
+                    'category:id,name'])
             ->get();
     }
 
@@ -124,6 +131,8 @@ final class BidPerformance
             $out[] = [
                 'label'   => $label,
                 'placed'  => $record['placed'],
+                // Her table names the accepted count beside the rate.
+                'won'     => $record['won'],
                 'rate'    => $record['rate'],
                 'average' => (int) round($inBand->avg('amount')),
             ];
@@ -143,11 +152,19 @@ final class BidPerformance
      */
     public static function lost(Collection $bids): array
     {
-        $lost = $bids->whereIn('status', self::LOST);
+        $lost     = $bids->whereIn('status', self::LOST);
+        $declined = $bids->whereIn('status', ['lost', 'declined', 'rejected']);
+        $expired  = $bids->where('status', 'expired');
+        $open     = $bids->reject(fn (Bid $b) => in_array($b->status, [...self::WON, ...self::LOST], true));
 
         return [
             'count'  => $lost->count(),
             'amount' => (float) $lost->sum('amount'),
+            // Her panel splits the closed ones into the two ways a bid is
+            // lost, and counts the open ones apart from both.
+            'declined' => ['count' => $declined->count(), 'amount' => (float) $declined->sum('amount')],
+            'expired'  => ['count' => $expired->count(),  'amount' => (float) $expired->sum('amount')],
+            'open'     => ['count' => $open->count(),     'amount' => (float) $open->sum('amount')],
         ];
     }
 
@@ -181,6 +198,150 @@ final class BidPerformance
             'months' => $months,
             // One or two requests do not make a season.
             'enough' => $dated->count() >= 6,
+        ];
+    }
+
+    /**
+     * The funnel, as far as this platform can honestly draw it.
+     *
+     * Khadijah's screen has four stages: invited, submitted, client viewed,
+     * accepted. Three of them are recorded. Nothing anywhere records a client
+     * opening a proposal, so that stage is missing rather than filled with a
+     * number: a funnel with an invented step in the middle makes every
+     * percentage after it wrong.
+     *
+     * @param  Collection<int, Bid>  $bids
+     * @return array<int, array{label:string, count:int, pct:int, note:?string}>
+     */
+    public static function funnel(User $me, Collection $bids): array
+    {
+        // An invitation is a request that came to this professional by name.
+        $invited = \App\Models\Event::where('source', 'direct_offer')
+            ->where('supplier_id', $me->id)->count();
+
+        // Plus the open requests they actually answered, which is the other
+        // way a bid starts.
+        $invited = max($invited, $bids->count());
+
+        $submitted = $bids->count();
+        $accepted  = $bids->whereIn('status', self::WON)->count();
+
+        $pct = fn (int $n) => $invited > 0 ? (int) round($n / $invited * 100) : 0;
+
+        return [
+            ['label' => 'Invited',   'count' => $invited,   'pct' => $invited > 0 ? 100 : 0, 'note' => null],
+            ['label' => 'Submitted', 'count' => $submitted, 'pct' => $pct($submitted),       'note' => null],
+            ['label' => 'Accepted',  'count' => $accepted,  'pct' => $pct($accepted),        'note' => null],
+        ];
+    }
+
+    /**
+     * How quickly they answered, and whether it made any difference.
+     *
+     * The gap between a request being published and their bid going in. Bands
+     * with nothing in them are dropped: a bar at zero per cent reads as
+     * "answering in this time never works", which is not what no data means.
+     *
+     * @param  Collection<int, Bid>  $bids
+     * @return array<int, array{label:string, placed:int, won:int, rate:?int}>
+     */
+    public static function timing(Collection $bids): array
+    {
+        $bands = [
+            ['Within 24 hrs', 0, 1],
+            ['1 to 2 days',   1, 2],
+            ['3 to 5 days',   2, 5],
+            ['6+ days',       5, PHP_INT_MAX],
+        ];
+
+        $timed = $bids->filter(fn (Bid $b) => $b->event?->published_at && ($b->submitted_at ?? $b->created_at));
+
+        $out = [];
+
+        foreach ($bands as [$label, $from, $to]) {
+            $inBand = $timed->filter(function (Bid $b) use ($from, $to) {
+                $days = $b->event->published_at->floatDiffInDays($b->submitted_at ?? $b->created_at);
+
+                return $days >= $from && $days < $to;
+            });
+
+            if ($inBand->isEmpty()) {
+                continue;
+            }
+
+            $record = self::record($inBand);
+
+            $out[] = [
+                'label'  => $label,
+                'placed' => $record['placed'],
+                'won'    => $record['won'],
+                'rate'   => $record['rate'],
+            ];
+        }
+
+        return $out;
+    }
+
+    /**
+     * The last twelve months, month by month.
+     *
+     * Only months they actually bid in carry a rate; a month they sat out is
+     * not a month they lost.
+     *
+     * @param  Collection<int, Bid>  $bids
+     * @return array<int, array{label:string, placed:int, won:int, rate:?int}>
+     */
+    public static function trend(Collection $bids): array
+    {
+        $out = [];
+
+        for ($back = 11; $back >= 0; $back--) {
+            $month = now()->startOfMonth()->subMonths($back);
+
+            $inMonth = $bids->filter(fn (Bid $b) => ($b->submitted_at ?? $b->created_at)
+                && ($b->submitted_at ?? $b->created_at)->isSameMonth($month));
+
+            $record = self::record($inMonth);
+
+            $out[] = [
+                'label'  => $month->format('M'),
+                'placed' => $record['placed'],
+                'won'    => $record['won'],
+                'rate'   => $record['rate'],
+            ];
+        }
+
+        return $out;
+    }
+
+    /**
+     * What their accepted bids had on them that the rest did not.
+     *
+     * Each line is a field on the bid itself, counted across the ones that
+     * were accepted. Not advice: a tally of what this professional actually
+     * sent when a client said yes.
+     *
+     * @param  Collection<int, Bid>  $bids
+     * @return array{rows: array<int, array{label:string, pct:int}>, sample: int}
+     */
+    public static function quality(Collection $bids): array
+    {
+        $won = $bids->whereIn('status', self::WON);
+        $n   = $won->count();
+
+        $share = fn (callable $has) => $n > 0
+            ? (int) round($won->filter($has)->count() / $n * 100)
+            : 0;
+
+        return [
+            'sample' => $n,
+            'rows'   => [
+                ['label' => 'A priced breakdown', 'pct' => $share(fn (Bid $b) => filled($b->breakdown))],
+                ['label' => 'A plan for the day', 'pct' => $share(fn (Bid $b) => filled($b->plan))],
+                ['label' => 'Your terms',         'pct' => $share(fn (Bid $b) => filled($b->terms))],
+                ['label' => 'A note to the client', 'pct' => $share(fn (Bid $b) => filled($b->note))],
+                ['label' => 'A date you confirmed', 'pct' => $share(fn (Bid $b) => (bool) $b->available_confirmed)],
+            ],
         ];
     }
 }

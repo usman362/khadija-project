@@ -146,10 +146,25 @@ class GigHubStatusTest extends TestCase
         $overview->assertSee('Awaiting Client', false);
         $contracts->assertSee('Awaiting Client', false);
 
-        // The bucket and the badge for a running gig now use the SAME words,
-        // rather than "In Progress" above and "Work in Progress" below.
-        $overview->assertSee('Work in Progress', false);
-        $overview->assertDontSee('>In Progress<', false);
+        /*
+         * The same gig, the same words on both tabs.
+         *
+         * The overview became Khadijah's table on 6 November and no longer
+         * carries the three state buckets, so the wording is checked where it
+         * now lives: on the gig's own row. The rule is unchanged — a running
+         * gig must not read "In Progress" above and "Work in Progress" below.
+         */
+        // Running right now, which is what GigStatus means by in progress:
+        // a confirmed gig whose event has started and has not ended.
+        $this->gig('confirmed', now()->subHour(), now()->addHours(3));
+
+        $running = $this->actingAs($this->pro)->get(route('professional.gig-hub.index'))->assertOk();
+        $runningContracts = $this->actingAs($this->pro)
+            ->get(route('professional.gig-hub.index', ['tab' => 'contracts']))->assertOk();
+
+        $running->assertSee('Work in Progress', false);
+        $running->assertDontSee('>In Progress<', false);
+        $runningContracts->assertSee('Work in Progress', false);
     }
 
     /* ── Row 130: one today for the whole page ──────────────── */

@@ -32,6 +32,7 @@ class Booking extends Model
         'price',
         'currency',
         'booked_at',
+        'archived_at',
         'source',
     ];
 
@@ -205,6 +206,7 @@ class Booking extends Model
     {
         return [
             'booked_at' => 'datetime',
+            'archived_at' => 'datetime',
             'point_of_contact_set_at' => 'datetime',
             'attendance_confirmed_at' => 'datetime',
             'price' => 'decimal:2',

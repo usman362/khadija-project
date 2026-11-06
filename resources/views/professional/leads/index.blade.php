@@ -209,8 +209,12 @@
                 <span class="meta">
                     <span class="l">{{ $s['label'] }}</span>
                     <span class="n">{{ $s['count'] }}</span>
-                    <span class="v">{{ $money($s['weighted']) }}</span>
-                    <span class="w">({{ $s['weight'] }}%)</span>
+                    {{-- With no leads at all there is no value and no share of
+                         one, so the stage is a filter and nothing more. --}}
+                    @if($total > 0)
+                        <span class="v">{{ $money($s['weighted']) }}</span>
+                        <span class="w">({{ $s['weight'] }}%)</span>
+                    @endif
                 </span>
             </a>
         @endforeach
@@ -221,19 +225,19 @@
     <form method="GET" action="{{ route('professional.leads.index') }}" class="lc-filters">
         <input type="search" class="lc-in" name="q" value="{{ $filters['q'] }}"
                placeholder="Search by client, event or place">
-        <select class="lc-sel" name="stage">
+        <select class="lc-sel" name="stage" aria-label="Stage">
             <option value="">All stages</option>
             @foreach($stages as $key => [$label, $colour, $weight])
                 <option value="{{ $key }}" @selected($filters['stage'] === $key)>{{ $label }}</option>
             @endforeach
         </select>
-        <select class="lc-sel" name="type">
+        <select class="lc-sel" name="type" aria-label="Event type">
             <option value="">All event types</option>
             @foreach($types as $type)
                 <option value="{{ $type }}" @selected($filters['type'] === $type)>{{ $type }}</option>
             @endforeach
         </select>
-        <select class="lc-sel" name="source">
+        <select class="lc-sel" name="source" aria-label="Lead source">
             <option value="">All sources</option>
             @foreach($sources as $source)
                 <option value="{{ $source }}" @selected($filters['source'] === $source)>{{ $source }}</option>
@@ -442,6 +446,13 @@
 </div>
 
 <div class="lc-bottom">
+    {{-- An account with no leads gets no pipeline and no weights.
+
+         The weights are constants of the scoring, not figures about this
+         account, but printed on an empty screen they read as findings: a
+         professional who has never had a lead should not be shown a pipeline
+         broken down by stage. --}}
+    @if($total > 0)
     <div class="lc-card" style="margin:0;">
         <h4 style="font-size:13px;font-weight:800;color:var(--text-primary);margin:0;">Pipeline value</h4>
         <div class="lc-big">{{ $money($pipeline) }}</div>
@@ -497,6 +508,7 @@
             @endforeach
         </div>
     </div>
+    @endif
 
     <div class="lc-card" style="margin:0;">
         <h4 style="font-size:13px;font-weight:800;color:var(--text-primary);margin:0 0 6px;">Your conversion</h4>

@@ -43,6 +43,7 @@ final class PriorityActions
             ->concat(self::bids($me))
             ->concat(self::drafts($me))
             ->concat(self::conflicts($me))
+            ->concat(self::payments($me))
             /*
              * Dated items first and soonest first, then the undated ones. A
              * list sorted by urgency alone puts an item due in an hour below
@@ -70,6 +71,9 @@ final class PriorityActions
                 'subject' => $a->booking?->event?->title,
                 'detail'  => 'The client has signed. Review it and confirm the booking.',
                 'due'     => null,
+                'where'   => $a->booking?->event?->location,
+                'sent'    => $a->created_at,
+                'sent_as' => 'Sent',
                 'when'    => $a->created_at ? 'Sent ' . $a->created_at->humanAgo() : null,
                 'cta'     => 'Review and sign',
                 'url'     => route('professional.agreements.index'),
@@ -93,6 +97,9 @@ final class PriorityActions
                 'subject' => $b->event?->title,
                 'detail'  => $b->price ? 'Asking $' . number_format((float) $b->price, 0) : null,
                 'due'     => null,
+                'where'   => $b->event?->location,
+                'sent'    => $b->created_at,
+                'sent_as' => 'Received',
                 'when'    => $b->created_at ? 'Received ' . $b->created_at->humanAgo() : null,
                 'cta'     => 'Open the request',
                 'url'     => route('professional.proposals.index'),
@@ -117,6 +124,9 @@ final class PriorityActions
                 'subject' => $s->event?->title ?: $s->role,
                 'detail'  => $s->role ? $s->role . ($s->location ? ' at ' . $s->location : '') : null,
                 'due'     => $s->starts_at,
+                'where'   => $s->location,
+                'sent'    => $s->starts_at,
+                'sent_as' => 'Starts',
                 'when'    => $s->starts_at ? 'Starts ' . $s->starts_at->humanAgo() : null,
                 'cta'     => 'Fill the shift',
                 'url'     => route('professional.team.index'),
@@ -141,6 +151,9 @@ final class PriorityActions
                 'subject' => $b->event?->title,
                 'detail'  => 'You can still change it until the client stops taking proposals.',
                 'due'     => $b->event?->proposal_deadline,
+                'where'   => $b->event?->location,
+                'sent'    => $b->event?->proposal_deadline,
+                'sent_as' => 'Expires',
                 'when'    => $b->event?->proposal_deadline
                     ? 'Closes ' . $b->event->proposal_deadline->humanAgo()
                     : null,
@@ -168,6 +181,9 @@ final class PriorityActions
                     'subject' => $p->title,
                     'detail'  => $next ? 'Stopped at ' . $next['label'] . ', needs ' . $next['missing'] : null,
                     'due'     => null,
+                    'where'   => null,
+                    'sent'    => $p->updated_at,
+                    'sent_as' => 'Last edited',
                     'when'    => $p->updated_at ? 'Last edited ' . $p->updated_at->humanAgo() : null,
                     'cta'     => 'Finish it',
                     'url'     => route('professional.packages.edit', $p),
@@ -204,12 +220,71 @@ final class PriorityActions
                     'subject' => $sameDay->map(fn (Booking $b) => $b->event->title)->implode(' and '),
                     'detail'  => $sameDay->count() . ' bookings on ' . $date->format('j M Y'),
                     'due'     => $date,
+                    'where'   => null,
+                    'sent'    => $date,
+                    'sent_as' => 'Detected',
                     'when'    => $date->isFuture() ? $date->humanAgo() : null,
                     'cta'     => 'Open the calendar',
                     'url'     => route('professional.calendar.index'),
                 ];
             })
             ->values();
+    }
+
+    /**
+     * Money waiting on somebody.
+     *
+     * A payout this professional has asked for and nobody has actioned, and
+     * finished work that has not been asked for yet. Both are real rows, not
+     * a reminder invented from a status.
+     */
+    private static function payments(User $me): Collection
+    {
+        $requested = \App\Models\Payout::where('user_id', $me->id)
+            ->where('status', 'requested')
+            ->get()
+            ->map(fn ($p) => [
+                'kind'    => 'Payment',
+                'tone'    => 'open',
+                'group'   => 'payments',
+                'title'   => 'A payout is waiting to be processed',
+                'subject' => '$' . number_format((float) $p->amount, 2),
+                'detail'  => 'You asked for this one. It is with us now.',
+                'due'     => null,
+                'where'   => null,
+                'sent'    => $p->requested_at,
+                'sent_as' => 'Requested',
+                'when'    => $p->requested_at ? 'Requested ' . $p->requested_at->humanAgo() : null,
+                'cta'     => 'Open payments',
+                'url'     => route('professional.earnings.index'),
+            ]);
+
+        /*
+         * Money that is yours and has not been asked for. Shown once, as one
+         * row, rather than one row per booking: a professional does not
+         * request a payout per job.
+         */
+        $available = \App\Support\Earnings::forProfessional($me)['available'] ?? 0;
+
+        $toClaim = $available > 0
+            ? collect([[
+                'kind'    => 'Payment',
+                'tone'    => 'open',
+                'group'   => 'payments',
+                'title'   => 'You have earnings you have not asked for',
+                'subject' => '$' . number_format((float) $available, 2) . ' available',
+                'detail'  => 'A payout happens when you request one.',
+                'due'     => null,
+                'where'   => null,
+                'sent'    => null,
+                'sent_as' => null,
+                'when'    => null,
+                'cta'     => 'Request a payout',
+                'url'     => route('professional.transactions.index'),
+            ]])
+            : collect();
+
+        return $requested->concat($toClaim);
     }
 
     /**
@@ -223,9 +298,11 @@ final class PriorityActions
         return [
             'all'        => ['label' => 'All',             'count' => $items->count()],
             'urgent'     => ['label' => 'Urgent',          'count' => $items->where('tone', 'urgent')->count()],
-            'soon'       => ['label' => 'Due soon',        'count' => $items->where('tone', 'soon')->count()],
-            'clients'    => ['label' => 'Client activity', 'count' => $items->where('group', 'clients')->count()],
-            'agreements' => ['label' => 'Agreements',      'count' => $items->where('group', 'agreements')->count()],
+            'soon'       => ['label' => 'Due Soon',        'count' => $items->where('tone', 'soon')->count()],
+            'clients'    => ['label' => 'Client Activity', 'count' => $items->where('group', 'clients')->count()],
+            'payments'   => ['label' => 'Payments',        'count' => $items->where('group', 'payments')->count()],
+            // Her tab reads "Agreement", singular.
+            'agreements' => ['label' => 'Agreement',       'count' => $items->where('group', 'agreements')->count()],
         ];
     }
 }

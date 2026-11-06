@@ -73,10 +73,11 @@ class TheRestOfTheProfessionalScreensTest extends TestCase
     {
         $this->actingAs($this->pro)->get(route('professional.services.index'))
             ->assertOk()
-            ->assertSee('Add-ons &amp; extras', false)
-            ->assertSee('Pricing rules')
-            ->assertSee('Travel')
-            ->assertSee('Quick Bid');
+            // Her own capitalisation, from the 28 October screen.
+            ->assertSee('Add-ons &amp; Extras', false)
+            ->assertSee('Pricing Rules')
+            ->assertSee('Travel Pricing')
+            ->assertSee('Quick Bid Settings');
     }
 
     public function test_pricing_rules_are_saved(): void
@@ -186,7 +187,10 @@ class TheRestOfTheProfessionalScreensTest extends TestCase
     {
         $page = $this->actingAs($this->pro)->get(route('professional.bid-intelligence.index'))
             ->assertOk()
-            ->assertSee('Your record');
+            // The page became Khadijah's dashboard on 6 November. "Your
+            // record" is now the four tiles and the funnel under them.
+            ->assertSee('Submitted Bids')
+            ->assertSee('Bid Funnel Conversion');
 
         $html = $page->getContent();
 

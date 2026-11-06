@@ -266,6 +266,11 @@ class AProfessionalCanPriceTheirOwnServicesTest extends TestCase
         $this->actingAs($this->pro)->get(route('professional.services.index'))
             ->assertOk()
             ->assertSee('Audio, Visual, Lighting &amp; Staging', false)
-            ->assertSee('Grouped by category');
+            // The grouping lives in the list view now. Khadijah's screen opens
+            // on cards, and the sentence that used to say "Grouped by
+            // category" was replaced by her own line on the Your Services
+            // card; the grouping it described is still here.
+            ->assertSee('id="spListView"', false)
+            ->assertSee('data-spgroup', false);
     }
 }

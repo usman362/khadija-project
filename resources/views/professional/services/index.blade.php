@@ -15,20 +15,157 @@
 
 @push('styles')
 <style>
-    .sp-head { display:flex; justify-content:space-between; align-items:flex-end; gap:16px; flex-wrap:wrap; margin-bottom:18px; }
-    .sp-head h1 { font-size:24px; font-weight:800; color:var(--text-primary); margin:0 0 4px; }
-    .sp-head p { font-size:13px; color:var(--text-muted); margin:0; line-height:1.6; max-width:70ch; }
+    .sp-head { display:flex; justify-content:space-between; align-items:flex-start; gap:16px;
+        flex-wrap:wrap; margin-bottom:16px; }
+    .sp-head > div:first-child { flex:1 1 auto; min-width:0; }
+    .sp-head h1 { font-size:25px; font-weight:800; color:var(--text-primary); margin:0 0 4px; }
+    /* One line, as hers is. Wrapped, it pushed the button down a row. */
+    .sp-head p { font-size:13px; color:var(--text-muted); margin:0; line-height:1.55; }
+    .sp-head .sp-btn { flex:none; }
 
-    .sp-stats { display:grid; grid-template-columns:repeat(auto-fit, minmax(150px,1fr)); gap:13px; margin-bottom:20px; }
-    .sp-stat { background:var(--bg-card); border:1px solid var(--border-color); border-radius:12px; padding:14px 16px; }
-    .sp-stat .n { font-size:22px; font-weight:800; color:var(--text-primary); line-height:1.1; }
-    .sp-stat .l { font-size:11.5px; color:var(--text-muted); margin-top:3px; }
+    .sp-layout { display:grid; grid-template-columns:minmax(0,1fr) 240px; gap:18px; align-items:start; }
+
+    .sp-btn { display:inline-flex; align-items:center; gap:7px; font-size:13px; font-weight:700;
+        padding:9px 15px; border-radius:9px; text-decoration:none; background:var(--accent-blue, #2563eb);
+        color:#fff; border:1px solid var(--accent-blue, #2563eb); cursor:pointer; font-family:inherit; white-space:nowrap; }
+    .sp-btn svg { width:15px; height:15px; flex:none; }
+    .sp-ghost { background:var(--bg-card); color:var(--text-primary); border-color:var(--border-color); }
+
+    /* Her tab bar: one card, six tabs, the open one filled. */
+    .sp-tabbar { display:flex; gap:0; background:var(--bg-card); border:1px solid var(--border-color);
+        border-radius:13px; padding:6px; margin-bottom:16px; overflow-x:auto; scrollbar-width:none; }
+    .sp-tabbar::-webkit-scrollbar { display:none; }
+    .sp-tab { position:relative; display:inline-flex; align-items:center; justify-content:center; gap:8px;
+        flex:1 1 0; padding:11px 10px; border-radius:9px; font-size:13px; font-weight:700;
+        text-decoration:none; color:var(--text-muted); white-space:nowrap; }
+    /* A hairline between tabs, the way her bar divides them, rather than a
+       border around every one. */
+    .sp-tab + .sp-tab::before { content:""; position:absolute; left:0; top:22%; bottom:22%;
+        width:1px; background:var(--border-color); }
+    .sp-tab.on + .sp-tab::before, .sp-tab.on::before { display:none; }
+    .sp-tab svg { width:16px; height:16px; flex:none; }
+    .sp-tab.on { background:var(--accent-blue, #2563eb); color:#fff; }
+
+    .sp-stats { display:grid; grid-template-columns:repeat(5, minmax(0,1fr)); gap:13px; margin-bottom:18px; }
+    .sp-stat { display:flex; gap:11px; align-items:flex-start; background:var(--bg-card);
+        border:1px solid var(--border-color); border-radius:13px; padding:13px 14px; }
+    .sp-stat .ic { width:36px; height:36px; border-radius:10px; flex:none; display:flex; align-items:center;
+        justify-content:center; color:var(--c); background:color-mix(in srgb, var(--c) 13%, transparent); }
+    .sp-stat .ic svg { width:18px; height:18px; }
+    .sp-stat .m { min-width:0; }
+    .sp-stat .l { display:block; font-size:12px; font-weight:600; color:var(--text-secondary, var(--text-muted));
+        line-height:1.3; white-space:nowrap; }
+    .sp-stat .n { display:block; font-size:24px; font-weight:800; color:var(--text-primary); line-height:1.25; margin:1px 0; }
+    .sp-stat .s { display:block; font-size:11px; color:var(--text-muted); line-height:1.4; }
+
+    .sp-cardhead { display:flex; gap:12px; align-items:center; margin-bottom:14px; }
+    .sp-cardhead .ic { width:34px; height:34px; border-radius:9px; flex:none; display:flex; align-items:center;
+        justify-content:center; color:var(--accent-blue, #2563eb);
+        background:color-mix(in srgb, var(--accent-blue, #2563eb) 12%, transparent); }
+    .sp-cardhead .ic svg { width:17px; height:17px; }
+    .sp-cardhead > div { flex:1 1 auto; min-width:0; }
+    .sp-cardhead .acts { display:flex; gap:9px; flex-wrap:wrap; flex:none; }
+    .sp-addbox:not([hidden]) { display:block; margin-bottom:16px; padding:14px; border-radius:11px;
+        background:var(--bg-page, rgba(128,128,128,.05)); border:1px solid var(--border-color); }
+
+    .sp-views { display:inline-flex; gap:4px; background:var(--bg-page, rgba(128,128,128,.07));
+        border:1px solid var(--border-color); border-radius:9px; padding:3px; }
+    .sp-view { display:inline-flex; align-items:center; gap:6px; padding:6px 11px; border-radius:7px;
+        font-size:12px; font-weight:700; border:0; background:none; color:var(--text-muted);
+        cursor:pointer; font-family:inherit; white-space:nowrap; }
+    .sp-view svg { width:14px; height:14px; }
+    .sp-view.on { background:var(--accent-blue, #2563eb); color:#fff; }
+
+    /* The service cards. */
+    .sp-cards { display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:15px; }
+    .sp-svc:not([hidden]) { display:flex; }
+    .sp-svc { flex-direction:column; border:1px solid var(--border-color); border-radius:13px;
+        overflow:hidden; background:var(--bg-card); }
+    .sp-svc.is-resting { opacity:.72; }
+    .sp-svc .media { position:relative; display:flex; align-items:center; justify-content:center; height:112px;
+        background:linear-gradient(135deg, color-mix(in srgb, var(--t) 85%, #000), color-mix(in srgb, var(--t) 45%, #000)); }
+    .sp-svc .media .initial { font-size:28px; font-weight:800; color:rgba(255,255,255,.85); }
+    .sp-svc .live { position:absolute; top:9px; right:9px; font-size:10.5px; font-weight:700; padding:3px 10px;
+        border-radius:20px; background:rgba(209,250,229,.95); color:#047857; }
+    .sp-svc .live.off { background:rgba(241,245,249,.95); color:#475569; }
+    .sp-svc .body { padding:12px 14px; flex:1 1 auto; }
+    .sp-svc .body b { display:block; font-size:14px; font-weight:800; color:var(--text-primary); line-height:1.3; }
+    .sp-svc .cat { display:block; font-size:11.5px; color:var(--text-muted); margin-top:2px; }
+    .sp-svc .chips { display:flex; gap:5px; flex-wrap:wrap; margin:9px 0 11px; }
+    .sp-svc .chip { display:inline-flex; align-items:center; gap:4px; font-size:10px; font-weight:700;
+        padding:3px 8px; border-radius:6px; background:var(--bg-page, rgba(128,128,128,.08));
+        color:var(--text-muted); border:1px solid var(--border-color); }
+    .sp-svc .chip svg { width:11px; height:11px; }
+    .sp-svc .chip.amber { background:rgba(217,119,6,.13); color:#b45309; border-color:transparent; }
+    .sp-svc .chip.blue { background:rgba(37,99,235,.12); color:#1d4ed8; border-color:transparent; }
+    .sp-svc .facts { display:grid; grid-template-columns:minmax(0,88px) minmax(0,1fr); gap:11px;
+        border-top:1px solid var(--border-color); padding-top:11px; }
+    .sp-svc .facts .k { display:block; font-size:10.5px; color:var(--text-muted); }
+    .sp-svc .facts .v { display:block; font-size:19px; font-weight:800; color:var(--text-primary); line-height:1.2; }
+    .sp-svc .facts .v.none { font-size:14px; color:var(--text-muted); }
+    .sp-svc .facts .u { display:block; font-size:10.5px; color:var(--text-muted); }
+    .sp-svc .facts ul { list-style:none; margin:0; padding:0; display:flex; flex-direction:column; gap:5px; }
+    .sp-svc .facts li { display:flex; gap:6px; align-items:flex-start; font-size:10px; color:var(--text-muted); line-height:1.45; }
+    .sp-svc .facts li svg { width:12px; height:12px; flex:none; margin-top:1px; }
+    .sp-svc .facts .none { color:var(--text-muted); font-style:italic; }
+    .sp-svc .foot { display:flex; border-top:1px solid var(--border-color); }
+    .sp-svc .foot > * { flex:1 1 0; min-width:0; }
+    .sp-svc .foot > * + * { border-left:1px solid var(--border-color); }
+    .sp-svc .foot .link { display:flex; align-items:center; justify-content:center; gap:6px; width:100%;
+        padding:10px 8px; font-size:12px; font-weight:700; border:0; background:none;
+        color:var(--accent-blue, #2563eb); cursor:pointer; font-family:inherit; list-style:none; }
+    .sp-svc .foot .link::-webkit-details-marker { display:none; }
+    .sp-svc .foot svg { width:13px; height:13px; }
+    .sp-svc .more { position:relative; }
+    .sp-svc .more .menu { position:absolute; right:0; bottom:calc(100% + 5px); z-index:25; min-width:186px;
+        background:var(--bg-card); border:1px solid var(--border-color); border-radius:11px;
+        padding:5px; box-shadow:0 14px 34px rgba(0,0,0,.18); text-align:left; }
+    .sp-svc .more .menu a, .sp-svc .more .menu button { display:block; width:100%; text-align:left;
+        padding:8px 10px; border-radius:8px; font-size:12px; font-weight:600; border:0; background:none;
+        color:var(--text-primary); text-decoration:none; cursor:pointer; font-family:inherit; }
+    .sp-svc .more .menu a:hover, .sp-svc .more .menu button:hover { background:var(--bg-card-hover, rgba(128,128,128,.1)); }
+
+    .sp-addmore { align-items:center; justify-content:center; text-align:center; gap:7px; padding:22px 18px;
+        border-style:dashed; text-decoration:none; }
+    .sp-addmore .plus { width:40px; height:40px; border-radius:50%; display:flex; align-items:center;
+        justify-content:center; background:var(--accent-blue, #2563eb); color:#fff; }
+    .sp-addmore .plus svg { width:19px; height:19px; }
+    .sp-addmore b { font-size:14px; font-weight:800; color:var(--accent-blue, #2563eb); }
+    .sp-addmore > span:not(.plus):not(.sp-btn) { font-size:11.5px; color:var(--text-muted); line-height:1.5; }
+    .sp-listview[hidden] { display:none; }
+
+    /* Right rail */
+    .sp-rail { display:flex; flex-direction:column; gap:16px; position:sticky; top:20px; }
+    .sp-side { background:var(--bg-card); border:1px solid var(--border-color); border-radius:13px; padding:15px; }
+    .sp-side h4 { display:flex; align-items:center; gap:8px; font-size:13.5px; font-weight:800;
+        color:var(--text-primary); margin:0 0 11px; }
+    .sp-side h4 svg { width:16px; height:16px; flex:none; }
+    .sp-side p { font-size:12px; color:var(--text-muted); line-height:1.55; margin:0 0 11px; }
+    .sp-ticks { list-style:none; margin:0 0 11px; padding:0; display:flex; flex-direction:column; gap:9px; }
+    .sp-ticks li { display:flex; gap:8px; font-size:12px; color:var(--text-secondary, var(--text-muted)); line-height:1.5; }
+    .sp-ticks svg { width:14px; height:14px; flex:none; color:#059669; margin-top:1px; }
+    .sp-link { display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:700;
+        color:var(--accent-blue, #2563eb); text-decoration:none; }
+    .sp-link svg { width:13px; height:13px; }
+
+    @media (max-width: 1250px) { .sp-layout { grid-template-columns:1fr; } .sp-rail { position:static; } }
+    @media (max-width: 1100px) { .sp-cards { grid-template-columns:repeat(2, minmax(0,1fr)); } }
+    @media (max-width: 1000px) { .sp-stats { grid-template-columns:repeat(2, minmax(0,1fr)); }
+        .sp-tools { flex-wrap:wrap; } }
+    @media (max-width: 720px) { .sp-cards { grid-template-columns:1fr; } }
 
     .sp-card { background:var(--bg-card); border:1px solid var(--border-color); border-radius:14px; padding:18px; margin-bottom:18px; }
     .sp-card > h2 { font-size:15px; font-weight:800; margin:0 0 4px; color:var(--text-primary); }
     .sp-card > .sub { font-size:12.5px; color:var(--text-muted); margin:0 0 16px; }
+    .sp-cardhead h2 { font-size:17px; font-weight:800; margin:0 0 2px; color:var(--text-primary); }
+    .sp-cardhead .sub { font-size:12.5px; color:var(--text-muted); margin:0; line-height:1.5; }
 
-    .sp-tools { display:grid; grid-template-columns:minmax(0,2fr) 1fr 1fr; gap:10px; margin-bottom:16px; }
+    .sp-tools { display:flex; gap:9px; align-items:center; flex-wrap:nowrap; margin-bottom:16px; }
+    .sp-search { flex:1 1 170px; min-width:130px; }
+    /* A select sizes itself to its longest option unless it is told not to,
+       which is how "All Pricing Types" pushed the view toggle off the row. */
+    .sp-tools select { flex:0 0 146px; width:146px; min-width:0; }
+    .sp-tools .sp-views { margin-left:auto; flex:none; }
     .sp-in, .sp-sel { width:100%; font-family:inherit; font-size:13px; padding:9px 11px; border-radius:9px;
         border:1px solid var(--border-color); background:var(--bg-page, var(--bg-card)); color:var(--text-primary); }
 
@@ -71,11 +208,9 @@
     .sp-tips li { position:relative; padding-left:16px; margin-bottom:8px; font-size:12.5px; color:var(--text-secondary); }
     .sp-tips li::before { content:"\2713"; position:absolute; left:0; color:#10b981; font-weight:800; }
 
-    .sp-tabs { display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 18px; }
-    .sp-tab { padding: 8px 15px; border-radius: 999px; font-size: 12.5px; font-weight: 700;
-        text-decoration: none; color: var(--text-secondary, var(--text-muted));
-        border: 1px solid var(--border-color); background: var(--bg-card); white-space: nowrap; }
-    .sp-tab.on { background: var(--text-primary); color: var(--bg-card); border-color: var(--text-primary); }
+    /* The old pill tabs are gone. Their .sp-tab rules sat below the new ones
+       and won on source order, which is why the open tab came out navy
+       instead of blue. Third time a stale duplicate has done this. */
     .sp-three { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 14px; }
     .sp-inline { display: grid; grid-template-columns: minmax(0,2fr) 120px 140px auto; gap: 11px; align-items: end; margin-top: 16px; }
     .sp-check { display: flex; gap: 9px; align-items: center; font-size: 13.5px; font-weight: 700; color: var(--text-primary); }
@@ -86,72 +221,129 @@
 @endpush
 
 @section('content')
+@php
+    $paths = [
+        'eye'    => '<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/>',
+        'grid'   => '<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>',
+        'tick'   => '<circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>',
+        'bolt'   => '<path d="M13 2 4 14h7l-1 8 9-12h-7z"/>',
+        'pause'  => '<circle cx="12" cy="12" r="10"/><path d="M10 9v6M14 9v6"/>',
+        'box'    => '<path d="M21 8v13H3V8"/><rect x="1" y="3" width="22" height="5" rx="1"/><path d="M10 12h4"/>',
+        'tag'    => '<path d="M20.6 13.4 12 22l-9-9V3h10z"/><path d="M7 7h.01"/>',
+        'plus'   => '<circle cx="12" cy="12" r="10"/><path d="M12 8v8M8 12h8"/>',
+        'car'    => '<path d="M5 17h14l-1.5-6.5A2 2 0 0 0 15.6 9H8.4a2 2 0 0 0-1.9 1.5z"/><circle cx="7.5" cy="17.5" r="1.5"/><circle cx="16.5" cy="17.5" r="1.5"/>',
+        'doc'    => '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/>',
+        'zap'    => '<path d="M13 2 4 14h7l-1 8 9-12h-7z"/>',
+        'sort'   => '<path d="m3 16 4 4 4-4"/><path d="M7 20V4"/><path d="m21 8-4-4-4 4"/><path d="M17 4v16"/>',
+        'add'    => '<path d="M12 5v14M5 12h14"/>',
+        'list'   => '<path d="M8 6h13M8 12h13M8 18h13M3 6h.01M3 12h.01M3 18h.01"/>',
+        'cards'  => '<rect x="3" y="3" width="8" height="8" rx="1"/><rect x="13" y="3" width="8" height="8" rx="1"/><rect x="3" y="13" width="8" height="8" rx="1"/><rect x="13" y="13" width="8" height="8" rx="1"/>',
+        'pen'    => '<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/>',
+        'clock'  => '<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>',
+        'cash'   => '<circle cx="12" cy="12" r="10"/><path d="M12 6v12"/><path d="M15 9.5a2.5 2.5 0 0 0-2.5-2h-1a2.25 2.25 0 0 0 0 4.5h1a2.25 2.25 0 0 1 0 4.5h-1A2.5 2.5 0 0 1 9 14.5"/>',
+        'gear'   => '<circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.9l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.9-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1A1.7 1.7 0 0 0 9 19.4a1.7 1.7 0 0 0-1.9.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.9 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.3-1.9l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.9.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.9-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.9V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/>',
+        'bulb'   => '<path d="M9 18h6"/><path d="M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7V17h8v-2.3A7 7 0 0 0 12 2z"/>',
+        'help'   => '<circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3"/><path d="M12 17h.01"/>',
+        'chat'   => '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
+        'out'    => '<path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><path d="M15 3h6v6"/><path d="M10 14 21 3"/>',
+        'arrow'  => '<path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>',
+        'dots'   => '<circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/>',
+    ];
+    $ico = fn (string $n, string $extra = '') => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ' . $extra . '>' . ($paths[$n] ?? '') . '</svg>';
+
+    $spTabs = [
+        'services'  => ['Services',          'tag'],
+        'rules'     => ['Pricing Rules',     'cash'],
+        'addons'    => ['Add-ons & Extras',  'plus'],
+        'travel'    => ['Travel Pricing',    'car'],
+        'templates' => ['Templates',         'doc'],
+        'quickbid'  => ['Quick Bid Settings','zap'],
+    ];
+@endphp
+
 <div class="sp-head">
     <div>
         <h1>My Services &amp; Pricing</h1>
         <p>Manage the services you offer, set your pricing, and customize options for Quick Bid, packages, and more.</p>
     </div>
-    <a href="{{ route('professional.profile.index') }}" class="sp-save" style="text-decoration:none;">Preview public profile</a>
+    <a href="{{ route('professional.profile.index') }}" class="sp-btn sp-ghost">{!! $ico('eye') !!} Preview Public Profile</a>
 </div>
+
+{{-- Her six tabs. Services was the only one with anything behind it; the
+     others had nowhere to store an answer, so a weekend surcharge or a travel
+     charge was typed into every quote by hand. --}}
+<div class="sp-tabbar">
+    @foreach ($spTabs as $key => [$label, $icon])
+        <a class="sp-tab {{ $tab === $key ? 'on' : '' }}"
+           href="{{ route('professional.services.index', $key === 'services' ? [] : ['tab' => $key]) }}">
+            {!! $ico($icon) !!} {{ $label }}
+        </a>
+    @endforeach
+</div>
+
+<div class="sp-layout">
+<div>
 
 <div class="sp-stats">
-    <div class="sp-stat"><div class="n">{{ $counts['total'] }}</div><div class="l">Services you offer</div></div>
-    <div class="sp-stat"><div class="n">{{ $counts['active'] }}</div><div class="l">Active, visible to clients</div></div>
-    <div class="sp-stat"><div class="n">{{ $counts['packaged'] }}</div><div class="l">Used in your packages</div></div>
-    <div class="sp-stat"><div class="n">{{ $counts['quickbid'] }}</div><div class="l">Priced, ready to quote</div></div>
-    <div class="sp-stat"><div class="n">{{ $counts['inactive'] }}</div><div class="l">Resting, hidden from clients</div></div>
-</div>
-
-{{-- Khadijah's screen puts these five across the page. Services was the only
-     one with anything behind it; the other four had nowhere to store an
-     answer, so a weekend surcharge or a travel charge was typed into every
-     quote by hand. --}}
-@php
-    $spTabs = [
-        'services' => 'Services',
-        'addons'   => 'Add-ons & extras',
-        'rules'    => 'Pricing rules',
-        'travel'   => 'Travel',
-        'quickbid' => 'Quick Bid',
-    ];
-@endphp
-<div class="sp-tabs">
-    @foreach ($spTabs as $key => $label)
-        <a class="sp-tab {{ $tab === $key ? 'on' : '' }}"
-           href="{{ route('professional.services.index', $key === 'services' ? [] : ['tab' => $key]) }}">{{ $label }}</a>
+    @foreach ([
+        ['total',    'Total Services',    'Active services you offer', '#2563eb', 'grid'],
+        ['active',   'Active Services',   'Visible to clients',        '#059669', 'tick'],
+        ['packaged', 'Package Usage',     'Services used in packages', '#7c3aed', 'box'],
+        ['quickbid', 'Quick Bid Ready',   'Services with pricing rules','#d97706', 'bolt'],
+        ['inactive', 'Inactive Services', 'Not visible to clients',    '#dc2626', 'pause'],
+    ] as [$key, $label, $note, $colour, $icon])
+        <div class="sp-stat" style="--c: {{ $colour }};">
+            <span class="ic">{!! $ico($icon) !!}</span>
+            <span class="m">
+                <span class="l">{{ $label }}</span>
+                <span class="n">{{ $counts[$key] }}</span>
+                <span class="s">{{ $note }}</span>
+            </span>
+        </div>
     @endforeach
 </div>
 
 @if ($tab === 'services')
-{{-- Add Service Offering. Khadijah asked for it here on 5 November; before
-     this, the only way to add a service was to leave this page. --}}
 <div class="sp-card">
-    <h2>Add a service offering</h2>
-    <p class="sub">Pick anything you do that is not on your list yet. You can price it straight after.</p>
+    <div class="sp-cardhead">
+        <span class="ic">{!! $ico('grid') !!}</span>
+        <div>
+            <h2>Your Services</h2>
+            <p class="sub">Create, edit, and organize the services you offer. These services can be used for
+               Quick Bid, packages, and your public profile.</p>
+        </div>
+        <div class="acts">
+            {{-- Reordering is the list view: the rows carry their own order and
+                 the public profile reads it. Nothing else on this page can
+                 change it, so the button opens the view that can. --}}
+            <button type="button" class="sp-btn sp-ghost" id="spReorder">{!! $ico('sort') !!} Reorder Services</button>
+            <button type="button" class="sp-btn" id="spAddOpen">{!! $ico('add') !!} Add Service</button>
+        </div>
+    </div>
 
-    @if (empty($addable))
-        <div class="sp-none">You already offer every service on the site.</div>
-    @else
-        <form method="POST" action="{{ route('professional.services.add') }}" class="sp-add">
-            @csrf
-            <div>
-                <label class="sp-lab" for="spAdd">Service</label>
-                <select class="sp-sel" id="spAdd" name="category_id" required>
-                    <option value="">Choose a service</option>
-                    @foreach ($addable as $option)
-                        <option value="{{ $option['id'] }}">{{ $option['label'] }}</option>
-                    @endforeach
-                </select>
-                @error('category_id') <div class="sp-note" style="color:#b91c1c;margin-top:6px;">{{ $message }}</div> @enderror
-            </div>
-            <button type="submit" class="sp-save">Add service offering</button>
-        </form>
-    @endif
-</div>
-
-<div class="sp-card">
-    <h2>Your services</h2>
-    <p class="sub">Grouped by category. Open a group to price what is in it.</p>
+    {{-- Add Service Offering. Khadijah asked for it here on 5 November; before
+         this, the only way to add a service was to leave this page. --}}
+    <div class="sp-addbox" id="spAddBox" hidden>
+        @if (empty($addable))
+            <div class="sp-none">You already offer every service on the site.</div>
+        @else
+            <form method="POST" action="{{ route('professional.services.add') }}" class="sp-add">
+                @csrf
+                <div>
+                    <label class="sp-lab" for="spAdd">Service</label>
+                    <select class="sp-sel" id="spAdd" name="category_id" required>
+                        <option value="">Choose a service</option>
+                        @foreach ($addable as $option)
+                            <option value="{{ $option['id'] }}">{{ $option['label'] }}</option>
+                        @endforeach
+                    </select>
+                    @error('category_id') <div class="sp-note" style="color:#b91c1c;margin-top:6px;">{{ $message }}</div> @enderror
+                </div>
+                <button type="submit" class="sp-btn">Add service offering</button>
+            </form>
+        @endif
+    </div>
 
     @if ($services->isEmpty())
         <p class="sp-empty">
@@ -160,18 +352,137 @@
         </p>
     @else
         <div class="sp-tools">
-            <input type="search" id="spSearch" class="sp-in" placeholder="Search your services..." oninput="spFilter()">
+            <span class="sp-search">
+                {!! $ico('tag', 'style="display:none;"') !!}
+                <input type="search" id="spSearch" class="sp-in" placeholder="Search services..." oninput="spFilter()">
+            </span>
+            <select id="spCat" class="sp-sel" onchange="spFilter()">
+                <option value="">All Categories</option>
+                @foreach ($categories as $catName)
+                    <option value="{{ $catName }}">{{ $catName }}</option>
+                @endforeach
+            </select>
             <select id="spStatus" class="sp-sel" onchange="spFilter()">
-                <option value="">All statuses</option>
-                <option value="active">Active only</option>
-                <option value="resting">Resting only</option>
+                <option value="">All Statuses</option>
+                <option value="active">Active</option>
+                <option value="resting">Inactive</option>
             </select>
             <select id="spPriced" class="sp-sel" onchange="spFilter()">
-                <option value="">All services</option>
-                <option value="priced">Priced only</option>
+                <option value="">All Pricing Types</option>
+                <option value="priced">Priced</option>
                 <option value="unpriced">No price yet</option>
             </select>
+            <span class="sp-views">
+                <button type="button" class="sp-view on" data-view="card">{!! $ico('cards') !!} Card View</button>
+                <button type="button" class="sp-view" data-view="list">{!! $ico('list') !!} List View</button>
+            </span>
         </div>
+
+        {{-- Card view is her screen. List view is the same services with their
+             prices editable in place, which is the only way to change them and
+             the only place the order can be set. --}}
+        <div class="sp-cards" id="spCardView">
+            @foreach ($services as $service)
+                @php
+                    $resting  = ! (bool) ($service->pivot->is_active ?? true);
+                    $hasPrice = $service->pivot->price !== null;
+                    $packaged = $inPackages->contains($service->name);
+                    $tint     = ['#2563eb', '#7c3aed', '#db2777', '#d97706', '#059669'][crc32($service->name) % 5];
+                @endphp
+                <article class="sp-svc {{ $resting ? 'is-resting' : '' }}"
+                         data-spcard
+                         data-name="{{ Str::lower($service->name) }}"
+                         data-cat="{{ $service->parent?->name }}"
+                         data-status="{{ $resting ? 'resting' : 'active' }}"
+                         data-priced="{{ $hasPrice ? 'priced' : 'unpriced' }}">
+                    {{-- No photograph is stored for a service, so this is a
+                         tile rather than a stock picture of somebody else's
+                         work. --}}
+                    <span class="media" style="--t: {{ $tint }};">
+                        <span class="initial">{{ Str::upper(Str::substr($service->name, 0, 1)) }}</span>
+                        <span class="live {{ $resting ? 'off' : '' }}">{{ $resting ? 'Inactive' : 'Active' }}</span>
+                    </span>
+
+                    <div class="body">
+                        <b>{{ $service->name }}</b>
+                        <span class="cat">{{ $service->parent?->name ?? 'Service' }}</span>
+
+                        <span class="chips">
+                            @if ($hasPrice)
+                                <span class="chip amber">{!! $ico('bolt') !!} Quick Bid Ready</span>
+                            @else
+                                <span class="chip">No price yet</span>
+                            @endif
+                            @if ($packaged)
+                                <span class="chip blue">{!! $ico('box') !!} In Packages</span>
+                            @else
+                                <span class="chip">{!! $ico('box') !!} Not in Packages</span>
+                            @endif
+                        </span>
+
+                        <div class="facts">
+                            <div>
+                                @if ($hasPrice)
+                                    <span class="k">{{ $units[$service->pivot->price_unit ?? 'from'] ?? 'Starting at' }}</span>
+                                    <span class="v">${{ number_format((float) $service->pivot->price, 0) }}</span>
+                                    <span class="u">{{ ($service->pivot->price_unit ?? 'from') === 'hourly' ? 'per hour' : 'per event' }}</span>
+                                @else
+                                    <span class="k">Price</span>
+                                    <span class="v none">Not set</span>
+                                    <span class="u">Clients cannot be quoted yet</span>
+                                @endif
+                            </div>
+                            <ul>
+                                <li>{!! $ico('clock') !!}
+                                    @if ($service->pivot->duration_hours)
+                                        Includes {{ $service->pivot->duration_hours }} {{ Str::plural('hour', $service->pivot->duration_hours) }}
+                                    @else
+                                        <span class="none">Hours not set</span>
+                                    @endif
+                                </li>
+                                <li>{!! $ico('cash') !!}
+                                    @if ($service->pivot->extra_hour_price !== null)
+                                        ${{ number_format((float) $service->pivot->extra_hour_price, 0) }} per additional hour
+                                    @else
+                                        <span class="none">No extra hour rate</span>
+                                    @endif
+                                </li>
+                                {{-- Her third line names what is included in the
+                                     booking. Nothing records that per service,
+                                     so this one says where it would come from
+                                     rather than inventing it. --}}
+                                <li>{!! $ico('gear') !!}
+                                    <span class="none">Inclusions are not recorded per service</span>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="foot">
+                        <button type="button" class="link" data-spedit>{!! $ico('pen') !!} Edit</button>
+                        <details class="more">
+                            <summary class="link">{!! $ico('dots') !!} More</summary>
+                            <div class="menu">
+                                <button type="submit" form="spToggle-{{ $service->id }}">
+                                    {{ $resting ? 'Offer this again' : 'Rest this service' }}
+                                </button>
+                                <a href="{{ route('professional.packages.create') }}">Put it in a package</a>
+                                <a href="{{ route('professional.profile.index') }}">See it on your profile</a>
+                            </div>
+                        </details>
+                    </div>
+                </article>
+            @endforeach
+
+            <a class="sp-svc sp-addmore" href="#" id="spAddMore">
+                <span class="plus">{!! $ico('add') !!}</span>
+                <b>Add Another Service</b>
+                <span>Create a new service to offer to clients. You can set pricing, add options, and include it in packages.</span>
+                <span class="sp-btn">{!! $ico('add') !!} Add Service</span>
+            </a>
+        </div>
+
+        <div class="sp-listview" id="spListView" hidden>
 
         <form method="POST" action="{{ route('professional.services.update') }}">
             @csrf
@@ -195,6 +506,7 @@
                             <div class="sp-row {{ $resting ? 'is-resting' : '' }}"
                                  data-sprow
                                  data-name="{{ Str::lower($service->name) }}"
+                                 data-cat="{{ $service->parent?->name }}"
                                  data-status="{{ $resting ? 'resting' : 'active' }}"
                                  data-priced="{{ $hasPrice ? 'priced' : 'unpriced' }}">
                                 <div>
@@ -265,6 +577,8 @@
             </div>
         </form>
 
+        </div>
+
         {{-- Outside the pricing form: nesting a form in a form is not allowed,
              and the browser drops the inner one silently. --}}
         @foreach ($services as $service)
@@ -276,6 +590,29 @@
     @endif
 </div>
 
+@endif
+
+@if ($tab === 'templates')
+    {{-- The reusable wording a Quick Bid goes out with. It is the one template
+         this platform stores; the tab is not a heading over an empty page. --}}
+    <div class="sp-card">
+        <h2>Response template</h2>
+        <p class="sub">The wording sent with every Quick Bid, so you are not retyping your terms on each reply.</p>
+
+        <form method="POST" action="{{ route('professional.services.rules') }}">
+            @csrf
+            <input type="hidden" name="tab" value="templates">
+            <div>
+                <label class="sp-lab" for="tplTerms">Your standard terms</label>
+                <textarea class="sp-in" id="tplTerms" name="quick_bid_terms" rows="6" maxlength="600"
+                          placeholder="e.g. Price includes setup and breakdown. A 30% deposit holds the date.">{{ old('quick_bid_terms', $rules->quick_bid_terms) }}</textarea>
+                <p class="sp-note">Up to 600 characters. Leave it empty and a Quick Bid goes out with the price alone.</p>
+            </div>
+            <div class="sp-foot">
+                <button type="submit" class="sp-btn">Save template</button>
+            </div>
+        </form>
+    </div>
 @endif
 
 @if ($tab === 'addons')
@@ -444,9 +781,26 @@
        are all filtered out hides itself rather than sitting there empty. */
     window.spFilter = function () {
         var q      = (document.getElementById('spSearch') || {}).value || '';
+        var cat    = (document.getElementById('spCat') || {}).value || '';
         var status = (document.getElementById('spStatus') || {}).value || '';
         var priced = (document.getElementById('spPriced') || {}).value || '';
         q = q.trim().toLowerCase();
+
+        var match = function (el) {
+            return (!q      || el.dataset.name.indexOf(q) !== -1)
+                && (!cat    || el.dataset.cat === cat)
+                && (!status || el.dataset.status === status)
+                && (!priced || el.dataset.priced === priced);
+        };
+
+        /* The cards answer the same four controls the list does, so switching
+           view never changes which services are on screen. */
+        var cards = 0;
+        document.querySelectorAll('[data-spcard]').forEach(function (card) {
+            var ok = match(card);
+            card.hidden = !ok;
+            if (ok) { cards++; }
+        });
 
         var shown = 0;
 
@@ -454,9 +808,7 @@
             var visible = 0;
 
             group.querySelectorAll('[data-sprow]').forEach(function (row) {
-                var ok = (!q      || row.dataset.name.indexOf(q) !== -1)
-                      && (!status || row.dataset.status === status)
-                      && (!priced || row.dataset.priced === priced);
+                var ok = match(row);
                 row.hidden = !ok;
                 if (ok) { visible++; }
             });
@@ -471,6 +823,103 @@
         var none = document.getElementById('spNone');
         if (none) { none.hidden = shown > 0; }
     };
+
+    /* Card view is her screen; list view is the same services with their
+       prices editable and their order settable. Both read the same filters. */
+    function spView(which) {
+        var card = document.getElementById('spCardView');
+        var list = document.getElementById('spListView');
+        if (!card || !list) { return; }
+
+        card.hidden = which !== 'card';
+        list.hidden = which !== 'list';
+
+        document.querySelectorAll('.sp-view').forEach(function (b) {
+            b.classList.toggle('on', b.dataset.view === which);
+        });
+    }
+
+    document.querySelectorAll('.sp-view').forEach(function (b) {
+        b.addEventListener('click', function () { spView(b.dataset.view); });
+    });
+
+    /* Reordering and editing a price both happen in the list, so the two
+       buttons that offer them open it rather than promising a screen that
+       does not exist. */
+    var reorder = document.getElementById('spReorder');
+    if (reorder) {
+        reorder.addEventListener('click', function () {
+            spView('list');
+            document.getElementById('spListView').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        });
+    }
+
+    document.querySelectorAll('[data-spedit]').forEach(function (b) {
+        b.addEventListener('click', function () {
+            spView('list');
+            var card = b.closest('[data-spcard]');
+            var row  = card && document.querySelector('[data-sprow][data-name="' + card.dataset.name + '"]');
+            if (row) {
+                row.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                var price = row.querySelector('input[type=number]');
+                if (price) { price.focus(); }
+            }
+        });
+    });
+
+    function spOpenAdd(e) {
+        if (e) { e.preventDefault(); }
+        var box = document.getElementById('spAddBox');
+        if (!box) { return; }
+        box.hidden = false;
+        box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        var pick = document.getElementById('spAdd');
+        if (pick) { pick.focus(); }
+    }
+
+    ['spAddOpen', 'spAddMore'].forEach(function (id) {
+        var el = document.getElementById(id);
+        if (el) { el.addEventListener('click', spOpenAdd); }
+    });
+
+    /* A failed add bounces back with an error, so the box has to be open to
+       show it rather than hiding the message it came back with. */
+    if (document.querySelector('#spAddBox .sp-note')) { spOpenAdd(); }
+
+    // One card menu open at a time, and clicking away closes it.
+    document.addEventListener('click', function (e) {
+        document.querySelectorAll('.sp-svc .more[open]').forEach(function (d) {
+            if (!d.contains(e.target)) { d.removeAttribute('open'); }
+        });
+    });
 })();
 </script>
+</div>
+
+<aside class="sp-rail">
+    <div class="sp-side">
+        <h4>{!! $ico('bulb', 'style="color:#d97706;"') !!} Helpful Tips</h4>
+        <ul class="sp-ticks">
+            <li>{!! $ico('tick') !!} Add the services you offer with clear pricing and details.</li>
+            <li>{!! $ico('tick') !!} Mark services as Quick Bid Ready to speed up your responses.</li>
+            <li>{!! $ico('tick') !!} Use Add-ons &amp; Extras for optional items, such as lighting or extended hours.</li>
+            <li>{!! $ico('tick') !!} Create Package Deals to bundle services for clients.</li>
+        </ul>
+        <a class="sp-link" href="{{ route('public.faq') }}">Learn more about Services &amp; Pricing {!! $ico('arrow') !!}</a>
+    </div>
+
+    <div class="sp-side">
+        <h4>{!! $ico('eye') !!} Service Display on Your Profile</h4>
+        <p>Active services are shown on your public profile and can be used for Quick Bid and package creation.</p>
+        <a class="sp-btn" style="display:flex;justify-content:center;" href="{{ route('professional.profile.index') }}">View Public Profile</a>
+    </div>
+
+    <div class="sp-side">
+        <h4>{!! $ico('help') !!} Need Help?</h4>
+        <p>Check out our step-by-step guide or contact support if you have questions about setting up your services and pricing.</p>
+        <a class="sp-btn sp-ghost" style="display:flex;justify-content:center;margin-bottom:9px;" href="{{ route('public.faq') }}">{!! $ico('out') !!} View Help Guide</a>
+        <a class="sp-btn sp-ghost" style="display:flex;justify-content:center;" href="{{ \App\Domain\Forms\FormRegistry::url('support_request') }}">{!! $ico('chat') !!} Contact Support</a>
+    </div>
+</aside>
+</div>
 @endsection

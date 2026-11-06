@@ -1,231 +1,477 @@
+{{-- Gig Operations Hub, overview. Khadijah's 28 October screen.
+
+     Three of her figures are not here, because nothing records them:
+
+       "6 Unread Messages"   no message carries a read state. What is counted
+                             instead is the threads where the last word was
+                             the client's, which is the thing that actually
+                             needs answering.
+       Event thumbnails      no event stores an image, so each row carries a
+                             tile rather than a stock photograph.
+       "Next event in 5      this one IS real, worked out from the soonest
+        days"                booked event, and says so when there is none. --}}
+
 @php
-    $money = fn ($n) => '$' . number_format((float) $n, 0);
-    // Row 133 — the badge comes from GigStats' own definitions now. The map
-    // that used to sit here badged a `requested` booking "In Progress" while
-    // the In Progress count above it meant an event running right now: the
-    // same two words for two different things, on one screen.
-    $gigDeposits = \App\Support\GigStatus::depositsFor($gigs);
-    // Row 130 — the sample cards read from the page's one shared today rather
-    // than carrying dates typed in by hand, which drifted out of date the
-    // moment they were written.
-    $sampleDate = $today->copy()->addDays(21)->format('M j');
-    $thumbs = ['linear-gradient(135deg,#f59e0b,#b45309)','linear-gradient(135deg,#10b981,#047857)','linear-gradient(135deg,#8b5cf6,#6d28d9)','linear-gradient(135deg,#2563eb,#1d4ed8)','linear-gradient(135deg,#ec4899,#be185d)'];
+    $tz    = config('app.display_timezone');
+    // $money is already the Earnings array from the controller, so the
+    // formatter gets its own name rather than overwriting it.
+    $cash = fn ($v) => '$' . number_format((float) $v, 0);
+    $on    = fn ($d) => $d?->timezone($tz)->format('M j, Y');
+
+    $paths = [
+        'cal'    => '<rect x="3" y="4" width="18" height="18" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/>',
+        'doc'    => '<path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/>',
+        'chat'   => '<path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>',
+        'right'  => '<path d="m9 18 6-6-6-6"/>',
+        'gigs'   => '<path d="M20 7h-3V5a2 2 0 0 0-2-2H9a2 2 0 0 0-2 2v2H4a2 2 0 0 0-2 2v9a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"/><path d="M9 7V5h6v2"/>',
+        'clock'  => '<circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/>',
+        'tick'   => '<circle cx="12" cy="12" r="10"/><path d="m9 12 2 2 4-4"/>',
+        'alert'  => '<circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/>',
+        'pen'    => '<path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4z"/>',
+        'cash'   => '<circle cx="12" cy="12" r="10"/><path d="M12 6v12"/><path d="M15 9.5a2.5 2.5 0 0 0-2.5-2h-1a2.25 2.25 0 0 0 0 4.5h1a2.25 2.25 0 0 1 0 4.5h-1A2.5 2.5 0 0 1 9 14.5"/>',
+        'hist'   => '<path d="M3 7v6h6"/><path d="M3 13a9 9 0 1 0 3-7.7L3 8"/>',
+        'team'   => '<path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.9"/>',
+        'box'    => '<path d="M21 8v13H3V8"/><rect x="1" y="3" width="22" height="5" rx="1"/><path d="M10 12h4"/>',
+        'alert'  => '<circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/>',
+    ];
+    $svg = fn (string $n, string $extra = '') => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor"
+        stroke-width="2" stroke-linecap="round" stroke-linejoin="round" ' . $extra . '>' . ($paths[$n] ?? '') . '</svg>';
+
+    $kindIcon = [
+        'Agreement' => 'doc', 'Request' => 'chat', 'Bid' => 'clock',
+        'Staffing' => 'team', 'Package' => 'box', 'Scheduling' => 'cal', 'Payment' => 'cash',
+    ];
+    $toneTint = ['urgent' => '#dc2626', 'soon' => '#d97706', 'new' => '#2563eb', 'open' => '#64748b'];
 @endphp
 
 @push('styles')
 <style>
-    .pg { --pg-blue: #2563eb; }
-    .pg-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 18px 20px; }
+    .gh-tiles { display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:12px; margin-bottom:14px; }
+    .gh-tile { display:flex; gap:14px; align-items:center; background:var(--bg-card);
+        border:1px solid var(--border-color); border-radius:14px; padding:17px 18px; text-decoration:none; }
+    .gh-tile .ic { width:46px; height:46px; border-radius:12px; flex:none; display:flex; align-items:center;
+        justify-content:center; color:var(--c); background:color-mix(in srgb, var(--c) 13%, transparent); }
+    .gh-tile .ic svg { width:23px; height:23px; }
+    .gh-tile .m { flex:1 1 auto; min-width:0; }
+    .gh-tile .n { display:block; font-size:27px; font-weight:800; color:var(--text-primary); line-height:1.15; }
+    .gh-tile .l { display:block; font-size:13px; color:var(--text-secondary, var(--text-muted)); }
+    /* Her sub-line is coloured by what it says, not by the card's icon:
+       green when there is something coming, amber when something is on
+       you, blue when a client is waiting. */
+    .gh-tile .s { display:block; font-size:11.5px; color:var(--s, var(--c)); font-weight:600; margin-top:3px; }
+    .gh-tile .go { color:var(--text-muted); flex:none; }
+    .gh-tile .go svg { width:17px; height:17px; }
 
-    .pg-top { display: grid; grid-template-columns: minmax(0,0.85fr) minmax(0,1.15fr); gap: 18px; align-items: start; margin-bottom: 20px; }
+    .gh-layout { display:grid; grid-template-columns:minmax(0,1fr) 322px; gap:18px; align-items:start; }
+    .gh-card { background:var(--bg-card); border:1px solid var(--border-color); border-radius:14px;
+        padding:16px 18px; margin-bottom:16px; }
+    .gh-card h3 { display:flex; align-items:center; justify-content:space-between; gap:12px;
+        font-size:15px; font-weight:800; color:var(--text-primary); margin:0 0 14px; }
+    .gh-card h3 .t { display:inline-flex; align-items:center; gap:10px; min-width:0; }
+    .gh-card h3 .t > .ic { width:30px; height:30px; border-radius:8px; flex:none; display:flex;
+        align-items:center; justify-content:center; color:var(--accent-blue, #2563eb);
+        background:color-mix(in srgb, var(--accent-blue, #2563eb) 12%, transparent); }
+    .gh-card h3 .t > .ic svg { width:16px; height:16px; }
+    .gh-card h3 a { font-size:12px; font-weight:700; color:var(--accent-blue, #2563eb); text-decoration:none; white-space:nowrap; }
+    .gh-card h3 small { display:block; font-weight:600; font-size:12px; color:var(--text-muted); margin-top:2px; }
 
-    /* Left intro */
-    .pg-art { width: 110px; height: 100px; display: flex; align-items: center; justify-content: center; margin-bottom: 8px; }
-    .pg-art svg { width: 100%; height: auto; }
-    .pg-intro h1 { font-size: 30px; font-weight: 800; color: var(--text-primary); margin: 0; }
-    .pg-intro .tag { font-size: 14px; color: var(--text-secondary); margin: 4px 0 10px; }
-    .pg-intro p { font-size: 12.5px; color: var(--text-muted); line-height: 1.6; margin: 0 0 14px; }
-    .pg-feat { display: flex; gap: 11px; padding: 11px 13px; border-radius: 11px; margin-bottom: 8px; }
-    .pg-feat.x1 { background: rgba(139,92,246,0.06); } .pg-feat.x2 { background: rgba(16,185,129,0.06); }
-    .pg-feat.x3 { background: rgba(249,115,22,0.06); } .pg-feat.x4 { background: rgba(37,99,235,0.06); }
-    .pg-feat-ico { width: 30px; height: 30px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-    .pg-feat-ico svg { width: 15px; height: 15px; }
-    .pg-feat b { font-size: 12.5px; color: var(--text-primary); }
-    .pg-feat p { font-size: 11px; color: var(--text-muted); margin: 2px 0 0; line-height: 1.4; }
+    /* Fixed, or the browser re-sizes the columns to fit its own idea of the
+       content and the colgroup above is ignored. Her widths then do not hold. */
+    .gh-table { width:100%; border-collapse:collapse; font-size:12.5px; table-layout:fixed; }
+    .gh-table th { text-align:left; font-size:11px; font-weight:700; color:var(--text-muted);
+        padding:0 8px 9px; border-bottom:1px solid var(--border-color); white-space:nowrap; }
+    .gh-table td { padding:9px 8px; border-bottom:1px solid var(--border-color);
+        vertical-align:middle; color:var(--text-primary); }
+    .gh-table tr:last-child td { border-bottom:0; }
+    .gh-who { display:flex; gap:11px; align-items:center; }
+    /* No event stores a photograph, so this is a tile: the same light tint
+       and coloured icon every other tile on this page uses. */
+    /* .gh-who span sets a muted colour and outranks a bare .gh-thumb, which
+       is why the icon came out slate instead of the row's own tint. */
+    .gh-who .gh-thumb { width:50px; height:41px; border-radius:9px; flex:none; display:flex;
+        align-items:center; justify-content:center; color:var(--t);
+        background:color-mix(in srgb, var(--t) 13%, transparent); }
+    .gh-who .gh-thumb svg { width:19px; height:19px; }
+    .gh-who b { display:block; font-size:13px; font-weight:800; color:var(--text-primary); line-height:1.3; }
+    .gh-who span { display:block; font-size:11.5px; color:var(--text-muted); }
+    .gh-chip { display:inline-flex; align-items:center; gap:5px; font-size:11px; font-weight:700;
+        padding:4px 10px; border-radius:20px; white-space:nowrap; }
+    .gh-chip svg { width:12px; height:12px; }
+    .gh-type { display:inline-flex; align-items:center; gap:6px; font-size:12px; font-weight:600;
+        color:var(--text-primary); white-space:nowrap; }
+    .gh-type svg { width:14px; height:14px; flex:none; color:var(--t); }
+    .gh-dates { font-size:11.5px; color:var(--text-muted); line-height:1.6; }
+    .gh-dates b { display:flex; align-items:center; gap:5px; font-size:12px; font-weight:700;
+        color:var(--text-primary); white-space:nowrap; }
+    .gh-dates b svg { width:12px; height:12px; flex:none; color:var(--text-muted); }
+    .gh-dates .hot { color:var(--bad-text, #dc2626); font-weight:700; }
+    .gh-dates span { display:flex; align-items:center; gap:5px; }
+    .gh-dates span svg { width:12px; height:12px; flex:none; }
+    .gh-dates .ok { color:var(--ok-text, #047857); font-weight:700; }
+    .gh-amt { font-size:13.5px; font-weight:800; white-space:nowrap; }
+    .gh-acts { display:inline-flex; gap:6px; align-items:center; }
+    .gh-btn { font-size:11.5px; font-weight:700; padding:6px 13px; border-radius:8px; text-decoration:none;
+        border:1px solid var(--border-color); color:var(--text-primary); background:var(--bg-card); white-space:nowrap; }
+    .gh-kebab { width:26px; height:27px; border-radius:7px; border:0;
+        background:none; color:var(--text-muted); font-size:15px; line-height:1;
+        display:inline-flex; align-items:center; justify-content:center; text-decoration:none; }
+    .gh-kebab:hover { background:var(--bg-card-hover, rgba(128,128,128,.1)); }
 
-    /* Right gig card */
-    .pg-hub-h { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
-    .pg-hub-ico { width: 48px; height: 48px; border-radius: 50%; background: #eef2ff; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-    .pg-hub-ico svg { width: 30px; height: 28px; }
-    .pg-hub-h b { font-size: 17px; font-weight: 800; color: var(--text-primary); }
-    .pg-hub-h p { font-size: 12px; color: var(--text-muted); margin: 1px 0 0; }
-    .pg-scores { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 14px; }
-    .pg-score { border: 1px solid var(--border-color); border-radius: 11px; padding: 12px 14px; display: flex; align-items: center; justify-content: space-between; }
-    .pg-score-k { font-size: 11px; color: var(--text-muted); font-weight: 600; }
-    .pg-score-v { font-size: 24px; font-weight: 800; color: var(--text-primary); }
-    .pg-score svg { width: 18px; height: 18px; color: var(--text-muted); }
-    .pg-gig { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-top: 1px solid var(--border-color); }
-    .pg-gig-thumb { width: 60px; height: 46px; border-radius: 9px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.85); }
-    .pg-gig-thumb svg { width: 18px; height: 18px; }
-    .pg-gig-mid { flex: 1; min-width: 0; }
-    .pg-gig-name { font-size: 13px; font-weight: 800; color: var(--text-primary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .pg-gig-meta { font-size: 11px; color: var(--text-muted); }
-    .pg-gig-svc { font-size: 11px; color: var(--text-muted); }
-    .pg-gig-price b { font-size: 12.5px; font-weight: 800; color: var(--text-primary); white-space: nowrap; }
-    .pg-gig-status { font-size: 11px; font-weight: 700; }
-    .pg-gig-stats { display: flex; align-items: center; gap: 14px; flex-shrink: 0; }
-    .pg-gig-stat { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; font-weight: 700; color: var(--text-secondary); }
-    .pg-gig-stat svg { width: 14px; height: 14px; color: var(--info-text); }
-    .pg-viewall { display: block; text-align: center; padding: 13px; margin-top: 6px; font-size: 13px; font-weight: 800; color: var(--pg-blue); text-decoration: none; }
-    .pg-empty { padding: 26px 10px; text-align: center; color: var(--text-muted); font-size: 13px; }
+    /* What happens if you click a gig: five columns, each with a preview. */
+    .gh-deep { display:grid; grid-template-columns:repeat(5, minmax(0,1fr)); gap:14px; }
+    .gh-deep > div { border:1px solid var(--border-color); border-radius:12px; padding:13px; }
+    .gh-deep h5 { display:flex; align-items:center; gap:7px; font-size:12.5px; font-weight:800;
+        color:var(--text-primary); margin:0 0 6px; }
+    .gh-deep h5 svg { width:15px; height:15px; flex:none; color:var(--accent-blue, #2563eb); }
+    .gh-deep p { font-size:11px; color:var(--text-muted); line-height:1.5; margin:0 0 10px; }
+    .gh-prev { background:var(--bg-page, rgba(128,128,128,.06)); border-radius:9px; padding:10px 11px;
+        font-size:11px; color:var(--text-secondary, var(--text-muted)); line-height:1.5; }
+    .gh-prev b { display:block; font-size:11.5px; color:var(--text-primary); }
+    .gh-prev .hot { color:var(--bad-text, #dc2626); font-weight:700; }
+    .gh-prev .row { display:flex; justify-content:space-between; gap:8px; padding:2px 0; }
 
-    /* Breakdown */
-    .pg-sec-h { display: flex; align-items: center; gap: 9px; margin-bottom: 4px; }
-    .pg-sec-h svg { width: 20px; height: 20px; color: var(--info-text); }
-    .pg-sec-h b { font-size: 18px; font-weight: 800; color: var(--text-primary); }
-    .pg-sec-sub { font-size: 12.5px; color: var(--text-muted); margin: 0 0 14px; }
+    /* Right rail */
+    .gh-rail { display:flex; flex-direction:column; gap:16px; position:sticky; top:20px; }
+    .gh-rail .gh-card { margin:0; }
+    .gh-rail .gh-due { background:#feedf1; border-color:#fbd5de; }
+    .gh-rail h4 { display:flex; align-items:center; justify-content:space-between; gap:10px;
+        font-size:14px; font-weight:800; color:var(--text-primary); margin:0 0 4px; }
+    .gh-rail h4 .t { display:inline-flex; align-items:center; gap:8px; }
+    .gh-rail h4 svg { width:17px; height:17px; flex:none; }
+    .gh-rail h4 a { font-size:11.5px; font-weight:700; color:var(--accent-blue, #2563eb); text-decoration:none; }
+    .gh-rail .hint { font-size:11.5px; color:var(--text-muted); margin:0 0 11px; }
+    .gh-line { display:flex; gap:11px; align-items:flex-start; padding:9px 0; border-top:1px solid var(--border-color); }
+    .gh-line:first-of-type { border-top:0; }
+    .gh-line .tile { width:30px; height:30px; border-radius:8px; flex:none; display:flex; align-items:center;
+        justify-content:center; color:var(--t); background:color-mix(in srgb, var(--t) 13%, transparent); }
+    .gh-line .tile svg { width:15px; height:15px; }
+    .gh-line .m { min-width:0; flex:1 1 auto; }
+    .gh-line .m b { display:block; font-size:12.5px; font-weight:700; color:var(--text-primary); line-height:1.35; }
+    .gh-line .m span { display:block; font-size:11px; color:var(--text-muted); }
+    .gh-line .at { font-size:11px; font-weight:700; white-space:nowrap; text-align:right; flex:none; color:var(--bad-text, #dc2626); }
+    .gh-line .at i { display:block; font-style:normal; font-weight:600; color:var(--text-muted); }
+    .gh-line .at.cool { color:var(--text-muted); font-weight:600; }
+    .gh-none { font-size:12.5px; color:var(--text-muted); line-height:1.6; }
 
-    /* Click-a-gig cards */
-        color: var(--text-muted); margin: 5px 0 1px; }
-
-    .pg-banner { display: flex; align-items: center; gap: 14px; background: rgba(37,99,235,0.06); border: 1px solid rgba(37,99,235,0.18); border-radius: 14px; padding: 16px 20px; margin-top: 18px; }
-    .pg-banner svg.star { width: 26px; height: 26px; color: var(--info-text); flex-shrink: 0; }
-    .pg-banner-txt { flex: 1; }
-    .pg-banner-txt b { font-size: 13.5px; color: var(--text-primary); }
-    .pg-banner-txt p { font-size: 12px; color: var(--text-muted); margin: 1px 0 0; }
-    .pg-banner a { display: inline-flex; align-items: center; gap: 8px; background: #2563eb; color: #fff; font-size: 13px; font-weight: 800; padding: 11px 18px; border-radius: 10px; text-decoration: none; white-space: nowrap; }
-    .pg-banner a svg { width: 15px; height: 15px; }
-
-    @media (max-width: 1200px) { .pg-top { grid-template-columns: 1fr; } }
-    .pg-work { display: grid; grid-template-columns: minmax(0,1fr) 300px; gap: 18px; align-items: start; }
-    .pg-rail { display: flex; flex-direction: column; gap: 16px; }
-    .pg-rail-h { font-size: 12.5px; font-weight: 800; color: var(--text-primary); margin: 0 0 10px; }
-    .pg-rail-row { padding: 8px 0; border-top: 1px solid var(--border-color); }
-    .pg-rail-row:first-of-type { border-top: 0; }
-    .pg-rail-row b { display: block; font-size: 12.5px; font-weight: 700; color: var(--text-primary); }
-    .pg-rail-row span { display: block; font-size: 11.5px; color: var(--text-secondary, var(--text-muted)); }
-    .pg-rail-row i { font-style: normal; font-size: 10.5px; color: var(--text-muted); }
-    .pg-rail-none { font-size: 12.5px; color: var(--text-muted); }
-    @media (max-width: 1100px) { .pg-work { grid-template-columns: 1fr; } }
-    /* Below the gigs it is one column of explanation, not a side panel. */
-    .pg-top-after { grid-template-columns: 1fr; margin-top: 20px; }
-    @media (max-width: 760px) { .pg-scores { grid-template-columns: 1fr; } }
+    @media (max-width: 1200px) { .gh-layout { grid-template-columns:1fr; } .gh-rail { position:static; }
+        .gh-deep { grid-template-columns:repeat(2, minmax(0,1fr)); } }
+    @media (max-width: 820px) { .gh-tiles { grid-template-columns:1fr; } .gh-deep { grid-template-columns:1fr; } }
 </style>
 @endpush
-<div class="pg">
 
-    {{-- ════════ Top: intro + gig snapshot ════════ --}}
-    <div class="pg-work">
-        <div class="pg-card">
-            <div class="pg-hub-h">
-                <span class="pg-hub-ico"><svg viewBox="0 0 32 28" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="9" width="26" height="17" rx="3.5" fill="#2563eb"/><rect x="3" y="9" width="26" height="17" rx="3.5" fill="url(#hbg)" opacity="0.22"/><rect x="11" y="3.5" width="10" height="6.5" rx="2" fill="#1d4ed8"/><rect x="13" y="5.5" width="6" height="3.2" rx="1.4" fill="#3b82f6"/><rect x="3" y="15" width="26" height="2" fill="rgba(255,255,255,0.4)"/><rect x="13.5" y="16" width="5" height="3.6" rx="1.5" fill="#fff"/><defs><linearGradient id="hbg" x1="3" y1="9" x2="29" y2="26"><stop stop-color="#fff"/><stop offset="1" stop-color="#1e40af"/></linearGradient></defs></svg></span>
-                <div><b>Gig Operations Hub</b><p>Manage all your gigs in one place.</p></div>
-            </div>
-            <div class="pg-scores">
-                <div class="pg-score"><div><div class="pg-score-k">Active Gigs</div><div class="pg-score-v">{{ $stats['active'] }}</div></div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg></div>
-                <div class="pg-score"><div><div class="pg-score-k">Work in Progress</div><div class="pg-score-v">{{ $stats['in_progress'] }}</div></div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2v6h-6M3 12a9 9 0 0 1 15-6.7L21 8M3 22v-6h6M21 12a9 9 0 0 1-15 6.7L3 16"/></svg></div>
-                <div class="pg-score"><div><div class="pg-score-k">Completed</div><div class="pg-score-v">{{ $stats['completed'] }}</div></div><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="9 12 11 14 15 10"/></svg></div>
-            </div>
-            @forelse($gigs as $i => $g)
-                @php
-                    $ev = $g->event;
-                    [$stLabel, $stColor] = \App\Support\GigStatus::for($g, $gigDeposits);
-                    $cr = $crew->get($g->event_id);
-                    $crewTxt = $cr ? ((int)$cr->filled).'/'.((int)$cr->total) : '—';
-                    $mc = optional($msg->get($g->id))->messages_count ?? 0;
-                @endphp
-                <div class="pg-gig">
-                    <span class="pg-gig-thumb" style="background:{{ $thumbs[$i % count($thumbs)] }};"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>
-                    <div class="pg-gig-mid">
-                        <div class="pg-gig-name">{{ \Illuminate\Support\Str::limit($ev?->title ?? 'Gig', 26) }}</div>
-                        <div class="pg-gig-meta">{{ $ev?->starts_at?->format('M d, Y') ?? '—' }} · {{ $ev?->location ? \Illuminate\Support\Str::limit($ev->location,16) : 'TBD' }}</div>
-                        <div class="pg-gig-svc">{{ $ev?->categories->first()?->name ?? 'Service' }}</div>
-                    </div>
-                    <div class="pg-gig-price" style="text-align:right;min-width:96px;">
-                        <b>{{ $g->price ? $money($g->price) : ($ev?->budget ? $money($ev->budget) : '—') }}</b>
-                        <div class="pg-gig-status" style="color:{{ $stColor }};">{{ $stLabel }}</div>
-                    </div>
-                    <div class="pg-gig-stats">
-                        <span class="pg-gig-stat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>{{ $crewTxt }}</span>
-                        <span class="pg-gig-stat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>{{ $mc }}</span>
+
+<div class="gh-layout">
+    <div>
+        <div class="gh-tiles">
+            {{-- Tile colours sampled from her file: #6e00fa, #fe6e00, #00a35f. --}}
+            <a class="gh-tile" style="--c:#6e00fa; --s:#089454;" href="{{ route('professional.calendar.index') }}">
+                <span class="ic">{!! $svg('cal') !!}</span>
+                <span class="m">
+                    <span class="n">{{ $stats['upcoming'] }}</span>
+                    <span class="l">Upcoming Events</span>
+                    <span class="s">
+                        @if($stats['next_event'])
+                            Next event {{ $stats['next_event']->humanAgo() }}
+                        @else
+                            Nothing booked ahead
+                        @endif
+                    </span>
+                </span>
+                <span class="go">{!! $svg('right') !!}</span>
+            </a>
+
+            <a class="gh-tile" style="--c:#fe6e00; --s:#d77100;" href="{{ route('professional.agreements.index') }}">
+                <span class="ic">{!! $svg('doc') !!}</span>
+                <span class="m">
+                    <span class="n">{{ $stats['contracts'] }}</span>
+                    <span class="l">Pending Contracts</span>
+                    <span class="s">
+                        {{ $stats['to_sign'] }} {{ $stats['to_sign'] === 1 ? 'needs' : 'need' }} your signature
+                    </span>
+                </span>
+                <span class="go">{!! $svg('right') !!}</span>
+            </a>
+
+            <a class="gh-tile" style="--c:#00a35f; --s:#2563eb;" href="{{ route('professional.chat.index') }}">
+                <span class="ic">{!! $svg('chat') !!}</span>
+                <span class="m">
+                    <span class="n">{{ $stats['waiting'] }}</span>
+                    {{-- Her card says "Unread Messages". No message on GigResource
+                         carries a read state, so this counts the threads where the
+                         client spoke last, which is the thing that needs answering. --}}
+                    <span class="l">Threads Awaiting You</span>
+                    <span class="s">of {{ $stats['waiting_threads'] }} {{ \Illuminate\Support\Str::plural('conversation', $stats['waiting_threads']) }}</span>
+                </span>
+                <span class="go">{!! $svg('right') !!}</span>
+            </a>
+        </div>
+
+        <div class="gh-card">
+            <h3>
+                <span class="t"><span class="ic">{!! $svg('gigs') !!}</span> Recent Gigs &amp; Contracts</span>
+                <a href="{{ route('professional.gig-hub.index', ['tab' => 'gigs']) }}">View All Gigs &rarr;</a>
+            </h3>
+
+            @if($gigs->count())
+                {{-- Her column widths, measured off the 28 October file:
+                     the card is 906px wide there and the headings sit at
+                     +0 / +241 / +332 / +488 / +720 / +819. --}}
+                <table class="gh-table">
+                    <colgroup>
+                        <col style="width:28.4%;"><col style="width:10.0%;"><col style="width:17.3%;">
+                        <col style="width:25.5%;"><col style="width:11.0%;"><col style="width:7.8%;">
+                    </colgroup>
+                    <thead>
+                        <tr>
+                            <th>Event / Client</th><th>Type</th><th>Status</th>
+                            <th>Key Dates</th><th>Amount</th><th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    @foreach($gigs as $gig)
+                        @php
+                            $event = $gig->event;
+                            $tint  = ['#2563eb', '#7c3aed', '#db2777', '#d97706', '#059669'][crc32((string) $gig->id) % 5];
+
+                            [$type, $typeIcon, $typeTint] = match ($gig->status) {
+                                'completed'   => ['Completed', 'tick',  '#059669'],
+                                'in_progress' => ['Booking',   'gigs',  '#2563eb'],
+                                'confirmed'   => ['Booking',   'gigs',  '#2563eb'],
+                                default       => ['Proposal',  'doc',   '#7c3aed'],
+                            };
+
+                            /*
+                             * Row 133 — one source for the badge, shared with
+                             * the Contracts tab, so the two tabs of one page
+                             * cannot label the same gig differently. They did,
+                             * and writing a second map here is how that
+                             * happened.
+                             */
+                            [$state, , $stateKey] = \App\Support\GigStatus::for($gig);
+                            // Sampled from her file: amber #d77100, green
+                            // #089454, blue #002efa, slate #003365.
+                            $stateTint = [
+                                'awaiting_client'  => '#d77100',
+                                'booked'           => '#089454',
+                                'payment_secured'  => '#089454',
+                                'work_in_progress' => '#002efa',
+                                'awaiting_payment' => '#d77100',
+                                'paid'             => '#089454',
+                                'cancelled'        => '#dc2626',
+                            ][$stateKey] ?? '#003365';
+                        @endphp
+                        <tr>
+                            <td>
+                                <div class="gh-who">
+                                    {{-- No event on this platform stores an image. A light
+                                         tile with the page's own icon, rather than a
+                                         saturated block of colour shouting down the row. --}}
+                                    <span class="gh-thumb" style="--t: {{ $tint }};">{!! $svg('cal') !!}</span>
+                                    <span>
+                                        <b>{{ $event?->title ?? 'Untitled event' }}</b>
+                                        <span>{{ $gig->client?->name ?: 'Client not named' }}</span>
+                                    </span>
+                                </div>
+                            </td>
+
+                            {{-- Her Type column is an icon and a word, with no
+                                 pill behind it. Only Status is a pill, which is
+                                 what makes the two columns readable apart. --}}
+                            <td>
+                                <span class="gh-type" style="--t: {{ $typeTint }};">
+                                    {!! $svg($typeIcon) !!} {{ $type }}
+                                </span>
+                            </td>
+
+                            {{-- Her status pill carries its own mark: a clock
+                                 while somebody is waiting, a tick once it is
+                                 settled. --}}
+                            @php
+                                $stateIcon = match ($stateKey) {
+                                    'awaiting_client', 'awaiting_payment' => 'clock',
+                                    'cancelled'                           => 'alert',
+                                    default                               => 'tick',
+                                };
+                            @endphp
+                            <td>
+                                <span class="gh-chip" style="background: {{ $stateTint }}1f; color: {{ $stateTint }};">
+                                    {!! $svg($stateIcon) !!} {{ $state }}
+                                </span>
+                            </td>
+
+                            {{-- Two lines, the way hers reads: the date, then
+                                 how far off it is. "Updated 2 hours ago" on a
+                                 third line pushed every row to triple height
+                                 and told nobody anything they could act on. --}}
+                            <td class="gh-dates">
+                                @if($event?->starts_at)
+                                    <b>{!! $svg('cal') !!} Event: {{ $on($event->starts_at) }}</b>
+                                    <span class="{{ $event->starts_at->isFuture() ? 'ok' : 'hot' }}">
+                                        {!! $svg('clock') !!} {{ $event->starts_at->humanAgo() }}
+                                    </span>
+                                @else
+                                    <b>No event date</b>
+                                    <span>Updated {{ $gig->updated_at?->humanAgo() }}</span>
+                                @endif
+                            </td>
+
+                            <td class="gh-amt">{{ $gig->price ? $cash($gig->price) : 'No figure' }}</td>
+
+                            <td>
+                                <span class="gh-acts">
+                                    @if($event)
+                                        <a class="gh-btn" href="{{ route('professional.gigs.show', $event) }}">View</a>
+                                        <a class="gh-kebab" href="{{ route('professional.gigs.show', $event) }}"
+                                           aria-label="Open {{ $event->title }}">&#8942;</a>
+                                    @endif
+                                </span>
+                            </td>
+                        </tr>
+                    @endforeach
+                    </tbody>
+                </table>
+            @else
+                <p class="gh-none">No gigs yet. One appears here as soon as a client books you.</p>
+            @endif
+        </div>
+
+        <div class="gh-card">
+            <h3>
+                <span class="t"><span class="ic">{!! $svg('hist') !!}</span>
+                    <span>What Happens If You Click a Gig?
+                        <small>Clicking any event opens a page with the tools to run that specific job.</small>
+                    </span>
+                </span>
+            </h3>
+
+            <div class="gh-deep">
+                <div>
+                    <h5>{!! $svg('cal') !!} Event Details</h5>
+                    <p>See client info, event date, location and service details.</p>
+                    <div class="gh-prev">
+                        @if($gigs->first()?->event)
+                            <b>{{ $gigs->first()->event->title }}</b>
+                            <span>{{ $on($gigs->first()->event->starts_at) }}</span>
+                            <span>{{ $gigs->first()->event->location ?: 'Location not set' }}</span>
+                        @else
+                            Nothing to show yet.
+                        @endif
                     </div>
                 </div>
+
+                <div>
+                    <h5>{!! $svg('pen') !!} Agreement Workspace</h5>
+                    <p>Review, negotiate and e-sign the agreement.</p>
+                    <div class="gh-prev">
+                        <b>Agreement status</b>
+                        @if($stats['to_sign'] > 0)
+                            <span class="hot">{{ $stats['to_sign'] }} awaiting your signature</span>
+                        @elseif($stats['contracts'] > 0)
+                            <span>{{ $stats['contracts'] }} in progress, none on you</span>
+                        @else
+                            <span>Nothing outstanding</span>
+                        @endif
+                    </div>
+                </div>
+
+                <div>
+                    <h5>{!! $svg('chat') !!} Messages</h5>
+                    <p>Keep all client communication in one place.</p>
+                    <div class="gh-prev">
+                        <b>Threads awaiting you</b>
+                        <span>{{ $stats['waiting'] }} of {{ $stats['waiting_threads'] }}</span>
+                    </div>
+                </div>
+
+                <div>
+                    <h5>{!! $svg('cash') !!} Payments &amp; Invoices</h5>
+                    <p>Track deposits, balances and payouts.</p>
+                    <div class="gh-prev">
+                        <span class="row"><span>Earned, after fees</span><b>{{ $cash($money['earned']) }}</b></span>
+                        <span class="row"><span>Paid out</span><b>{{ $cash($money['withdrawn']) }}</b></span>
+                        <span class="row"><span>Available</span><b>{{ $cash($money['available']) }}</b></span>
+                    </div>
+                </div>
+
+                <div>
+                    <h5>{!! $svg('clock') !!} Calendar</h5>
+                    <p>See how this event fits your schedule.</p>
+                    <div class="gh-prev">
+                        <b>Next booked event</b>
+                        @if($stats['next_event'])
+                            <span>{{ $on($stats['next_event']) }}</span>
+                            <span>{{ $stats['next_event']->humanAgo() }}</span>
+                        @else
+                            <span>Nothing booked ahead</span>
+                        @endif
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <aside class="gh-rail">
+        {{-- Tinted, as hers is: the one card on this page that is about a
+             clock running out should not look like the rest. --}}
+        <div class="gh-card gh-due">
+            <h4>
+                <span class="t">{!! $svg('clock', 'style="color:#dc2626;"') !!} Upcoming Deadlines</span>
+                <a href="{{ route('professional.priority.index') }}">View All &rarr;</a>
+            </h4>
+            <p class="hint">Items that need your attention soon.</p>
+
+            @forelse($deadlines as $item)
+                <div class="gh-line" style="--t: {{ $toneTint[$item['tone']] ?? '#64748b' }};">
+                    <span class="tile">{!! $svg($kindIcon[$item['kind']] ?? 'doc') !!}</span>
+                    <span class="m">
+                        <b>{{ $item['title'] }}</b>
+                        @if($item['subject'])<span>{{ $item['subject'] }}</span>@endif
+                    </span>
+                    <span class="at">
+                        Due {{ $on($item['due']) }}
+                        <i>{{ $item['due']->humanAgo() }}</i>
+                    </span>
+                </div>
             @empty
-                <div class="pg-empty">No gigs yet. Win a gig from Live Opportunities to see it here.</div>
+                <p class="gh-none">Nothing with a date on it.</p>
             @endforelse
-            <a href="{{ route('professional.gig-hub.index', ['tab' => 'gigs']) }}" class="pg-viewall">View All Gigs →</a>
         </div>
 
-        <aside class="pg-rail">
-            {{-- Khadijah's 28 October screen carries these two beside the
-                 gigs. Both read records that already exist: there is no
-                 activity log, and adding one would mean a second account of
-                 what the bookings and agreements already know. --}}
-            <div class="pg-card">
-                <h4 class="pg-rail-h">Upcoming deadlines</h4>
-                @forelse ($deadlines as $d)
-                    <div class="pg-rail-row">
-                        <b>{{ $d['title'] }}</b>
-                        <span>{{ $d['subject'] ?: $d['kind'] }}</span>
-                        <i>{{ $d['when'] ?? $d['due']->timezone(config('app.display_timezone'))->format('j M Y') }}</i>
-                    </div>
-                @empty
-                    <div class="pg-rail-none">Nothing with a date on it.</div>
-                @endforelse
-            </div>
+        <div class="gh-card">
+            <h4>
+                <span class="t">{!! $svg('hist') !!} Recent Activity</span>
+                <a href="{{ route('professional.gig-hub.index', ['tab' => 'gigs']) }}">View All &rarr;</a>
+            </h4>
+            <p class="hint">Latest updates across your gigs and messages.</p>
 
-            <div class="pg-card">
-                <h4 class="pg-rail-h">Recent activity</h4>
-                @forelse ($activity as $a)
-                    <div class="pg-rail-row">
-                        <b>{{ $a['what'] }}</b>
-                        @if ($a['subject']) <span>{{ $a['subject'] }}</span> @endif
-                        <i>{{ $a['at']->humanAgo() }}</i>
-                    </div>
-                @empty
-                    <div class="pg-rail-none">Nothing has happened yet.</div>
-                @endforelse
-            </div>
-        </aside>
-    </div>
-
-
-    {{-- The explanation sat beside the gigs at half width, so somebody
-         opening this page read about the page before they could read their
-         own jobs. Khadijah's screen puts the work first, so it moved under
-         them. --}}
-    <div class="pg-top pg-top-after">
-        <div class="pg-intro">
-            <div class="pg-art">
-                <svg viewBox="0 0 120 110" fill="none" xmlns="http://www.w3.org/2000/svg">
-                    <ellipse cx="62" cy="60" rx="54" ry="44" fill="#eef2ff"/>
-                    <rect x="26" y="44" width="72" height="50" rx="9" fill="#2563eb"/>
-                    <rect x="26" y="44" width="72" height="50" rx="9" fill="url(#bg)" opacity="0.25"/>
-                    <rect x="48" y="34" width="28" height="16" rx="5" fill="#1d4ed8"/>
-                    <rect x="52" y="38" width="20" height="9" rx="3" fill="#3b82f6"/>
-                    <rect x="26" y="62" width="72" height="5" fill="rgba(255,255,255,0.35)"/>
-                    <rect x="56" y="66" width="12" height="9" rx="2.5" fill="#fff"/>
-                    <path d="M150 30" /><path d="M104 40l1.4 4 4 1.4-4 1.4-1.4 4-1.4-4-4-1.4 4-1.4z" fill="#f59e0b"/>
-                    <path d="M20 36l1.2 3.4 3.4 1.2-3.4 1.2-1.2 3.4-1.2-3.4-3.4-1.2 3.4-1.2z" fill="#60a5fa"/>
-                    <defs><linearGradient id="bg" x1="26" y1="44" x2="98" y2="94"><stop stop-color="#fff"/><stop offset="1" stop-color="#1e40af"/></linearGradient></defs>
-                </svg>
-            </div>
-            <h1>Gig Operations Hub</h1>
-            <div class="tag">Manage all your gigs in one place.</div>
-            <p>Your centralized control center to track jobs, monitor earnings, manage staffing, and organize communications, all in one powerful dashboard.</p>
-            <div class="pg-feat x1"><span class="pg-feat-ico" style="background:rgba(139,92,246,0.14);color:var(--accent-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19.5 12.5l-7 7a2 2 0 0 1-2.8 0l-7-7a2 2 0 0 1 0-2.8l7-7a2 2 0 0 1 2.8 0l7 7a2 2 0 0 1 0 2.8z"/></svg></span><div><b>Stops Confusion</b><p>Gathers scattered details into one view.</p></div></div>
-            <div class="pg-feat x2"><span class="pg-feat-ico" style="background:rgba(16,185,129,0.14);color:var(--ok-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v12M9 9.5a2.5 2.5 0 0 1 5 0M9 14.5a2.5 2.5 0 0 0 5 0"/></svg></span><div><b>Tracks Money</b><p>Shows exactly how much each job pays.</p></div></div>
-            <div class="pg-feat x3"><span class="pg-feat-ico" style="background:rgba(249,115,22,0.14);color:var(--brand-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg></span><div><b>Manages Teams</b><p>Helps verify that enough workers are assigned to every event.</p></div></div>
-            <div class="pg-feat x4"><span class="pg-feat-ico" style="background:rgba(37,99,235,0.14);color:var(--info-text);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span><div><b>One place</b><p>Your gigs, their money and their messages on one screen.</p></div></div>
+            @forelse($activity as $row)
+                @php
+                    /*
+                     * Her rows are coloured by what happened, not all one
+                     * blue: money green, paperwork amber, a cancellation
+                     * red, a message blue.
+                     */
+                    [$aTint, $aIcon] = match (true) {
+                        str_contains($row['what'], 'cancelled')  => ['#dc2626', 'alert'],
+                        str_contains($row['what'], 'completed')  => ['#059669', 'tick'],
+                        str_contains($row['what'], 'confirmed')  => ['#059669', 'tick'],
+                        str_contains($row['what'], 'signed')     => ['#d97706', 'pen'],
+                        str_contains($row['what'], 'greement')   => ['#d97706', 'pen'],
+                        str_contains($row['what'], 'asked')      => ['#2563eb', 'chat'],
+                        default                                  => ['#2563eb', 'gigs'],
+                    };
+                @endphp
+                <div class="gh-line" style="--t: {{ $aTint }};">
+                    <span class="tile">{!! $svg($aIcon) !!}</span>
+                    <span class="m">
+                        <b>{{ $row['what'] }}</b>
+                        @if($row['subject'])<span>{{ $row['subject'] }}</span>@endif
+                    </span>
+                    <span class="at cool">{{ $row['at']?->humanAgo() }}</span>
+                </div>
+            @empty
+                <p class="gh-none">Nothing has happened on your gigs yet.</p>
+            @endforelse
         </div>
-    </div>
-
-    {{-- Two sections stood here and both are gone.
-
-         The first was a "Detailed Section Breakdown": three columns
-         explaining this page, on this page, the last of them a drawing of an
-         interface shown inside the interface. The same block was on My
-         Calendar, the Lead Pipeline and Bid Intelligence, and went from all
-         four for the same reason.
-
-         The second was "What happens if you click a gig", and it was the
-         largest invented thing on the professional side. A map with a route
-         drawn on it and "1 hr 23 min (84.6 mi)" — no maps provider exists, so
-         that was the same distance for every gig on the platform. A team chat
-         with three messages nobody sent. An inventory of chicken, salmon,
-         chafing dishes and serving tables, for a caterer who may be a DJ. And
-         an event of 120 guests on a $4,000 contract with 3 of 5 crew
-         assigned, none of it belonging to the person reading it.
-
-         A professional opening their own Gig Operations Hub saw somebody
-         else's job, in detail, and had no way to know it was not theirs. --}}
-
-    {{-- ════════ Bottom banner ════════ --}}
-    <div class="pg-banner">
-        <svg class="star" viewBox="0 0 24 24" fill="currentColor"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-        {{-- "profitable" and "stress-free" are promises about somebody's
-             business, which Sir Peter's rules on claims forbid. --}}
-        <div class="pg-banner-txt"><b>Your gigs, in one place.</b><p>What is booked, what is owed, and what still needs doing.</p></div>
-        <a href="{{ route('professional.dashboard') }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Go to Dashboard</a>
-    </div>
+    </aside>
 </div>

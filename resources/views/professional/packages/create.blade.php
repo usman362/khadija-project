@@ -3,8 +3,8 @@
 @php $p = $package ?? null; $editing = (bool) $p; @endphp
 
 @section('title', $editing ? 'Edit Package' : 'Create a Package')
-@section('page-title', $editing ? 'Edit Package' : 'Create a Package for Clients')
-@section('page-subtitle', 'Build a clear, valuable package that clients can book with confidence.')
+@section('page-title', $editing ? 'Edit Package' : 'Create a Package')
+@section('page-subtitle', 'Bundle your services into a package to attract more clients. Use your existing services, set pricing, and customize the details.')
 
 {{-- Professional — Create a Package for Package Search. A pro bundles 2+ of
      their own services (solo — one professional) into a fixed offering that
@@ -51,19 +51,27 @@
     .pc { --pc: #2563eb; --pc-dark: #1d4ed8; --pc-soft: #eff6ff; }
     .pc-grid { display: grid; grid-template-columns: minmax(0,1fr) 320px; gap: 22px; align-items: start; }
 
-    .pc-stepper { display: flex; align-items: center; background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; padding: 16px 20px; margin-bottom: 20px; }
+    /* Her stepper: the number sits above its label, and the line runs
+       between the circles rather than between the whole blocks. */
+    .pc-stepper { display: flex; align-items: flex-start; background: var(--bg-card);
+        border: 1px solid var(--border-color); border-radius: 14px; padding: 18px 20px 16px; margin-bottom: 20px; }
     .pc-own { margin-top: 10px; padding: 10px 12px; border: 1px solid var(--border-color); border-radius: 10px; background: var(--bg-card-hover, transparent); }
     .pc-own b { display: block; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: .3px; color: var(--text-muted); margin-bottom: 6px; }
     .pc-own-row, .pc-own-sum { display: flex; justify-content: space-between; gap: 10px; font-size: 12.5px; color: var(--text-secondary); padding: 3px 0; }
     .pc-own-row i, .pc-own-sum i { font-style: normal; font-weight: 700; color: var(--text-primary); }
     .pc-own-sum { border-top: 1px solid var(--border-color); margin-top: 5px; padding-top: 6px; font-weight: 700; color: var(--text-primary); }
-    .pc-step { display: flex; align-items: center; gap: 11px; flex: 1; cursor: pointer; }
-    .pc-step .num { width: 30px; height: 30px; border-radius: 50%; background: var(--bg-card-hover, #e5e7eb); color: var(--text-muted); font-weight: 800; font-size: 14px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-    .pc-step.on .num, .pc-step.done .num { background: var(--pc); color: #fff; }
-    .pc-step .lbl b { display: block; font-size: 13.5px; font-weight: 800; color: var(--text-muted); line-height: 1.2; }
+    .pc-step { display: flex; flex-direction: column; align-items: center; gap: 9px;
+        flex: 1 1 auto; min-width: 0; cursor: pointer; text-align: center; padding: 0 2px; }
+    .pc-step .num { width: 34px; height: 34px; border-radius: 50%; background: var(--bg-card);
+        border: 2px solid var(--border-color); color: var(--text-muted); font-weight: 800; font-size: 14px;
+        display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .pc-step.on .num, .pc-step.done .num { background: var(--pc); border-color: var(--pc); color: #fff; }
+    .pc-step .lbl b { display: block; font-size: 12.5px; font-weight: 800; color: var(--text-muted); line-height: 1.25; white-space: nowrap; }
     .pc-step.on .lbl b, .pc-step.done .lbl b { color: var(--text-primary); }
-    .pc-step .lbl span { font-size: 11.5px; color: var(--text-muted); }
-    .pc-step .bar { flex: 1; height: 2px; background: var(--border-color); margin: 0 6px; }
+    .pc-step .lbl span { display: block; font-size: 10.5px; color: var(--text-muted); line-height: 1.4; margin-top: 2px; }
+    /* The connector lines up with the middle of the circles above it. */
+    .pc-stepper .bar { flex: 0 1 60px; min-width: 12px; height: 2px; background: var(--border-color); margin: 17px -2px 0; }
+    .pc-stepper .bar.done { background: var(--pc); }
 
     .pc-panel { display: none; }
     .pc-panel.on { display: block; }
@@ -110,43 +118,80 @@
 
     /* Step 1 — the professional's own services as cards, per Khadijah's screen. */
     .pc-svctools { display: grid; grid-template-columns: minmax(0,2fr) 1fr 1fr; gap: 10px; margin-bottom: 16px; }
-    .pc-svcgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px,1fr)); gap: 12px; }
-    .pc-svccard { position: relative; border: 2px solid var(--border-color); border-radius: 12px; padding: 14px; cursor: pointer; display: block; }
-    .pc-svccard.on { border-color: var(--pc); background: color-mix(in srgb, var(--pc) 12%, transparent); }
+    .pc-svcgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(196px,1fr)); gap: 14px; }
+    /* display on the element itself beats the hidden attribute, which is how
+       a filtered-out service stayed on the grid. Third time on this project. */
+    .pc-svccard:not([hidden]) { display: block; }
+    .pc-svccard { position: relative; border: 2px solid var(--border-color); border-radius: 13px;
+        cursor: pointer; overflow: hidden; background: var(--bg-card); }
+    .pc-svccard.on { border-color: var(--pc); }
     .pc-svccard input { position: absolute; opacity: 0; pointer-events: none; }
-    .pc-svccard .tick { position: absolute; top: 10px; right: 10px; width: 20px; height: 20px; border-radius: 6px;
-        border: 1.5px solid var(--border-color); background: var(--bg-card); color: #fff;
+    .pc-svccard .media { position: relative; display: flex; align-items: center; justify-content: center;
+        height: 108px; background: linear-gradient(135deg, color-mix(in srgb, var(--t) 85%, #000),
+        color-mix(in srgb, var(--t) 45%, #000)); overflow: hidden; }
+    .pc-svccard .media img { width: 100%; height: 100%; object-fit: cover; }
+    .pc-svccard .media .initial { font-size: 30px; font-weight: 800; color: rgba(255,255,255,.85); }
+    .pc-svccard .tick { position: absolute; top: 9px; left: 9px; width: 22px; height: 22px; border-radius: 50%;
+        border: 2px solid rgba(255,255,255,.85); background: rgba(0,0,0,.2); color: #fff;
         display: flex; align-items: center; justify-content: center; }
     .pc-svccard .tick svg { width: 12px; height: 12px; opacity: 0; }
     .pc-svccard.on .tick { background: var(--pc); border-color: var(--pc); }
     .pc-svccard.on .tick svg { opacity: 1; }
-    .pc-svccard b { display: block; font-size: 13.5px; font-weight: 800; color: var(--text-primary); padding-right: 26px; line-height: 1.25; }
+    .pc-svccard .live { position: absolute; top: 9px; right: 9px; font-size: 10.5px; font-weight: 700;
+        padding: 3px 9px; border-radius: 20px; background: rgba(209,250,229,.95); color: #047857; }
+    .pc-svccard .live.off { background: rgba(241,245,249,.95); color: #475569; }
+    .pc-svccard .body { display: block; padding: 11px 13px 13px; }
+    .pc-svccard b { display: block; font-size: 13.5px; font-weight: 800; color: var(--text-primary); line-height: 1.25; }
     .pc-svccard .cat { display: block; font-size: 11.5px; color: var(--text-muted); margin-top: 3px; }
-    .pc-svccard .price { display: block; font-size: 15px; font-weight: 800; color: var(--text-primary); margin-top: 9px; }
+    .pc-svccard .price { display: block; font-size: 17px; font-weight: 800; color: var(--text-primary); margin-top: 9px; }
     .pc-svccard .price i { display: block; font-style: normal; font-size: 11px; font-weight: 600; color: var(--text-muted); }
     .pc-svcnone { font-size: 13px; color: var(--text-muted); padding: 16px 0; }
 
-    .pc-picked { list-style: none; padding: 0; margin: 0; }
-    .pc-picked li { display: flex; align-items: center; justify-content: space-between; gap: 10px;
-        padding: 10px 0; border-bottom: 1px solid var(--border-color); font-size: 13.5px; color: var(--text-primary); }
-    .pc-picked li:last-child { border-bottom: 0; }
-    .pc-picked li i { font-style: normal; font-weight: 800; }
-    .pc-picked li .none { font-weight: 600; color: var(--text-muted); font-size: 12px; }
-    .pc-picked-empty { font-size: 13px; color: var(--text-muted); }
+    .pc-picked-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .pc-clearall { background: none; border: 0; padding: 0; cursor: pointer; font-family: inherit;
+        font-size: 12px; font-weight: 700; color: var(--pc); }
+    .pc-picked { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 9px; }
+    .pc-picked li { display: flex; align-items: center; gap: 9px; padding: 9px 10px;
+        border: 1px solid var(--border-color); border-radius: 11px; background: var(--bg-card); }
+    .pc-picked li.drag { opacity: .45; }
+    .pc-picked .grip { color: var(--text-muted); cursor: grab; flex: none; line-height: 1;
+        font-size: 13px; letter-spacing: -2px; }
+    .pc-picked .thumb { width: 44px; height: 34px; border-radius: 7px; flex: none; overflow: hidden;
+        display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,.9);
+        font-size: 13px; font-weight: 800; }
+    .pc-picked .thumb img { width: 100%; height: 100%; object-fit: cover; }
+    .pc-picked .m { min-width: 0; flex: 1 1 auto; }
+    .pc-picked .m b { display: block; font-size: 12.5px; font-weight: 800; color: var(--text-primary);
+        line-height: 1.3; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .pc-picked .m .c { display: block; font-size: 11px; color: var(--text-muted); }
+    .pc-picked .m .p { display: block; font-size: 11.5px; font-weight: 700; color: var(--text-primary); margin-top: 1px; }
+    .pc-picked .m .p.none { font-weight: 600; color: var(--text-muted); }
+    .pc-picked .x { flex: none; width: 22px; height: 22px; border-radius: 50%; border: 0; cursor: pointer;
+        background: none; color: var(--text-muted); font-size: 13px; line-height: 1; font-family: inherit; }
+    .pc-picked .x:hover { background: var(--bg-card-hover); color: var(--bad-text); }
+    .pc-picked-empty { font-size: 12.5px; color: var(--text-muted); }
+    .pc-picked-tip:not([hidden]) { display: flex; gap: 8px; margin-top: 12px; padding: 10px 11px;
+        border-radius: 10px; background: color-mix(in srgb, var(--pc) 9%, transparent); }
+    .pc-picked-tip svg { width: 14px; height: 14px; flex: none; color: var(--pc); margin-top: 1px; }
+    .pc-picked-tip span { font-size: 11px; color: var(--text-secondary, var(--text-muted)); line-height: 1.5; }
+    .pc-picked-tip b { display: block; font-weight: 800; color: var(--text-primary); }
     /* display on the element itself would beat the hidden attribute, which is
        how this row showed a $0 total with nothing selected. */
     .pc-picked-sum:not([hidden]) { display: flex; align-items: center; justify-content: space-between; gap: 10px;
         margin-top: 14px; padding-top: 13px; border-top: 2px solid var(--border-color); }
-    .pc-picked-sum span { font-size: 13px; font-weight: 700; color: var(--text-primary); }
-    .pc-picked-sum small { display: block; font-size: 11px; font-weight: 600; color: var(--text-muted); }
-    .pc-picked-sum b { font-size: 19px; font-weight: 900; color: var(--text-primary); }
+    .pc-picked-sum span { font-size: 12.5px; font-weight: 800; color: var(--text-primary); }
+    .pc-picked-sum small { display: block; font-size: 10.5px; font-weight: 600; color: var(--text-muted);
+        line-height: 1.45; margin-top: 2px; }
+    .pc-picked-sum b { font-size: 21px; font-weight: 900; color: var(--text-primary); white-space: nowrap; }
 
     .pc-rep-item { display: flex; gap: 8px; margin-bottom: 8px; }
     .pc-rep-item input { flex: 1; }
     .pc-rep-del { border: 1px solid var(--border-color); background: var(--bg-card); border-radius: 9px; padding: 0 12px; color: var(--text-muted); cursor: pointer; }
     .pc-addbtn { border: 1px dashed var(--border-color); background: var(--bg-card); border-radius: 9px; padding: 9px 14px; font-size: 13px; font-weight: 700; color: var(--pc); cursor: pointer; }
 
-    .pc-actions { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 6px; }
+    .pc-actions { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 6px;
+        background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; padding: 14px 16px; }
+    .pc-actions-r { display: inline-flex; align-items: center; gap: 10px; }
     .pc-btn { border-radius: 11px; padding: 12px 22px; font-size: 14px; font-weight: 800; cursor: pointer; border: none; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; }
     .pc-btn-primary { background: var(--pc); color: #fff; }
     .pc-btn-primary:hover { background: var(--pc-dark); }
@@ -154,6 +199,8 @@
     .pc-head { display: flex; align-items: center; justify-content: flex-end; gap: 10px; margin-bottom: 16px; }
 
     .pc-side { display: flex; flex-direction: column; gap: 16px; position: sticky; top: 84px; }
+    /* Her step 1 rail holds the picked services and nothing else. */
+    .pc-afterone[hidden] { display: none; }
     .pc-scard { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 16px; padding: 16px; }
     .pc-scard h4 { font-size: 13.5px; font-weight: 800; color: var(--text-primary); margin: 0 0 12px; display: flex; align-items: center; gap: 7px; }
     .pc-prev-media { aspect-ratio: 16/10; border-radius: 12px; background: linear-gradient(135deg,#e2e8f0,#eff6ff); overflow: hidden; margin-bottom: 12px; display: flex; align-items: center; justify-content: center; color: var(--text-muted); font-size: 12px; }
@@ -263,11 +310,16 @@
          safe. This is the single button, and the card at the foot of the page
          submits this same one rather than being a second, different thing. --}}
     <div class="pc-head">
-        <a href="{{ route('professional.packages.index') }}" class="pc-btn pc-btn-ghost">Cancel</a>
         @if($editing)
             <a href="{{ route('public.package', $p->slug) }}" class="pc-btn pc-btn-ghost" target="_blank" rel="noopener">Preview as Client</a>
         @endif
-        <button type="submit" name="is_active" value="0" class="pc-btn pc-btn-ghost" id="pcDraftBtn">Save as Draft</button>
+        {{-- There is no separate help guide; the FAQ is the help page this
+             platform actually has, so the button goes there. --}}
+        <a href="{{ route('public.faq') }}" class="pc-btn pc-btn-ghost">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                 style="width:16px;height:16px;"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3"/><path d="M12 17h.01"/></svg>
+            View Help Guide
+        </a>
     </div>
 
     <div class="pc-stepper" id="pcStepper">
@@ -310,38 +362,66 @@
                                     <option value="{{ $catName }}">{{ $catName }}</option>
                                 @endforeach
                             </select>
+                            {{-- "Active" is the switch on My Services & Pricing:
+                                 a service turned off is one this professional
+                                 is not taking work for, so it should not be
+                                 bundled into something clients can book. --}}
                             <select id="pcSvcPriced" class="pc-select" onchange="pcSvcFilter()">
-                                <option value="">All services</option>
-                                <option value="priced">Priced services only</option>
+                                <option value="active">Active Services Only</option>
+                                <option value="">All Services</option>
+                                <option value="priced">Priced Services Only</option>
                             </select>
                         </div>
 
                         <div class="pc-svcgrid" id="pcSvcList">
                             @foreach($myServices as $svc)
                                 @php
-                                    $svcPrice = $svc->pivot->price;
-                                    $svcOn    = in_array($svc->name, $pServices, true);
+                                    $svcPrice  = $svc->pivot->price;
+                                    $svcOn     = in_array($svc->name, $pServices, true);
+                                    $svcLive   = (bool) ($svc->pivot->is_active ?? true);
+                                    $svcImage  = $svc->thumbnail ?: $svc->cover_image;
+                                    // No photograph is stored for most services, so the
+                                    // tile is a tile. A stock picture of somebody else's
+                                    // wedding would say this is what you get.
+                                    $svcTint   = ['#2563eb', '#7c3aed', '#db2777', '#d97706', '#059669'][
+                                        crc32($svc->name) % 5];
                                 @endphp
                                 <label class="pc-svccard {{ $svcOn ? 'on' : '' }}"
                                        data-svccard
                                        data-name="{{ Str::lower($svc->name) }}"
                                        data-cat="{{ $svc->parent?->name }}"
+                                       data-live="{{ $svcLive ? '1' : '0' }}"
                                        data-priced="{{ $svcPrice !== null ? '1' : '0' }}">
                                     <input type="checkbox" name="services[]" value="{{ $svc->name }}"
                                            data-price="{{ $svcPrice !== null ? (float) $svcPrice : '' }}"
+                                           data-cat="{{ $svc->parent?->name }}"
+                                           data-unit="{{ $svc->pivot->price_unit ?: 'flat rate' }}"
+                                           data-tint="{{ $svcTint }}"
                                            @checked($svcOn) onchange="pcSvcSync()">
-                                    <span class="tick" aria-hidden="true">
-                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg>
-                                    </span>
-                                    <b>{{ $svc->name }}</b>
-                                    <span class="cat">{{ $svc->parent?->name ?? 'Service' }}</span>
-                                    <span class="price">
-                                        @if($svcPrice !== null)
-                                            ${{ number_format((float) $svcPrice, 0) }}
-                                            <i>{{ $svc->pivot->price_unit ?: 'flat rate' }}</i>
+
+                                    <span class="media" style="--t: {{ $svcTint }};">
+                                        @if($svcImage)
+                                            <img src="{{ $svcImage }}" alt="" loading="lazy">
                                         @else
-                                            <i>No price set</i>
+                                            <span class="initial">{{ Str::upper(Str::substr($svc->name, 0, 1)) }}</span>
                                         @endif
+                                        <span class="tick" aria-hidden="true">
+                                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><path d="M20 6 9 17l-5-5"/></svg>
+                                        </span>
+                                        <span class="live {{ $svcLive ? '' : 'off' }}">{{ $svcLive ? 'Active' : 'Inactive' }}</span>
+                                    </span>
+
+                                    <span class="body">
+                                        <b>{{ $svc->name }}</b>
+                                        <span class="cat">{{ $svc->parent?->name ?? 'Service' }}</span>
+                                        <span class="price">
+                                            @if($svcPrice !== null)
+                                                ${{ number_format((float) $svcPrice, 0) }}
+                                                <i>{{ $svc->pivot->price_unit ?: 'flat rate' }}</i>
+                                            @else
+                                                <i>No price set</i>
+                                            @endif
+                                        </span>
                                     </span>
                                 </label>
                             @endforeach
@@ -370,22 +450,18 @@
                     <div class="pc-svccount" id="pcSvcCount">Total Services: <b>0</b> &middot; Minimum 2 required to appear in Package Search</div>
                 </div>
 
-                {{-- What they have picked, and what those parts cost booked one
-                     at a time. The discount on step 3 is measured against this
-                     number, so it is shown here before it is used there. --}}
-                <div class="pc-card" id="pcPicked">
-                    <h3 style="margin-bottom:12px;">Selected Services (<span id="pcPickedN">0</span>)</h3>
-                    <ul class="pc-picked" id="pcPickedList"></ul>
-                    <div class="pc-picked-empty" id="pcPickedEmpty">Nothing selected yet. A package needs at least two.</div>
-                    <div class="pc-picked-sum" id="pcPickedSum" hidden>
-                        <span>Booked separately<small>Total if each service is booked on its own</small></span>
-                        <b id="pcPickedTotal">$0</b>
-                    </div>
-                </div>
-
                 <div class="pc-actions">
                     <a href="{{ route('professional.packages.index') }}" class="pc-btn pc-btn-ghost">Cancel</a>
-                    <button type="button" class="pc-btn pc-btn-primary" data-next="2">Save &amp; Continue to Package Details &rarr;</button>
+                    <span class="pc-actions-r">
+                        <button type="submit" name="is_active" value="0" class="pc-btn pc-btn-ghost">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                                 stroke-linecap="round" stroke-linejoin="round" style="width:15px;height:15px;">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6"/>
+                            </svg>
+                            Save as Draft
+                        </button>
+                        <button type="button" class="pc-btn pc-btn-primary" data-next="2">Next Step &rarr;</button>
+                    </span>
                 </div>
             </div>
 
@@ -723,7 +799,35 @@
                  Terms, which are not sections of this form and have no fields
                  behind them. Counting them would mean a package could never
                  reach 100%. --}}
-            <div class="pc-scard">
+            {{-- What they have picked, and what those parts cost booked one at a
+                 time. The discount on step 3 is measured against this number,
+                 so it is shown here before it is used there. --}}
+            <div class="pc-scard" id="pcPicked">
+                <h4 class="pc-picked-head">
+                    <span>Selected Services (<span id="pcPickedN">0</span>)</span>
+                    <button type="button" id="pcPickedClear" class="pc-clearall" hidden>Clear All</button>
+                </h4>
+                <ul class="pc-picked" id="pcPickedList"></ul>
+                <div class="pc-picked-empty" id="pcPickedEmpty">Nothing selected yet. A package needs at least two.</div>
+
+                {{-- The order is the order they are listed in, and dragging
+                     changes it. Said here because nothing else on the card
+                     shows that the handles do anything. --}}
+                <div class="pc-picked-tip" id="pcPickedTip" hidden>
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                        <circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>
+                    </svg>
+                    <span><b>You can change the order of services by dragging.</b>
+                    These services will be bundled together in this package.</span>
+                </div>
+
+                <div class="pc-picked-sum" id="pcPickedSum" hidden>
+                    <span>Estimated Individual Total<small>Total if each service is booked separately at base price.</small></span>
+                    <b id="pcPickedTotal">$0</b>
+                </div>
+            </div>
+
+            <div class="pc-scard pc-afterone">
                 <h4>Package Readiness</h4>
                 <div class="pc-ring">
                     <svg viewBox="0 0 120 120" aria-hidden="true">
@@ -747,8 +851,8 @@
                 </ul>
             </div>
 
-            <div class="pc-scard">
-                <h4>👁 Package Preview</h4>
+            <div class="pc-scard pc-afterone">
+                <h4>Package Preview</h4>
                 <div class="pc-prev-media" id="pcPrevMedia">Cover photo preview</div>
                 <div class="pc-prev-title" id="pcPrevTitle">{{ old('title', $p?->title) ?: 'Your package name' }}</div>
                 <span class="pc-prev-type" id="pcPrevType">Service Package</span>
@@ -764,8 +868,8 @@
                 @endif
             </div>
 
-            <div class="pc-scard">
-                <h4>💡 Package Highlights</h4>
+            <div class="pc-scard pc-afterone">
+                <h4>Package Highlights</h4>
                 <ul class="pc-list">
                     {{-- "Build trust with verified badge" only when there is a
                          badge to show. Every verification mark on the site was
@@ -785,8 +889,8 @@
                 </ul>
             </div>
 
-            <div class="pc-scard">
-                <h4>✨ Tips for a Great Package</h4>
+            <div class="pc-scard pc-afterone">
+                <h4>Tips for a Great Package</h4>
                 <ul class="pc-tips" style="list-style:none;padding:0;margin:0;">
                     <li>Include at least 2 complementary services</li>
                     <li>Use high-quality photos and clear descriptions</li>
@@ -795,8 +899,8 @@
                 </ul>
             </div>
 
-            <div class="pc-scard pc-help">
-                <h4>🎧 Need Help?</h4>
+            <div class="pc-scard pc-help pc-afterone">
+                <h4>Need Help?</h4>
                 <p>Our support team is here to help you create the perfect package.</p>
                 {{-- Row 122 — pointed at client↔professional messaging, which
                      reaches another user rather than the platform. --}}
@@ -805,39 +909,12 @@
         </aside>
     </div>
 
-    {{-- The three cards the mockup ends on. "Save as Draft Anytime" submits the
-         SAME button as the header — one feature, two doorways, not two features
-         that might behave differently. --}}
-    <div class="pc-trio">
-        <div class="pc-tcard">
-            <span class="ic">🎧</span>
-            <div>
-                <b>Need Assistance?</b>
-                <span>Our support team is here to help you build the package.</span>
-                <a href="{{ \App\Domain\Forms\FormRegistry::url('support_request') }}">Contact Support →</a>
-            </div>
-        </div>
-        <div class="pc-tcard">
-            <span class="ic">💾</span>
-            <div>
-                <b>Save as Draft Anytime</b>
-                <span>Save your progress and come back to finish later. Nothing is live until you publish.</span>
-                <button type="button" onclick="document.getElementById('pcDraftBtn').click()">Save Draft</button>
-            </div>
-        </div>
-        <div class="pc-tcard">
-            <span class="ic">👁</span>
-            <div>
-                <b>Preview as Client</b>
-                <span>See exactly how your package looks to clients before publishing.</span>
-                @if($editing)
-                    <a href="{{ route('public.package', $p->slug) }}" target="_blank" rel="noopener">Preview as Client →</a>
-                @else
-                    <span style="color:var(--text-muted);">Available once you save a draft.</span>
-                @endif
-            </div>
-        </div>
-    </div>
+    {{-- The three cards an older mockup ended on are gone. Her 28 October
+         screen ends at the action bar, and all three were a second doorway to
+         something already on this page: help is the button in the header,
+         saving a draft is the button in the bar, and previewing is in the
+         header once there is a draft to preview. One of them clicked a
+         button that no longer exists. --}}
 </form>
 </div>
 
@@ -849,6 +926,14 @@
             s.classList.toggle('on', s.dataset.step == n);
             s.classList.toggle('done', parseInt(s.dataset.step) < n);
         });
+
+        /* The connector between two circles is filled once the step on its
+           left has been passed, so the line reads as progress. */
+        var bars = document.querySelectorAll('#pcStepper .bar');
+        Array.prototype.forEach.call(bars, function (b, i) { b.classList.toggle('done', i + 1 < n); });
+
+        if (window.pcStepRail) { window.pcStepRail(parseInt(n)); }
+
         window.scrollTo({ top: 0, behavior: 'smooth' });
     }
     document.querySelectorAll('[data-next]').forEach(function (b) { b.addEventListener('click', function () { goStep(b.dataset.next); }); });
@@ -1069,19 +1154,61 @@
             if (has) { total += parseFloat(raw) || 0; } else { unpriced++; }
 
             var li = document.createElement('li');
-            var name = document.createElement('span');
+            li.draggable = true;
+
+            var grip = document.createElement('span');
+            grip.className = 'grip';
+            grip.textContent = '\u2059\u2059';
+            grip.setAttribute('aria-hidden', 'true');
+
+            var thumb = document.createElement('span');
+            thumb.className = 'thumb';
+            thumb.style.background = c.dataset.tint || '#64748b';
+            thumb.textContent = (c.value || '?').charAt(0).toUpperCase();
+
+            var m = document.createElement('span');
+            m.className = 'm';
+
+            var name = document.createElement('b');
             name.textContent = c.value;
-            var amount = document.createElement(has ? 'i' : 'span');
-            if (!has) { amount.className = 'none'; }
-            amount.textContent = has ? ('$' + (parseFloat(raw) || 0).toLocaleString()) : 'No price set';
-            li.appendChild(name);
-            li.appendChild(amount);
+            name.title = c.value;
+
+            var cat = document.createElement('span');
+            cat.className = 'c';
+            cat.textContent = c.dataset.cat || 'Service';
+
+            var price = document.createElement('span');
+            price.className = has ? 'p' : 'p none';
+            price.textContent = has
+                ? ('$' + (parseFloat(raw) || 0).toLocaleString() + ' ' + (c.dataset.unit || ''))
+                : 'No price set';
+
+            m.appendChild(name); m.appendChild(cat); m.appendChild(price);
+
+            /* Removing from here unticks the card, so the two can never show
+               different things about the same service. */
+            var x = document.createElement('button');
+            x.type = 'button';
+            x.className = 'x';
+            x.setAttribute('aria-label', 'Remove ' + c.value);
+            x.textContent = '\u2715';
+            x.addEventListener('click', function () { c.checked = false; pcSvcSync(); });
+
+            li.appendChild(grip); li.appendChild(thumb); li.appendChild(m); li.appendChild(x);
             list.appendChild(li);
         });
+
+        pcPickedDrag(list);
 
         var nEl = document.getElementById('pcPickedN');
         if (nEl) { nEl.textContent = n; }
         if (empty) { empty.hidden = n > 0; }
+
+        var tip = document.getElementById('pcPickedTip');
+        if (tip) { tip.hidden = n < 2; }
+
+        var clear = document.getElementById('pcPickedClear');
+        if (clear) { clear.hidden = n === 0; }
         if (sumEl) {
             sumEl.hidden = total <= 0;
             var totalEl = document.getElementById('pcPickedTotal');
@@ -1096,6 +1223,53 @@
         pcSummary();
     };
 
+    /* Dragging reorders the list, and the order is the order the services
+       are stored in, so the package reads the way it was arranged. */
+    function pcPickedDrag(list) {
+        var from = null;
+
+        list.querySelectorAll('li').forEach(function (li) {
+            li.addEventListener('dragstart', function () { from = li; li.classList.add('drag'); });
+            li.addEventListener('dragend', function () { li.classList.remove('drag'); pcPickedOrder(); });
+            li.addEventListener('dragover', function (e) {
+                e.preventDefault();
+                if (!from || from === li) { return; }
+                var box = li.getBoundingClientRect();
+                var after = (e.clientY - box.top) > box.height / 2;
+                list.insertBefore(from, after ? li.nextSibling : li);
+            });
+        });
+    }
+
+    /* The checkboxes are what the form submits, so the list's order is
+       written back onto them rather than kept only on screen. */
+    function pcPickedOrder() {
+        var list = document.getElementById('pcPickedList');
+        var host = document.getElementById('pcSvcList');
+        if (!list || !host) { return; }
+
+        Array.prototype.slice.call(list.children).reverse().forEach(function (li) {
+            var name = li.querySelector('.m b');
+            if (!name) { return; }
+
+            var cb = Array.prototype.slice.call(
+                host.querySelectorAll('input[type=checkbox]')
+            ).filter(function (c) { return c.value === name.textContent; })[0];
+
+            var card = cb && cb.closest('[data-svccard]');
+            if (card && card.parentElement) { card.parentElement.prepend(card); }
+        });
+    }
+
+    var pcClear = document.getElementById('pcPickedClear');
+    if (pcClear) {
+        pcClear.addEventListener('click', function () {
+            document.querySelectorAll('#pcSvcList input[type=checkbox]:checked')
+                .forEach(function (c) { c.checked = false; });
+            pcSvcSync();
+        });
+    }
+
     /* Search and the two dropdowns, all three narrowing the same grid. */
     window.pcSvcFilter = function () {
         var q    = (document.getElementById('pcSvcSearch') || {}).value || '';
@@ -1105,9 +1279,17 @@
 
         var shown = 0;
         document.querySelectorAll('[data-svccard]').forEach(function (card) {
-            var ok = (!q   || card.dataset.name.indexOf(q) !== -1)
-                  && (!cat || card.dataset.cat === cat)
-                  && (only !== 'priced' || card.dataset.priced === '1');
+            /* A service already in the package stays on screen whatever the
+               filter says: hiding something that is ticked makes it look as
+               though it was dropped. */
+            var picked = card.querySelector('input[type=checkbox]').checked;
+
+            var ok = picked || (
+                   (!q   || card.dataset.name.indexOf(q) !== -1)
+                && (!cat || card.dataset.cat === cat)
+                && (only !== 'priced' || card.dataset.priced === '1')
+                && (only !== 'active' || card.dataset.live === '1')
+            );
             card.hidden = !ok;
             if (ok) { shown++; }
         });
@@ -1115,6 +1297,16 @@
         var none = document.getElementById('pcSvcNone');
         if (none) { none.hidden = shown > 0; }
     };
+
+    /* Her step 1 rail carries the picked services and nothing else. The
+       readiness ring and the preview appear once there is something for them
+       to describe. */
+    window.pcStepRail = function (step) {
+        document.querySelectorAll('.pc-afterone').forEach(function (c) { c.hidden = step === 1; });
+    };
+
+    pcSvcFilter();
+    pcStepRail(1);
 
     pcSvcSync();
 
