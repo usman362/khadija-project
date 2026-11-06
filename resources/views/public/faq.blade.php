@@ -21,15 +21,25 @@
     /* ── Hero, with the search inside it ──────────────────────── */
     .fq-hero { position: relative; overflow: hidden;
         background: linear-gradient(103deg, #ecf3fe 0%, #eef4fe 46%, #f4f8fe 100%); }
-    /* The photograph, the FAQ card, the four ticks and the handwriting are
-       one picture on the file, so they are one picture here. */
-    .fq-hero-art { position: absolute; top: 0; right: 0; bottom: 0; width: 54.1%;
+    /* Two cuts from the file, not one. The file's own search row sits
+       under the left of this area, so the lower strip starts to the right
+       of it and the upper one, which carries the FAQ card and the ticks,
+       runs the full width above it. The stripes that were here came from
+       filling that corner with pixels copied along each row; nothing is
+       painted over now. */
+    .fq-hero-art, .fq-hero-foot { position: absolute; right: 0; z-index: 1;
+        background-position: right top; background-size: 100% 100%;
+        background-repeat: no-repeat; }
+    .fq-hero-art { top: 0; height: 69.7%; width: 54.1%;
         background-image: url('{{ asset('images/faq/hero.png') }}');
-        background-position: right top; background-size: 100% 100%; z-index: 1;
         -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 9%);
         mask-image: linear-gradient(90deg, transparent 0, #000 9%); }
+    .fq-hero-foot { top: 69.7%; bottom: 0; width: 45.3%;
+        background-image: url('{{ asset('images/faq/hero-foot.png') }}');
+        -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 11%);
+        mask-image: linear-gradient(90deg, transparent 0, #000 11%); }
     .fq-hero-in { position: relative; z-index: 2; padding: calc(18 * var(--u)) 0 calc(24 * var(--u));
-        max-width: calc(620 * var(--u)); }
+        max-width: calc(700 * var(--u)); }
     .fq-eyebrow { display: block; font-size: calc(15 * var(--u)); font-weight: 800;
         letter-spacing: calc(1 * var(--u)); color: #fb4404; margin: 0 0 calc(5 * var(--u)); }
     .fq-hero h1 { font-size: calc(52 * var(--u)); font-weight: 800; letter-spacing: calc(-1.4 * var(--u));
@@ -40,7 +50,7 @@
         margin: calc(11 * var(--u)) 0 0; max-width: calc(470 * var(--u)); }
 
     .fq-searchrow { position: relative; z-index: 2; display: flex; margin: calc(16 * var(--u)) 0 0;
-        max-width: calc(560 * var(--u)); border-radius: calc(10 * var(--u)); overflow: hidden;
+        max-width: calc(688 * var(--u)); border-radius: calc(10 * var(--u)); overflow: hidden;
         border: 1px solid #cfe0fb; background: #fff; }
     .fq-searchrow .ic { display: flex; align-items: center; padding: 0 calc(5 * var(--u)) 0 calc(15 * var(--u)); color: #0b1340; }
     .fq-searchrow .ic svg { width: calc(22 * var(--u)); height: calc(22 * var(--u)); }
@@ -134,13 +144,23 @@
         font-weight: 700; color: #0b1340; }
     .fq-item > summary::-webkit-details-marker { display: none; }
     .fq-item > summary svg { width: calc(14 * var(--u)); height: calc(14 * var(--u)); color: #1565e8; }
-    .fq-item > summary .sign { justify-self: end; font-size: calc(20 * var(--u)); color: #1565e8; line-height: 1; }
+    .fq-item > summary .sign { justify-self: end; font-size: calc(20 * var(--u)); color: #1565e8;
+        line-height: 1; display: flex; align-items: center; }
+    .fq-item > summary .sign i { font-style: normal; }
+    .fq-item > summary .sign svg { display: none; width: calc(14 * var(--u)); height: calc(14 * var(--u)); }
     .fq-item[open] { border-color: #cfe0fb; }
     .fq-item[open] > summary { background: #e4effe; }
-    .fq-item[open] > summary .chev { transform: rotate(180deg); }
+    /* One state indicator, on the right: a plus closed, a chevron up open.
+       The chevron on the left used to turn as well, which said the same
+       thing twice and disagreed with the file. */
+    .fq-item[open] > summary .sign i { display: none; }
+    .fq-item[open] > summary .sign svg { display: block; }
     .fq-item .ans { padding: calc(9 * var(--u)) calc(15 * var(--u)) calc(14 * var(--u)) calc(43 * var(--u));
         font-size: calc(15 * var(--u)); color: #4a5670; line-height: 1.55; background: #f4f8ff; }
     .fq-none { padding: calc(24 * var(--u)) calc(15 * var(--u)); font-size: calc(15 * var(--u)); color: #5a6679; }
+    .fq-more { align-self: flex-start; cursor: pointer; background: none; border: 0;
+        padding: calc(6 * var(--u)) calc(4 * var(--u)); font-family: inherit;
+        font-size: calc(14.5 * var(--u)); font-weight: 700; color: #1565e8; }
 
     /* ── Still need help ──────────────────────────────────────── */
     .fq-help { position: relative; margin-top: calc(20 * var(--u)); background: #fff;
@@ -200,7 +220,7 @@
         .fq-help .agent { display: none; }
     }
     @media (max-width: 760px) {
-        .fq-hero-art, .fq-cta-art, .fq-cta-script { display: none; }
+        .fq-hero-art, .fq-hero-foot, .fq-cta-art, .fq-cta-script { display: none; }
         .fq-hero-in { max-width: none; }
         .fq-searchrow { max-width: none; }
         .fq-topics, .fq-cards, .fq-roles { grid-template-columns: minmax(0, 1fr); }
@@ -261,13 +281,12 @@
         ['How do bookings and payments work?', 'Understand the steps from agreement to payment and booking.',       'cal',    '#fa035f', $find('payment work when i book')],
     ];
 
-    /* Her pills. Only shown when the word actually matches something
-       somebody wrote, so a pill never leads to an empty result. */
-    $terms = collect(['pricing', 'payments', 'proposals', 'cancellation', 'how it works'])
-        ->filter(fn ($t) => $faqs->contains(
-            fn ($f) => str_contains(strtolower($f->question . ' ' . $f->answer), $t)
-        ))
-        ->values();
+    /* Her five pills, all of them. They were filtered to the words that
+       match something somebody wrote, which quietly dropped the fifth:
+       nobody has written a question containing "how it works" yet. A pill
+       that finds nothing now says so, which is the honest half of this,
+       and the missing fifth is reported rather than hidden. */
+    $terms = collect(['pricing', 'payments', 'proposals', 'cancellation', 'how it works']);
 
     /* The roles somebody can sign up as. All four exist here: Affiliate has
        its own AFF- reference, its own sign-in and its own signup. The
@@ -283,7 +302,8 @@
         ['Affiliate', 'Refer new users and earn commissions.', 'mega', 'affiliate', route('influencer.join')],
     ];
 
-    $chev  = '<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8.5 12 15.5 19 8.5"/></svg>';
+    $chev  = '<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5 7 7-7 7"/></svg>';
+    $up    = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 15.5 12 8.5 19 15.5"/></svg>';
     $right = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5 7 7-7 7"/></svg>';
     $arrow = '<svg class="go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h15"/><path d="m13 6 6 6-6 6"/></svg>';
 @endphp
@@ -293,6 +313,7 @@
 {{-- ── Hero, search inside it ───────────────────────────────── --}}
 <section class="fq-hero">
     <div class="fq-hero-art" role="presentation"></div>
+    <div class="fq-hero-foot" role="presentation"></div>
     <div class="lp-container">
         <div class="fq-hero-in">
             <span class="fq-eyebrow">FAQ</span>
@@ -414,14 +435,19 @@
             <div class="fq-list" id="fqList">
                 @foreach($topics as $i => [$cat, $ic, $k])
                     @foreach($byCat[$cat] as $j => $faq)
+                        {{-- Her file shows eight under a topic. The ninth and
+                             anything after it is behind "Show all", not hidden:
+                             it is in the page, the search still reads it, and
+                             one click brings it up. --}}
                         <details class="fq-item" data-cat="{{ $cat }}" data-id="{{ $faq->id }}"
+                                 data-extra="{{ $j >= 8 ? 1 : 0 }}"
                                  data-q="{{ \Illuminate\Support\Str::lower($faq->question . ' ' . strip_tags($faq->answer)) }}"
-                                 @if($i !== 0) hidden @endif
+                                 @if($i !== 0 || $j >= 8) hidden @endif
                                  @if($i === 0 && $j === 0) open @endif>
                             <summary>
                                 {!! $chev !!}
                                 <span>{{ $faq->question }}</span>
-                                <span class="sign" aria-hidden="true">+</span>
+                                <span class="sign" aria-hidden="true"><i>+</i>{!! $up !!}</span>
                             </summary>
                             <div class="ans">{!! nl2br(e($faq->answer)) !!}</div>
                         </details>
@@ -430,6 +456,7 @@
                 {{-- Two of her eight topics have no question written for them
                      yet. Saying so is better than filling them in. --}}
                 <p class="fq-none" id="fqNone" hidden>Nothing here yet. Try another topic, another word, or contact support below.</p>
+                <button type="button" class="fq-more" id="fqMore" hidden></button>
             </div>
         </div>
     </section>
@@ -502,21 +529,33 @@
 
     // One rule for what is on screen: a search beats the chosen topic,
     // because somebody who typed a word wants that word, not that topic.
+    var more = document.getElementById('fqMore');
+    var all  = false;   // has the reader asked for the rest of this topic?
+
     function apply() {
         var q   = (input.value || '').trim().toLowerCase();
         var cat = current();
-        var seen = 0;
+        var seen = 0, held = 0;
 
         items.forEach(function (el) {
-            var show = q
+            var mine = q
                 ? el.getAttribute('data-q').indexOf(q) !== -1
                 : el.getAttribute('data-cat') === cat;
-            el.hidden = !show;
-            if (show) { seen++; }
+
+            // A search reads every question, including the held-back ones.
+            var hold = !q && !all && el.getAttribute('data-extra') === '1';
+
+            el.hidden = !mine || hold;
+            if (mine && hold) { held++; }
+            if (mine && !hold) { seen++; }
         });
 
-        none.hidden = seen > 0;
+        none.hidden = seen > 0 || held > 0;
+        more.hidden = held === 0;
+        more.textContent = held === 0 ? '' : 'Show all ' + (seen + held) + ' questions';
     }
+
+    more.addEventListener('click', function () { all = true; apply(); });
 
     function choose(cat) {
         tabs.forEach(function (b) {
@@ -525,6 +564,7 @@
             b.setAttribute('aria-selected', on ? 'true' : 'false');
         });
         input.value = '';
+        all = false;
         apply();
     }
 
@@ -555,6 +595,7 @@
             var want = list.querySelector('.fq-item[data-id="' + card.getAttribute('data-open') + '"]');
             if (!want) { return; }
             choose(want.getAttribute('data-cat'));
+            if (want.hidden) { all = true; apply(); }
             items.forEach(function (el) { el.open = el === want; });
         });
     });
@@ -565,6 +606,10 @@
             items.forEach(function (el) { if (el !== e.target) { el.open = false; } });
         }
     }, true);
+
+    // Once on load: the markup renders the first topic and holds back its
+    // extras, but only this knows whether there are any to offer.
+    apply();
 
     document.getElementById('fqSort').addEventListener('change', function () {
         var az = this.value === 'az';
