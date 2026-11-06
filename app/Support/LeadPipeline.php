@@ -84,6 +84,13 @@ final class LeadPipeline
             ->pluck('event_id')
             ->unique();
 
+        // Who has hired them before, so a lead can say new client or repeat.
+        $repeatClients = Booking::where('supplier_id', $me->id)
+            ->whereIn('status', ['confirmed', 'in_progress', 'completed'])
+            ->pluck('client_id')
+            ->filter()
+            ->unique();
+
         return $events
             ->map(fn (Event $event) => self::row(
                 $event,
@@ -92,6 +99,7 @@ final class LeadPipeline
                 $talking->contains($event->id),
                 $notes->get($event->id),
                 $now,
+                $repeatClients,
             ))
             ->sortByDesc(fn (array $r) => $r['activity_at']?->timestamp ?? 0)
             ->values();
@@ -105,6 +113,7 @@ final class LeadPipeline
         bool $talking,
         ?LeadNote $note,
         ?\Illuminate\Support\Carbon $now = null,
+        ?Collection $repeatClients = null,
     ): array {
         $now ??= now();
         $stage = match (true) {
@@ -218,7 +227,36 @@ final class LeadPipeline
             'valueLow'  => $low,
             'valueHigh' => $high,
             'isRange'   => $low !== null && $high !== null && $high > $low,
+
+            // What the table shows beside each row.
+            'client_id'  => $event->client_id,
+            'initials'   => self::initials($event->client?->name ?: $event->title),
+            'repeat'     => $event->client_id !== null
+                && (bool) $repeatClients?->contains($event->client_id),
+            // A single figure is a fixed price; a range is a range. Saying
+            // which is which stops one being read as the other.
+            'fixed'      => $low !== null && ($high === null || $high <= $low),
+            'description' => $event->description
+                ? \Illuminate\Support\Str::limit($event->description, 220)
+                : null,
+            'guests'     => $event->guest_count,
+            'venue'      => $event->venue,
         ];
+    }
+
+    /** Two letters for the avatar, from whatever name there is. */
+    private static function initials(?string $name): string
+    {
+        $parts = preg_split('/\s+/', trim((string) $name)) ?: [];
+        $parts = array_values(array_filter($parts));
+
+        if ($parts === []) {
+            return '?';
+        }
+
+        return mb_strtoupper(
+            mb_substr($parts[0], 0, 1) . (count($parts) > 1 ? mb_substr(end($parts), 0, 1) : '')
+        );
     }
 
     /**

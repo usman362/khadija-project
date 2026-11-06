@@ -44,6 +44,7 @@ class ProfessionalLeadController extends Controller
             'q'       => trim((string) $request->query('q', '')),
             'stage'   => (string) $request->query('stage', ''),
             'source'  => (string) $request->query('source', ''),
+            'type'    => (string) $request->query('type', ''),
             'needs'   => $request->boolean('needs'),
         ];
 
@@ -80,6 +81,7 @@ class ProfessionalLeadController extends Controller
             'conversion' => LeadPipeline::conversion($all),
             'pipeline'   => round($all->sum('weighted'), 2),
             'sources'    => $all->pluck('source')->unique()->sort()->values()->all(),
+            'types'      => $all->pluck('type')->filter()->unique()->sort()->values()->all(),
             // Leads they said they would chase and have not.
             'overdue'    => $all->where('overdue', true)->count(),
             'lost'       => $all->where('stage', 'lost')->count(),
@@ -131,6 +133,7 @@ class ProfessionalLeadController extends Controller
             'q'      => trim((string) $request->query('q', '')),
             'stage'  => (string) $request->query('stage', ''),
             'source' => (string) $request->query('source', ''),
+            'type'   => (string) $request->query('type', ''),
             'needs'  => $request->boolean('needs'),
         ]);
 
@@ -192,6 +195,7 @@ class ProfessionalLeadController extends Controller
             }))
             ->when($f['stage'] !== '', fn ($rows) => $rows->where('stage', $f['stage']))
             ->when($f['source'] !== '', fn ($rows) => $rows->where('source', $f['source']))
+            ->when($f['type'] !== '', fn ($rows) => $rows->where('type', $f['type']))
             // "Needs attention" is a promise they made and have not kept, not
             // a score: the follow-up date they set has passed.
             ->when($f['needs'], fn ($rows) => $rows->where('overdue', true))

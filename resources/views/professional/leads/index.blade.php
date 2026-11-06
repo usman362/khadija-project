@@ -18,11 +18,19 @@
 
 @php
     $money  = fn ($v) => '$' . number_format((float) $v, 0);
+    $stageIcons = [
+        'new'         => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg>',
+        'proposal'    => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>',
+        'negotiation' => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>',
+        'booked'      => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>',
+        'lost'        => '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.9" y1="4.9" x2="19.1" y2="19.1"/></svg>',
+    ];
     $stages = \App\Support\LeadPipeline::STAGES;
     $link   = fn (array $over = []) => route('professional.leads.index', array_merge(array_filter([
         'q'      => $filters['q'] ?: null,
         'stage'  => $filters['stage'] ?: null,
         'source' => $filters['source'] ?: null,
+        'type'   => $filters['type'] ?: null,
         'needs'  => $filters['needs'] ?: null,
     ]), $over));
 @endphp
@@ -37,6 +45,51 @@
     .lc-btn.ghost { background:var(--bg-card); color:var(--text-secondary, var(--text-muted));
         border:1px solid var(--border-color); }
 
+    /* ── Pipeline head and the five stages ── */
+    .lc-pipehead { display:flex; gap:12px; align-items:center; margin-bottom:15px; }
+    .lc-pipehead .ic { width:38px; height:38px; border-radius:11px; flex:none;
+        background:var(--accent-blue, #2563eb); color:#fff; display:flex; align-items:center; justify-content:center; }
+    .lc-pipehead .ic svg { width:19px; height:19px; }
+    .lc-pipehead b { display:block; font-size:15px; font-weight:800; color:var(--text-primary); }
+    .lc-pipehead span { font-size:12px; color:var(--text-muted); }
+
+    .lc-stages { display:flex; gap:9px; align-items:stretch; }
+    .lc-arrow { display:flex; align-items:center; color:var(--text-muted); flex:none; }
+    .lc-arrow svg { width:15px; height:15px; }
+    .lc-stage { flex:1 1 0; min-width:0; display:flex; gap:10px; align-items:flex-start; text-decoration:none;
+        border:1px solid color-mix(in srgb, var(--c) 35%, transparent); border-radius:12px; padding:13px 14px;
+        background:color-mix(in srgb, var(--c) 9%, transparent); }
+    .lc-stage.on { box-shadow:0 0 0 2px var(--c) inset; }
+    .lc-stage > .ic { width:32px; height:32px; border-radius:9px; flex:none; display:flex; align-items:center;
+        justify-content:center; background:color-mix(in srgb, var(--c) 20%, transparent); color:var(--c); }
+    .lc-stage > .ic svg { width:16px; height:16px; }
+    .lc-stage .meta { min-width:0; }
+    .lc-stage .l { display:block; font-size:11.5px; font-weight:800; color:var(--c); }
+    .lc-stage .n { display:block; font-size:23px; font-weight:800; color:var(--text-primary); line-height:1.1; margin:2px 0; }
+    .lc-stage .v { font-size:12px; font-weight:700; color:var(--text-primary); }
+    .lc-stage .w { font-size:11px; color:var(--text-muted); margin-left:4px; }
+
+    /* ── Table details ── */
+    .lc-who { display:flex; gap:10px; align-items:flex-start; }
+    .lc-av { width:30px; height:30px; border-radius:50%; flex:none; color:#fff; font-size:11px; font-weight:800;
+        display:flex; align-items:center; justify-content:center; }
+    .lc-chiplet { display:inline-flex; gap:5px; align-items:center; font-size:11.5px; font-weight:600;
+        padding:3px 9px; border-radius:20px; border:1px solid var(--border-color);
+        color:var(--text-secondary, var(--text-muted)); white-space:nowrap; }
+    .lc-chiplet.plain { border:0; padding:0; }
+    .lc-chiplet svg { width:12px; height:12px; flex:none; }
+    .lc-sub { display:block; font-size:10.5px; color:var(--text-muted); }
+    .lc-acts { display:inline-flex; gap:4px; align-items:center; }
+    .lc-acts a, .lc-acts button { display:inline-flex; align-items:center; justify-content:center;
+        width:27px; height:27px; border-radius:7px; border:1px solid var(--border-color);
+        background:var(--bg-card); color:var(--text-muted); cursor:pointer; padding:0; }
+    .lc-acts a:hover, .lc-acts button:hover { border-color:var(--accent-blue, #2563eb); color:var(--accent-blue, #2563eb); }
+    .lc-acts svg { width:13px; height:13px; }
+    .lc-clear { font-size:12px; font-weight:700; color:var(--accent-blue, #2563eb); text-decoration:none; white-space:nowrap; }
+    .lc-chip svg { width:13px; height:13px; vertical-align:-2px; margin-right:3px; }
+    .lc-legend span { display:flex; flex-direction:column; }
+    .lc-legend em { font-style:normal; font-size:10.5px; color:var(--text-muted); }
+
     .lc-card { background:var(--bg-card); border:1px solid var(--border-color); border-radius:14px; padding:17px 18px; margin-bottom:17px; }
 
     /* ── The five stages ── */
@@ -50,7 +103,7 @@
     .lc-stage .w { display:block; font-size:10.5px; color:var(--text-muted); margin-top:2px; }
 
     /* ── Filters ── */
-    .lc-filters { display:grid; grid-template-columns:minmax(0,2fr) 1fr 1fr auto auto; gap:10px; align-items:center; }
+    .lc-filters { display:grid; grid-template-columns:minmax(0,1.6fr) 1fr 1fr auto auto auto; gap:10px; align-items:center; }
     .lc-in, .lc-sel { width:100%; font:inherit; font-size:13px; padding:9px 11px; border-radius:9px;
         border:1px solid var(--border-color); background:var(--bg-page, var(--bg-card)); color:var(--text-primary); }
     .lc-chip { font-size:12px; font-weight:700; padding:9px 13px; border-radius:9px; text-decoration:none;
@@ -90,7 +143,7 @@
         text-decoration:none; border:1px solid var(--border-color); color:var(--text-secondary, var(--text-muted)); }
     .lc-pages .on { background:var(--text-primary); color:var(--bg-card); border-color:var(--text-primary); }
 
-    .lc-bottom { display:grid; grid-template-columns:minmax(0,1.3fr) minmax(0,1fr) minmax(0,1fr); gap:17px; align-items:start; }
+    .lc-bottom { display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:17px; align-items:start; }
     .lc-bar { display:flex; height:11px; border-radius:6px; overflow:hidden; margin:11px 0 10px; background:var(--border-color); }
     .lc-bar i { display:block; height:100%; }
     .lc-legend { display:grid; gap:6px; }
@@ -103,7 +156,8 @@
     .lc-quick a { display:block; font-size:12.5px; font-weight:700; padding:10px 13px; border-radius:9px;
         text-decoration:none; border:1px solid var(--border-color); color:var(--text-primary); }
 
-    @media (max-width: 1100px) { .lc-stages { grid-template-columns:repeat(2, minmax(0,1fr)); }
+    @media (max-width: 1250px) { .lc-stages { flex-wrap:wrap; } .lc-arrow { display:none; }
+        .lc-stage { flex:1 1 170px; }
         .lc-filters { grid-template-columns:1fr; } .lc-bottom { grid-template-columns:1fr; } }
     @media (max-width: 860px) { .lc-table thead { display:none; }
         .lc-table td { display:block; border:0; padding:3px 0; }
@@ -123,15 +177,31 @@
 {{-- The five stages. Clicking one filters the table, and the counts and the
      table are the same set of leads, so they cannot disagree. --}}
 <div class="lc-card">
+    <div class="lc-pipehead">
+        <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg></span>
+        <div>
+            <b>Lead pipeline</b>
+            <span>Click a stage to filter the leads below. The counts and the table come from the same records.</span>
+        </div>
+    </div>
+
     <div class="lc-stages">
         @foreach($summary as $key => $s)
+            @if(! $loop->first)
+                <span class="lc-arrow" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+                </span>
+            @endif
             <a class="lc-stage {{ $filters['stage'] === $key ? 'on' : '' }}"
-               style="border-top-color: {{ $s['colour'] }}; color: {{ $s['colour'] }};"
+               style="--c: {{ $s['colour'] }};"
                href="{{ $filters['stage'] === $key ? $link(['stage' => null]) : $link(['stage' => $key, 'page' => null]) }}">
-                <span class="l">{{ $s['label'] }}</span>
-                <span class="n">{{ $s['count'] }}</span>
-                <span class="v">{{ $money($s['weighted']) }}</span>
-                <span class="w">counted at {{ $s['weight'] }}%</span>
+                <span class="ic">{!! $stageIcons[$key] !!}</span>
+                <span class="meta">
+                    <span class="l">{{ $s['label'] }}</span>
+                    <span class="n">{{ $s['count'] }}</span>
+                    <span class="v">{{ $money($s['weighted']) }}</span>
+                    <span class="w">({{ $s['weight'] }}%)</span>
+                </span>
             </a>
         @endforeach
     </div>
@@ -147,6 +217,12 @@
                 <option value="{{ $key }}" @selected($filters['stage'] === $key)>{{ $label }}</option>
             @endforeach
         </select>
+        <select class="lc-sel" name="type">
+            <option value="">All event types</option>
+            @foreach($types as $type)
+                <option value="{{ $type }}" @selected($filters['type'] === $type)>{{ $type }}</option>
+            @endforeach
+        </select>
         <select class="lc-sel" name="source">
             <option value="">All sources</option>
             @foreach($sources as $source)
@@ -156,8 +232,14 @@
         <button type="submit" class="lc-btn">Search</button>
         <a class="lc-chip {{ $filters['needs'] ? 'on' : '' }}"
            href="{{ $filters['needs'] ? $link(['needs' => null]) : $link(['needs' => 1, 'page' => null]) }}">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
             Overdue follow-ups ({{ $overdue }})
         </a>
+        {{-- Only where there is something to clear. A Clear button on an
+             unfiltered page is a control that does nothing. --}}
+        @if(array_filter($filters))
+            <a class="lc-clear" href="{{ route('professional.leads.index') }}">Clear</a>
+        @endif
     </form>
 </div>
 
@@ -197,16 +279,40 @@
                         : ($lead['is_range'] ? $money($lead['low']) . ' to ' . $money($lead['high']) : $money($lead['low']));
                 @endphp
                 <tr>
-                    <td class="lc-who">
-                        <b>{{ $lead['title'] }}</b>
-                        <span>{{ $lead['client'] ?: 'Client not named' }}@if($lead['when']) &middot; {{ $lead['when']->format('j M Y') }}@endif</span>
-                        @if($lead['ageDays'] !== null)
-                            <span>{{ $lead['ageDays'] }} {{ \Illuminate\Support\Str::plural('day', $lead['ageDays']) }} old</span>
+                    <td>
+                        <div class="lc-who">
+                            <span class="lc-av" style="background: {{ $lead['stage_color'] }};">{{ $lead['initials'] }}</span>
+                            <span>
+                                <b>{{ $lead['title'] }}</b>
+                                <span>{{ $lead['client'] ?: 'Client not named' }}@if($lead['when']) &middot; {{ $lead['when']->format('j M Y') }}@endif</span>
+                                @if($lead['ageDays'] !== null)
+                                    <span>{{ $lead['ageDays'] }} {{ \Illuminate\Support\Str::plural('day', $lead['ageDays']) }} old</span>
+                                @endif
+                            </span>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="lc-chiplet">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                            {{ $lead['source'] }}
+                        </span>
+                    </td>
+                    <td>
+                        <span class="lc-chiplet plain">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                            {{ $lead['where'] ?: 'Not stated' }}
+                        </span>
+                    </td>
+                    <td>
+                        {{ $budget }}
+                        @if($lead['fixed'])
+                            {{-- One figure is a fixed price and a band is a
+                                 band; naming it stops one reading as the other. --}}
+                            <span class="lc-sub">Fixed</span>
+                        @elseif($lead['is_range'])
+                            <span class="lc-sub">Client's own range</span>
                         @endif
                     </td>
-                    <td class="lc-muted">{{ $lead['source'] }}</td>
-                    <td class="lc-muted">{{ $lead['where'] ?: 'Not stated' }}</td>
-                    <td>{{ $budget }}</td>
                     <td>
                         {{-- The stage and the priority are told apart by shape
                              as well as colour, and the priority names itself,
@@ -229,7 +335,20 @@
                     </td>
                     <td class="lc-muted">{{ $lead['next_action'] ?: '—' }}</td>
                     <td>
-                        <button type="button" class="lc-exp" data-lead="{{ $lead['event_id'] }}">Open</button>
+                        <span class="lc-acts">
+                            <a title="Messages" href="{{ route('professional.chat.index') }}">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+                            </a>
+                            <a title="Open the request" href="{{ route('professional.bid.step', ['event' => $lead['event_id']]) }}">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+                            </a>
+                            <a title="Calendar" href="{{ route('professional.calendar.index') }}">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                            </a>
+                            <button type="button" class="lc-exp" data-lead="{{ $lead['event_id'] }}" title="Open details">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
+                            </button>
+                        </span>
                     </td>
                 </tr>
                 <tr class="detail" id="lead-{{ $lead['event_id'] }}" hidden>
@@ -238,8 +357,21 @@
                             <div>
                                 <h4>The request</h4>
                                 @if($lead['type'])<p>{{ $lead['type'] }}</p>@endif
+                                @if($lead['when'])<p class="lc-muted">{{ $lead['when']->format('l j F Y') }}</p>@endif
                                 @if($lead['services'])<p>{{ implode(', ', $lead['services']) }}</p>@endif
                                 <p class="lc-muted">{{ $lead['where'] ?: 'Location not stated' }}</p>
+                                @if($lead['guests'])<p class="lc-muted">About {{ number_format($lead['guests']) }} guests</p>@endif
+                                @if($lead['venue'])<p class="lc-muted">{{ $lead['venue'] }}</p>@endif
+                                @if($lead['description'])<p class="lc-muted">{{ $lead['description'] }}</p>@endif
+                            </div>
+                            <div>
+                                <h4>Client information</h4>
+                                <p><b>{{ $lead['client'] ?: 'Not named' }}</b></p>
+                                <p class="lc-muted">{{ $lead['repeat'] ? 'Has booked you before' : 'New to you' }}</p>
+                                <p class="lc-muted">Came in through {{ $lead['source'] }}</p>
+                                @if($lead['ageDays'] !== null)
+                                    <p class="lc-muted">{{ $lead['ageDays'] }} {{ \Illuminate\Support\Str::plural('day', $lead['ageDays']) }} on your list</p>
+                                @endif
                             </div>
                             <div>
                                 <h4>Where it stands</h4>
@@ -317,19 +449,43 @@
             @foreach($summary as $s)
                 <div>
                     <i style="background: {{ $s['colour'] }};"></i>
-                    {{ $s['label'] }} at {{ $s['weight'] }}%
+                    {{ $s['label'] }}
                     <b>{{ $money($s['weighted']) }}</b>
                 </div>
             @endforeach
         </div>
 
-        {{-- The weights are shown rather than applied quietly. A weighted
-             figure nobody can see the workings of is a number somebody plans
-             against without knowing what it assumed. --}}
-        <p class="lc-note">
-            Each stage counts for part of its budget. Lost work counts for nothing, which is why it is
-            listed and adds nothing.
-        </p>
+        <p class="lc-note">Based on where each lead has got to and what its budget is.</p>
+    </div>
+
+    {{-- The weights, on their own, with what each stage means.
+
+         They are printed rather than applied quietly: a weighted pipeline
+         figure nobody can see the workings of is a number somebody plans
+         against without knowing what it assumed. --}}
+    <div class="lc-card" style="margin:0;">
+        <h4 style="font-size:13px;font-weight:800;color:var(--text-primary);margin:0 0 11px;">Stage weights</h4>
+        @php
+            $meaning = [
+                'new'         => 'Early, least certain',
+                'proposal'    => 'Your quote is with them',
+                'negotiation' => 'You are talking',
+                'booked'      => 'Agreed, most certain',
+                'lost'        => 'Not counted in the value',
+            ];
+        @endphp
+        <div class="lc-legend">
+            @foreach($summary as $key => $s)
+                <div>
+                    <i style="background: {{ $s['colour'] }};"></i>
+                    <span>
+                        {{ $s['label'] }}
+                        <em>{{ $meaning[$key] }}</em>
+                    </span>
+                    <b>{{ $s['weight'] }}%</b>
+                </div>
+            @endforeach
+        </div>
     </div>
 
     <div class="lc-card" style="margin:0;">
