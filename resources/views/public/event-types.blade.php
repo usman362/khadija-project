@@ -19,7 +19,7 @@
 
     /* ── Hero band ────────────────────────────────────────────── */
     .et-hero { position: relative; background: #eef3f9; overflow: hidden;
-        height: calc(144 * var(--u)); display: flex; align-items: center; }
+        padding: calc(11 * var(--u)) 0 calc(19 * var(--u)); }
     /* Both halves are cut from the design file. The middle is a pale panel
        there, so the words sit on the panel rather than on the photograph. */
     .et-hero-l, .et-hero-r { position: absolute; top: 0; bottom: 0; }
@@ -38,17 +38,17 @@
         line-height: 1.1; color: #0b1340; margin: 0; }
     .et-hero h1 span { color: #0d6bf5; }
     .et-hero p { font-size: calc(15 * var(--u)); color: #3f4a63; line-height: 1.45;
-        margin: calc(8 * var(--u)) auto 0; max-width: calc(700 * var(--u)); }
+        margin: calc(7 * var(--u)) auto 0; max-width: calc(980 * var(--u)); }
 
     .et-search { display: flex; align-items: center; margin: calc(12 * var(--u)) auto 0;
         width: calc(533 * var(--u)); background: #fff; border-radius: calc(10 * var(--u));
         box-shadow: 0 calc(6 * var(--u)) calc(22 * var(--u)) rgba(15,27,53,.10);
-        padding: calc(5 * var(--u)); }
+        padding: calc(4 * var(--u)); }
     .et-search .ic { display: flex; align-items: center; padding: 0 calc(4 * var(--u)) 0 calc(12 * var(--u)); color: #0b1340; }
     .et-search .ic svg { width: calc(21 * var(--u)); height: calc(21 * var(--u)); }
     .et-search input { flex: 1 1 auto; min-width: 0; border: 0; outline: 0; background: transparent;
         font-family: inherit; font-size: calc(15 * var(--u)); color: #0b1340;
-        padding: calc(9 * var(--u)) calc(8 * var(--u)); }
+        padding: calc(8 * var(--u)) calc(8 * var(--u)); }
     .et-search input::placeholder { color: #7b879c; }
     .et-search button { flex: none; border: 0; cursor: pointer; background: #0d6bf5; color: #fff;
         font-family: inherit; font-size: calc(14 * var(--u)); font-weight: 700;
@@ -57,7 +57,8 @@
     .et-body { background: #f8fdfe; padding-bottom: calc(16 * var(--u)); }
 
     /* ── Group chips ──────────────────────────────────────────── */
-    .et-chips { display: flex; flex-wrap: wrap; gap: calc(10 * var(--u)); padding-top: calc(11 * var(--u)); }
+    .et-chips { display: flex; flex-wrap: wrap; justify-content: center;
+        gap: calc(10 * var(--u)); padding-top: calc(17 * var(--u)); }
     .et-chip { display: inline-flex; align-items: center; gap: calc(9 * var(--u)); text-decoration: none;
         background: #fff; border: 1px solid #e3ecf7; border-radius: calc(999 * var(--u));
         padding: calc(3 * var(--u)) calc(15 * var(--u)); font-size: calc(13 * var(--u));
@@ -167,7 +168,7 @@
         .et-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
     @media (max-width: 760px) {
-        .et-hero { height: auto; padding: calc(26 * var(--u)) 0; }
+        .et-hero { padding: calc(22 * var(--u)) 0; }
         .et-hero-l, .et-hero-r, .et-cta-art { display: none; }
         .et-search { width: 100%; }
         .et-grid { grid-template-columns: minmax(0, 1fr); }
