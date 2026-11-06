@@ -56,7 +56,7 @@
 
     /* ── two 3-column rows ── */
     .pd-row { display: grid; gap: 14px; margin-bottom: 14px; align-items: start; }
-    .pd-row-1 { grid-template-columns: minmax(0,0.9fr) minmax(0,1fr) minmax(0,1.75fr); }
+    .pd-row-1 { grid-template-columns: minmax(0,1.1fr) minmax(0,1fr); }
     .pd-row-2 { grid-template-columns: minmax(0,1fr) minmax(0,1fr) minmax(0,1.15fr); }
     .pd-card { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px; padding: 16px 17px; min-width: 0; }
     .pd-card-head { display: flex; align-items: center; gap: 9px; margin-bottom: 14px; }
@@ -155,6 +155,42 @@
     .pd-bid-rec-txt b { color: var(--text-primary); display: block; margin-bottom: 1px; }
     .pd-bid-rec-spark { flex-shrink: 0; align-self: center; }
 
+    /* ── Four summary cards ── */
+    .pd-sum { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: 13px; margin-bottom: 16px; }
+    .pd-sumcard { display: block; text-decoration: none; background: var(--bg-card);
+        border: 1px solid var(--border-color); border-radius: 14px; padding: 15px 16px; }
+    .pd-sumcard:hover { border-color: var(--accent-blue, #2563eb); }
+    .pd-sumlabel { display: block; font-size: 11.5px; font-weight: 700; color: var(--text-muted); }
+    .pd-sumval { display: block; font-size: 28px; font-weight: 800; color: var(--text-primary); line-height: 1.1; margin: 5px 0 4px; }
+    .pd-sumparts { display: block; font-size: 11.5px; color: var(--text-secondary, var(--text-muted)); }
+    .pd-sumnote { display: block; font-size: 11.5px; font-weight: 700; color: var(--bad-text, #b91c1c); margin-top: 3px; }
+
+    /* ── Needs your attention ── */
+    .pd-row-attn { display: grid; grid-template-columns: minmax(0,1.55fr) minmax(0,1fr); gap: 16px;
+        align-items: start; margin-bottom: 16px; }
+    .pd-stack { display: flex; flex-direction: column; gap: 16px; }
+    .pd-attn-row { display: grid; grid-template-columns: minmax(0,1fr) auto auto; gap: 11px; align-items: center;
+        border-left: 3px solid var(--border-color); padding: 10px 0 10px 11px;
+        border-bottom: 1px solid var(--border-color); }
+    .pd-attn-row:last-child { border-bottom: 0; }
+    .pd-attn-row b { display: block; font-size: 13px; font-weight: 700; color: var(--text-primary); line-height: 1.3; }
+    .pd-attn-row span { display: block; font-size: 11.5px; color: var(--text-muted); }
+    .pd-attn-pri { font-size: 11px; font-weight: 800; white-space: nowrap; }
+    .pd-attn-go { font-size: 11.5px; font-weight: 700; padding: 7px 12px; border-radius: 8px;
+        background: var(--accent-blue, #2563eb); color: #fff; text-decoration: none; white-space: nowrap; }
+    .pd-quiet { font-size: 12.5px; color: var(--text-muted); margin: 4px 0 0; }
+    .pd-next b { display: block; font-size: 14px; font-weight: 800; color: var(--text-primary); }
+    .pd-next span { display: block; font-size: 12.5px; color: var(--text-secondary, var(--text-muted)); margin-top: 3px; }
+    .pd-next i { display: block; font-style: normal; font-size: 11.5px; color: var(--text-muted); margin-top: 3px; }
+    .pd-next a { display: inline-block; margin-top: 11px; font-size: 12.5px; font-weight: 700; padding: 9px 16px;
+        border-radius: 9px; background: var(--accent-blue, #2563eb); color: #fff; text-decoration: none; }
+    .pd-new { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 11px; }
+    .pd-new b { display: block; font-size: 19px; font-weight: 800; color: var(--text-primary); line-height: 1.1; }
+    .pd-new span { font-size: 11px; color: var(--text-muted); }
+    @media (max-width: 1100px) { .pd-sum { grid-template-columns: repeat(2, minmax(0,1fr)); }
+        .pd-row-attn { grid-template-columns: 1fr; } }
+    @media (max-width: 620px) { .pd-attn-row { grid-template-columns: 1fr; } }
+
     /* ── Setup bar, goal and seasons ── */
     .pd-setup { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 14px;
         padding: 15px 17px; margin-bottom: 18px; }
@@ -176,8 +212,14 @@
     .pd-month i { display: block; width: 100%; border-radius: 4px 4px 0 0; background: var(--accent-blue, #2563eb); }
     .pd-month span { font-size: 9px; color: var(--text-muted); }
 
+    .pd-gap { margin-top: 13px; border: 1px solid var(--border-color); border-left: 3px solid var(--accent-blue, #2563eb);
+        border-radius: 10px; padding: 11px 13px; }
+    .pd-gap b { display: block; font-size: 12.5px; font-weight: 800; color: var(--text-primary); line-height: 1.35; }
+    .pd-gap span { display: block; font-size: 11.5px; color: var(--text-muted); margin: 4px 0 8px; }
+    .pd-gap a { font-size: 12px; font-weight: 700; color: var(--accent-blue, #2563eb); text-decoration: none; }
+
     /* ── Finance Hub ── */
-    .pd-fin-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 9px; }
+    .pd-fin-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 9px; }
     .pd-fin-box { background: var(--bg-card-hover); border: 1px solid var(--border-color); border-radius: 10px; padding: 11px 10px; }
     .pd-fin-box .k { font-size: 10px; color: var(--text-muted); margin-bottom: 4px; }
     .pd-fin-box .v { font-size: 15px; font-weight: 800; color: var(--text-primary); }
@@ -248,63 +290,99 @@
         </div>
     @endif
 
-    {{-- ════════ 8 stat cards ════════ --}}
-    <div class="pd-stats">
-        <div class="pd-stat">
-            <div class="pd-stat-top"><span class="pd-stat-ico c-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span><span class="pd-stat-label">Monthly Revenue</span></div>
-            <div class="pd-stat-val">${{ number_format($stats['this_month_earnings'] ?? 0, 2) }}</div>
-            @php
-                // Built here rather than with directives in the markup:
-                // Blade will not compile a directive that follows a word
-                // character, so it printed the directive instead.
-                $__last = (float) ($stats['last_month_earnings'] ?? 0);
-                $__now  = (float) ($stats['this_month_earnings'] ?? 0);
-                $__move = $__last > 0 ? (int) round(($__now - $__last) / $__last * 100) : null;
-                $__trend = $__move === null
-                    ? 'Nothing last month to compare'
-                    : ($__move >= 0 ? '▲' : '▼') . ' ' . abs($__move) . '% vs last month';
-            @endphp
-            <div class="pd-stat-foot"><span class="pd-stat-delta muted">{{ $__trend }}</span></div>
+    {{-- Four cards, each carrying the parts it is made of.
+
+         Eight flat figures stood here. Khadijah's screen has four, and each
+         says what it is made of underneath: a "6" on its own tells somebody
+         six things are waiting without saying what any of them are, which is
+         the same fault the Priority Actions page had. --}}
+    @php
+        $pdCards = [
+            ['key' => 'response', 'label' => 'Needs your response', 'tone' => 'c-orange'],
+            ['key' => 'upcoming', 'label' => 'Upcoming gigs',       'tone' => 'c-blue'],
+            ['key' => 'payments', 'label' => 'Payments waiting',    'tone' => 'c-green'],
+            ['key' => 'today',    'label' => "Today's commitments", 'tone' => 'c-purple'],
+        ];
+    @endphp
+    <div class="pd-sum">
+        @foreach($pdCards as $card)
+            @php $c = $summary[$card['key']]; @endphp
+            <a class="pd-sumcard" href="{{ $c['to'] }}">
+                <span class="pd-sumlabel">{{ $card['label'] }}</span>
+                <span class="pd-sumval">{{ $c['count'] }}</span>
+                <span class="pd-sumparts">{{ $c['parts'] ? implode(' · ', $c['parts']) : 'Nothing right now' }}</span>
+                @if($c['note'])
+                    <span class="pd-sumnote">{{ $c['note'] }}</span>
+                @endif
+            </a>
+        @endforeach
+    </div>
+
+    {{-- Needs your attention, the one to do first, and what has changed. --}}
+    <div class="pd-row pd-row-attn">
+        <div class="pd-card">
+            <div class="pd-card-head">
+                <span class="pd-card-ico c-orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg></span>
+                <span class="pd-card-title">Needs your attention</span>
+                <span class="pd-pill-count">{{ $waiting->count() }}</span>
+                <a href="{{ route('professional.priority.index') }}" class="pd-card-link">View all</a>
+            </div>
+            <div class="pd-attn">
+                @forelse($waiting->take(5) as $item)
+                    @php
+                        $pdTone = ['urgent' => ['High', '#ef4444'], 'soon' => ['Due soon', '#f59e0b'],
+                                   'new' => ['New', '#2563eb']][$item['tone']] ?? ['Open', '#64748b'];
+                    @endphp
+                    <div class="pd-attn-row" style="border-left-color: {{ $pdTone[1] }};">
+                        <div>
+                            <b>{{ $item['title'] }}</b>
+                            @if($item['subject'])<span>{{ $item['subject'] }}</span>@endif
+                        </div>
+                        <span class="pd-attn-pri" style="color: {{ $pdTone[1] }};">{{ $pdTone[0] }}</span>
+                        <a class="pd-attn-go" href="{{ $item['url'] }}">{{ $item['cta'] }}</a>
+                    </div>
+                @empty
+                    <p class="pd-quiet">Nothing needs you right now.</p>
+                @endforelse
+            </div>
         </div>
-        <div class="pd-stat">
-            <div class="pd-stat-top"><span class="pd-stat-ico c-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg></span><span class="pd-stat-label">Awaiting Your Response</span></div>
-            <div class="pd-stat-val">{{ $stats['awaiting_you'] ?? 0 }}</div>
-            <div class="pd-stat-foot"><span class="pd-stat-delta muted">Requests nobody has answered yet</span></div>
-        </div>
-        <div class="pd-stat">
-            <div class="pd-stat-top"><span class="pd-stat-ico c-teal"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></svg></span><span class="pd-stat-label">Leads Received</span></div>
-            <div class="pd-stat-val">{{ $stats['leads_total'] ?? 0 }}</div>
-            <div class="pd-stat-foot"><span class="pd-stat-delta muted">Everything that has reached you</span></div>
-        </div>
-        <div class="pd-stat">
-            <div class="pd-stat-top"><span class="pd-stat-ico c-purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span><span class="pd-stat-label">Upcoming Gigs</span></div>
-            <div class="pd-stat-val">{{ $stats['upcoming_gigs'] ?? 0 }}</div>
-            <div class="pd-stat-foot"><span class="pd-stat-delta muted">Confirmed and still ahead of you</span></div>
-        </div>
-        <div class="pd-stat">
-            {{-- "Win Rate" is derived from sealed bid outcomes — a leak the rules
-                 name explicitly (R8). Replaced with a request-count metric, which
-                 is allowed. --}}
-            <div class="pd-stat-top"><span class="pd-stat-ico c-indigo"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span><span class="pd-stat-label">Active Bids</span></div>
-            <div class="pd-stat-val">{{ \App\Models\Bid::where('supplier_id', auth()->id())->where('status', 'submitted')->count() }}</div>
-            <div class="pd-stat-foot"><span class="pd-stat-delta">Open on the board now</span></div>
-        </div>
-        <div class="pd-stat">
-            <div class="pd-stat-top"><span class="pd-stat-ico c-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span><span class="pd-stat-label">Average Rating</span></div>
-            <div class="pd-stat-val">@if(($stats['review_count'] ?? 0) > 0){{ number_format($stats['avg_rating'] ?? 0, 1) }}@else&mdash;@endif</div>
-            <div class="pd-stat-foot"><span class="pd-stat-delta muted">{{ $stats['review_count'] ?? 0 }} {{ ($stats['review_count'] ?? 0) === 1 ? 'review' : 'reviews' }}</span></div>
-        </div>
-        <div class="pd-stat">
-            <div class="pd-stat-top"><span class="pd-stat-ico c-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg></span><span class="pd-stat-label">Total Booked</span></div>
-            <div class="pd-stat-val">${{ number_format($stats['total_booked'] ?? 0, 2) }}</div>
-            <div class="pd-stat-foot"><span class="pd-stat-delta muted">All of your confirmed work</span></div>
-        </div>
-        <div class="pd-stat">
-            <div class="pd-stat-top"><span class="pd-stat-ico c-orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span><span class="pd-stat-label">Payment Pending</span></div>
-            <div class="pd-stat-val">${{ number_format($stats['pending_payout'] ?? 0, 2) }}</div>
-            <div class="pd-stat-foot"><span class="pd-stat-delta muted">{{ $stats['pending_count'] ?? 0 }} {{ ($stats['pending_count'] ?? 0) === 1 ? 'payment' : 'payments' }}</span><svg class="pd-stat-spark" width="40" height="18" viewBox="0 0 40 18" fill="none"><polyline points="0,9 8,10 16,8 24,11 32,7 40,8" stroke="#f97316" stroke-width="1.6"/></svg></div>
+
+        <div class="pd-stack">
+            <div class="pd-card">
+                <div class="pd-card-head">
+                    <span class="pd-card-ico c-purple"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg></span>
+                    <span class="pd-card-title">Do this first</span>
+                </div>
+                @if($nextBest)
+                    <div class="pd-next">
+                        <b>{{ $nextBest['title'] }}</b>
+                        @if($nextBest['subject'])<span>{{ $nextBest['subject'] }}</span>@endif
+                        @if($nextBest['when'])<i>{{ $nextBest['when'] }}</i>@endif
+                        <a href="{{ $nextBest['url'] }}">{{ $nextBest['cta'] }}</a>
+                    </div>
+                @else
+                    <p class="pd-quiet">Nothing is waiting, so there is nothing to put first.</p>
+                @endif
+            </div>
+
+            {{-- Measured from the last time this page was opened, not from the
+                 last request made, or the answer would always be nothing. --}}
+            @if($sinceLast)
+                <div class="pd-card">
+                    <div class="pd-card-head">
+                        <span class="pd-card-ico c-blue"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span>
+                        <span class="pd-card-title">Since you were last here</span>
+                    </div>
+                    <div class="pd-new">
+                        @foreach($sinceLast as $row)
+                            <div><b>{{ $row['count'] }}</b><span>{{ $row['label'] }}</span></div>
+                        @endforeach
+                    </div>
+                </div>
+            @endif
         </div>
     </div>
+
 
     {{-- ════════ Row 1 ════════ --}}
     <div class="pd-row pd-row-1">
@@ -312,27 +390,11 @@
         {{-- Opportunity Feed — Rule R61, Option B --}}
         @include('professional._opportunity-feed')
 
-        {{-- Priority Actions --}}
-        <div class="pd-card">
-            <div class="pd-card-head">
-                <span class="pd-card-ico c-orange"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg></span>
-                <span class="pd-card-title">Priority Actions</span>
-                <span class="pd-pill-count">{{ $attention->sum('count') }}</span>
-                <a href="{{ route('professional.priority.index') }}" class="pd-card-link">View All <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
-            </div>
-            <div class="pd-pa">
-                @forelse($attention as $__a)
-                    <a href="{{ $__a['to'] }}" class="pd-pa-row" style="text-decoration:none;">
-                        <span class="pd-pa-ico {{ $__a['tone'] }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg></span>
-                        <div class="pd-pa-body"><div class="pd-pa-title">{{ $__a['title'] }}</div></div>
-                        <span class="pd-pa-pri pri-medium">{{ $__a['count'] }}</span>
-                    </a>
-                @empty
-                    <p style="font-size:12px;color:var(--text-muted);margin:0;padding:4px 0;">Nothing needs you right now.</p>
-                @endforelse
-            </div>
-            <div class="pd-pa-foot"><a href="{{ route('professional.priority.index') }}">View All Actions →</a></div>
-        </div>
+        {{-- The Priority Actions card that stood here is gone. "Needs your
+             attention" above shows the same list, naming each job rather than
+             counting it, so the page was telling somebody the same thing
+             twice and disagreeing with itself on the detail. --}}
+
 
         {{-- Gig Operations Hub --}}
         <div class="pd-card">
@@ -416,9 +478,24 @@
                     @endforelse
                 </div>
             </div>
-            {{-- A "Recommendation" sat here: wedding packages were winning 21%
-                 more than DJ-only packages. Nothing measured it, and a figure
-                 about what wins work is one a professional prices against. --}}
+            {{-- Khadijah's screen has a recommendation here, "Add Lighting
+                 Services to match 5 new open bids".
+
+                 This is that, counted rather than suggested: a service named
+                 by open requests in this professional's own state that they
+                 do not offer, with how many ask for it. Both halves can be
+                 checked against the bidding board.
+
+                 What used to sit here was "wedding packages are winning 21%
+                 more than DJ-only packages". Nothing measured that, and a
+                 figure about what wins work is one somebody prices against. --}}
+            @if($gap)
+                <div class="pd-gap">
+                    <b>{{ $gap['count'] }} open {{ \Illuminate\Support\Str::plural('request', $gap['count']) }} ask for {{ $gap['name'] }}</b>
+                    <span>You do not offer it yet. Adding it puts you in front of those requests.</span>
+                    <a href="{{ route('professional.services.index') }}">Add it to your services</a>
+                </div>
+            @endif
         </div>
 
         {{-- This month against what they said they were aiming for.
@@ -478,6 +555,11 @@
                 <div class="pd-fin-box"><div class="k">Available Balance</div><div class="v">${{ number_format($stats['available_balance'] ?? 0, 2) }}</div></div>
                 <div class="pd-fin-box"><div class="k">Pending Payout</div><div class="v">${{ number_format($stats['pending_payout'] ?? 0, 2) }}</div></div>
                 <div class="pd-fin-box"><div class="k">Earned This Month</div><div class="v green">${{ number_format($stats['this_month_earnings'] ?? 0, 2) }}</div></div>
+                {{-- The fourth is the first two added together: what is theirs
+                     once the work already agreed has settled. Khadijah's
+                     screen calls it a forecast; it is addition, and it is
+                     labelled as such rather than as a prediction. --}}
+                <div class="pd-fin-box"><div class="k">Yours once everything settles</div><div class="v">${{ number_format($cash['forecast'], 2) }}</div></div>
             </div>
             <div class="pd-fin-actions">
                 <a href="{{ route('professional.transactions.index') }}" class="pd-fin-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Invoices</a>

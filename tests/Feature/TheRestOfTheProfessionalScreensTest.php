@@ -219,6 +219,51 @@ class TheRestOfTheProfessionalScreensTest extends TestCase
             ->assertSee('This month against your goal');
     }
 
+    /** Each summary card says what it is made of, not just a total. */
+    public function test_the_summary_cards_name_their_parts(): void
+    {
+        Booking::create([
+            'event_id' => $this->event()->id, 'client_id' => $this->client->id,
+            'created_by' => $this->client->id, 'supplier_id' => $this->pro->id,
+            'status' => 'requested', 'price' => 900,
+        ]);
+
+        $this->actingAs($this->pro)->get(route('professional.dashboard'))
+            ->assertOk()
+            ->assertSee('Needs your response')
+            // The count, and underneath it what the count is made of.
+            ->assertSee('1 request');
+    }
+
+    /**
+     * "Since you were last here" needs a previous visit to measure from.
+     * On a first visit it is not shown, rather than reporting every record
+     * the account has ever had as new.
+     */
+    public function test_nothing_is_new_on_a_first_visit(): void
+    {
+        $this->assertNull($this->pro->dashboard_seen_at);
+
+        $this->actingAs($this->pro)->get(route('professional.dashboard'))
+            ->assertOk()
+            ->assertDontSee('Since you were last here');
+
+        // The visit is recorded, so the next one has something to compare to.
+        $this->assertNotNull($this->pro->fresh()->dashboard_seen_at);
+    }
+
+    /** The old Priority Actions card said the same thing twice. */
+    public function test_the_attention_list_is_not_shown_twice(): void
+    {
+        $html = $this->actingAs($this->pro)->get(route('professional.dashboard'))
+            ->assertOk()->getContent();
+
+        // The card's own title, not any mention of the phrase: a CSS comment
+        // in the page carries it too and is not what this is about.
+        $this->assertSame(1, substr_count($html, '>Needs your attention<'));
+        $this->assertStringNotContainsString('>Priority Actions<', $html);
+    }
+
     /** Two bookings do not make a season. */
     public function test_the_months_chart_waits_for_enough_history(): void
     {

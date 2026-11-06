@@ -64,6 +64,10 @@ class User extends Authenticatable implements MustVerifyEmail
             'deletion_requested_at' => 'datetime',
             'deletion_scheduled_at' => 'datetime',
             'login_locked_at'       => 'datetime',
+            'last_active_at'        => 'datetime',
+            // Moves only when the dashboard is opened, so "since your last
+            // visit" has something to be measured against.
+            'dashboard_seen_at'     => 'datetime',
         ];
     }
 

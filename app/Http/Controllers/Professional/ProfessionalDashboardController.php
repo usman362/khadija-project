@@ -197,14 +197,204 @@ class ProfessionalDashboardController extends Controller
          * setup bar below is the honest version of the same idea: it lists
          * what is actually missing, and every line can be checked.
          */
+        /*
+         * Four summary cards, each with the parts it is made of, as Khadijah's
+         * screen has them. A single "6" tells somebody six things are waiting
+         * without saying what any of them are, which is the same fault the
+         * Priority Actions page had.
+         */
+        $summary = $this->summary($user);
+
+        /*
+         * What is waiting, and which one to do first.
+         *
+         * The same list the Priority Actions page builds, so the dashboard and
+         * that page can never disagree about what is outstanding.
+         */
+        $waiting = \App\Support\PriorityActions::forProfessional($user);
+        $nextBest = $waiting->first();
+
+        // Read BEFORE the visit is recorded, or the answer is always nothing.
+        $sinceLast = $this->sinceLastVisit($user);
+        $user->forceFill(['dashboard_seen_at' => now()])->saveQuietly();
+
+        $gap     = $this->serviceGap($user);
         $setup   = $this->setup($user);
         $goal    = $this->goal($user, $thisMonthNet);
         $busiest = $this->busiest($user);
+        $cash    = [
+            'available' => (float) ($money['available'] ?? 0),
+            'pending'   => (float) ($money['pending'] ?? 0),
+            'month'     => $thisMonthNet,
+            // What is theirs once everything already agreed has settled.
+            'forecast'  => (float) ($money['available'] ?? 0) + (float) ($money['pending'] ?? 0),
+        ];
 
-        return view('professional.dashboard', compact('setup', 'goal', 'busiest', 
+        return view('professional.dashboard', compact('setup', 'goal', 'busiest', 'summary', 'waiting', 'nextBest', 'sinceLast', 'gap', 'cash', 
             'stats', 'recentBookings', 'todaySchedule', 'bidBreakdown', 'bidTotal', 'attention',
             'subscription', 'feed', 'myServicesOnly'
         ));
+    }
+
+    /**
+     * The four cards across the top, each carrying its own parts.
+     *
+     * @return array<string, array{count:int, parts: array<int, string>, note:?string, to:string}>
+     */
+    private function summary(\App\Models\User $user): array
+    {
+        $zone  = config('app.display_timezone', config('app.timezone'));
+        $today = \Illuminate\Support\Carbon::today($zone);
+
+        $proposals = Booking::where('supplier_id', $user->id)->where('status', 'requested')->count();
+
+        $unread = \App\Models\Message::whereHas(
+            'conversation.participants',
+            fn ($q) => $q->where('users.id', $user->id)
+        )->where('sender_id', '!=', $user->id)->count();
+
+        $leads = \App\Models\Bid::where('supplier_id', $user->id)
+            ->whereIn('status', ['submitted', 'pending'])
+            ->count();
+
+        $soon = Booking::where('supplier_id', $user->id)
+            ->whereIn('status', ['confirmed', 'in_progress'])
+            ->whereHas('event', fn ($q) => $q
+                ->whereBetween('starts_at', [now(), now()->addDays(30)]))
+            ->with('event:id,starts_at')
+            ->get();
+
+        // A gig "needs attention" when its crew is not filled. Nothing else
+        // on a confirmed booking is outstanding by definition.
+        $shortStaffed = \App\Models\Shift::where('supplier_id', $user->id)
+            ->where('status', 'open')
+            ->whereIn('event_id', $soon->pluck('event_id')->filter())
+            ->distinct('event_id')
+            ->count('event_id');
+
+        $payouts = \App\Models\Payout::where('user_id', $user->id)
+            ->whereIn('status', ['requested', 'pending'])
+            ->count();
+
+        $todayGigs = Booking::where('supplier_id', $user->id)
+            ->whereIn('status', ['confirmed', 'in_progress'])
+            ->whereHas('event', fn ($q) => $q->whereDate('starts_at', $today->toDateString()))
+            ->with('event:id,starts_at,title')
+            ->get();
+
+        $nextToday = $todayGigs
+            ->map(fn (Booking $b) => $b->event?->starts_at)
+            ->filter(fn ($at) => $at && $at->isFuture())
+            ->sort()
+            ->first();
+
+        $part = fn (int $n, string $word) => $n > 0
+            ? $n . ' ' . \Illuminate\Support\Str::plural($word, $n)
+            : null;
+
+        return [
+            'response' => [
+                'count' => $proposals + $leads + $unread,
+                'parts' => array_values(array_filter([
+                    $part($proposals, 'request'),
+                    $part($leads, 'open bid'),
+                    $part($unread, 'message'),
+                ])),
+                'note'  => null,
+                'to'    => route('professional.proposals.index'),
+            ],
+            'upcoming' => [
+                'count' => $soon->count(),
+                'parts' => ['Next 30 days'],
+                'note'  => $shortStaffed > 0
+                    ? $shortStaffed . ' ' . \Illuminate\Support\Str::plural('needs', $shortStaffed) . ' staff'
+                    : null,
+                'to'    => route('professional.gig-hub.index'),
+            ],
+            'payments' => [
+                'count' => $payouts,
+                'parts' => array_values(array_filter([$part($payouts, 'payout waiting')])),
+                'note'  => null,
+                'to'    => route('professional.earnings.index'),
+            ],
+            'today' => [
+                'count' => $todayGigs->count(),
+                'parts' => ['Booked for today'],
+                'note'  => $nextToday ? 'Next in ' . $nextToday->diffForHumans(null, true) : null,
+                'to'    => route('professional.calendar.index'),
+            ],
+        ];
+    }
+
+    /**
+     * What has happened since they last opened this page.
+     *
+     * Null on a first visit, because "new since your last visit" has no answer
+     * when there has not been one, and showing every record they have ever had
+     * as new would be worse than showing nothing.
+     *
+     * @return array<int, array{label:string, count:int}>|null
+     */
+    private function sinceLastVisit(\App\Models\User $user): ?array
+    {
+        $since = $user->dashboard_seen_at;
+
+        if (! $since) {
+            return null;
+        }
+
+        $rows = [
+            ['label' => 'New requests', 'count' => Booking::where('supplier_id', $user->id)
+                ->where('created_at', '>=', $since)->count()],
+            ['label' => 'Bids you placed', 'count' => \App\Models\Bid::where('supplier_id', $user->id)
+                ->where('created_at', '>=', $since)->count()],
+            ['label' => 'Messages', 'count' => \App\Models\Message::whereHas(
+                'conversation.participants', fn ($q) => $q->where('users.id', $user->id)
+            )->where('sender_id', '!=', $user->id)->where('created_at', '>=', $since)->count()],
+            ['label' => 'Reviews', 'count' => Review::where('reviewee_id', $user->id)
+                ->where('created_at', '>=', $since)->count()],
+        ];
+
+        return collect($rows)->sum('count') > 0 ? $rows : null;
+    }
+
+    /**
+     * A service being asked for nearby that this professional does not offer.
+     *
+     * Khadijah's screen has a recommendation here: "Add Lighting Services to
+     * match 5 new open bids". This is that, counted rather than suggested. It
+     * says which service and how many open requests name it, and both can be
+     * checked against the bidding board.
+     *
+     * @return array{name:string, count:int}|null
+     */
+    private function serviceGap(\App\Models\User $user): ?array
+    {
+        $mine = $user->serviceCategories()
+            ->where('categories.kind', \App\Models\Category::SERVICE)
+            ->pluck('categories.id');
+
+        $state = $user->profile?->state;
+
+        $wanted = \Illuminate\Support\Facades\DB::table('category_event')
+            ->join('events', 'events.id', '=', 'category_event.event_id')
+            ->join('categories', 'categories.id', '=', 'category_event.category_id')
+            ->where('events.is_published', true)
+            ->whereNull('events.supplier_id')
+            ->whereIn('events.status', ['pending', 'published'])
+            // Work they could actually take.
+            ->when($state, fn ($q) => $q->where('events.state', $state))
+            ->whereNotIn('categories.id', $mine)
+            ->where('categories.kind', \App\Models\Category::SERVICE)
+            ->groupBy('categories.id', 'categories.name')
+            ->orderByRaw('count(*) desc')
+            ->selectRaw('categories.name as name, count(*) as total')
+            ->first();
+
+        // One open request is not a gap worth telling somebody to fill.
+        return $wanted && $wanted->total >= 2
+            ? ['name' => $wanted->name, 'count' => (int) $wanted->total]
+            : null;
     }
 
     /**
