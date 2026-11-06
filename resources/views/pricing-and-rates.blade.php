@@ -4,22 +4,28 @@
 
 @push('styles')
 <style>
+    /* ── one unit for the whole page ──────────────────────────────
+       Every length below is the design file's own number multiplied by
+       1.377, the ratio between its content column and the one this page
+       now uses. That only holds while the column is 1272px wide, so the
+       unit carries the rest: it is 1px when the column is 1272 and grows
+       and shrinks with it, which is what the file does and what fixed
+       pixels could not. */
+    .pr-page { --u: clamp(0.78px, 0.0710vw, 1.34px); }
+
     /* ══════ Pricing and Rates, against the 2026 design file ══════
-       Every length below is taken off that file and scaled by the ratio
-       between its content column (924px in a 1023px screenshot) and this
-       site's own (.lp-container, 1272px inside its padding): 1.377. The
-       header and the footer are the layout's and are not touched here, so
-       the content lines up with them rather than with the design's slightly
-       wider gutters. */
+       Every number below is that file's own, multiplied by 1.377: the ratio
+       between its content column, 924px in a 1023px screenshot, and a
+       1272px one. The unit above carries the rest. */
 
     /* ── 1. Hero band ─────────────────────────────────────────── */
     .pr-hero { position: relative; background: #e5f1fd; overflow: hidden; }
-    .pr-hero-in { position: relative; z-index: 2; padding: 34px 0 30px; max-width: 760px; }
-    .pr-hero h1 { font-size: clamp(34px, 5.1vw, 73px); font-weight: 800; letter-spacing: -1.8px;
-        line-height: 1.05; color: #02022f; margin: 0 0 14px; }
+    .pr-hero-in { position: relative; z-index: 2; padding: calc(34 * var(--u)) 0 calc(30 * var(--u)); max-width: calc(760 * var(--u)); }
+    .pr-hero h1 { font-size: calc(73 * var(--u)); font-weight: 800; letter-spacing: calc(-1.8 * var(--u));
+        line-height: 1.05; color: #02022f; margin: 0 0 calc(14 * var(--u)); }
     .pr-hero h1 span { color: #0259fb; }
-    .pr-hero p { font-size: clamp(14px, 1.35vw, 18px); color: #3f4a63; line-height: 1.45;
-        margin: 0; max-width: 700px; }
+    .pr-hero p { font-size: calc(18 * var(--u)); color: #3f4a63; line-height: 1.45;
+        margin: 0; max-width: calc(700 * var(--u)); }
 
     /* The artwork is cut from the design file itself rather than stood in
        for: on that file the photograph, its fade into the band and the
@@ -28,89 +34,99 @@
     .pr-hero-art { position: absolute; top: 0; right: 0; bottom: 0; width: 42.7%;
         background-image: url('{{ asset('images/pricing/hero.png') }}');
         background-position: right center; background-size: 100% 100%; z-index: 1;
-        -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 16%);
-        mask-image: linear-gradient(90deg, transparent 0, #000 16%); }
+        -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 24%);
+        mask-image: linear-gradient(90deg, transparent 0, #000 24%); }
+
+    /* The design file's content column is 90.3% of the viewport, which the
+       shared 1320px container only happens to equal at about 1456 wide. Past
+       that it falls behind, and that is the whole of the "narrower than the
+       reference" difference. This rule is pushed from this page, so no other
+       page is affected.
+       Nothing about the header or the footer changes except that, on this
+       page, they share the same column, which is what keeps the logo in line
+       with the first card the way the file has it. */
+    .lp-container { max-width: min(calc(90.3% + 48px), 1620px); }
 
     .pr-body { background: #f3f9fe; }
 
     /* ── 2 and 3. Fee sections ────────────────────────────────── */
-    .pr-sec { margin: 0 0 26px; }
-    .pr-sec:first-of-type { margin-top: 5px; }
-    .pr-sec h2 { font-size: clamp(21px, 2.4vw, 32px); font-weight: 800; letter-spacing: -.5px;
+    .pr-sec { margin: 0 0 calc(26 * var(--u)); }
+    .pr-sec:first-of-type { margin-top: calc(5 * var(--u)); }
+    .pr-sec h2 { font-size: calc(32 * var(--u)); font-weight: 800; letter-spacing: calc(-.5 * var(--u));
         color: #11204a; margin: 0; line-height: 1.2; }
     .pr-sec h2 em { font-style: normal; color: #fb3c02; }
     .pr-sec h2 em.blue { color: #0259fb; }
-    .pr-sec > p.lede { font-size: clamp(13px, 1.25vw, 17px); color: #5a6679; margin: 0 0 14px; }
+    .pr-sec > p.lede { font-size: calc(17 * var(--u)); color: #5a6679; margin: 0 0 calc(14 * var(--u)); }
 
-    .pr-cards { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; }
-    .pr-card { border-radius: 13px; padding: 18px 20px 20px 23px; border: 1px solid transparent; }
+    .pr-cards { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: calc(14 * var(--u)); }
+    .pr-card { border-radius: calc(13 * var(--u)); padding: calc(18 * var(--u)) calc(20 * var(--u)) calc(20 * var(--u)) calc(23 * var(--u)); border: 1px solid transparent; }
     .pr-card.client { background: #fcf4ec; border-color: #f4ece5; }
     .pr-card.pro { background: #edf7ff; border-color: #e4effb; }
-    .pr-card .top { display: grid; grid-template-columns: 83px minmax(0, 1fr); align-items: start; margin-right: -21px; }
+    .pr-card .top { display: grid; grid-template-columns: calc(83 * var(--u)) minmax(0, 1fr); align-items: start; margin-right: calc(-21 * var(--u)); }
     /* Each icon is lifted straight off the design file, at the size it is
        drawn there, on the same card colour it sits on there. Redrawing them
        by hand produced a handshake that was not one. */
-    .pr-card .ic { grid-row: span 2; align-self: center; width: 68px; height: 66px;
+    .pr-card .ic { grid-row: span 2; align-self: center; width: calc(68 * var(--u)); height: calc(66 * var(--u));
         background-repeat: no-repeat; background-position: left center; }
-    .pr-card b { font-size: clamp(13px, 1.2vw, 17px); font-weight: 700; color: #16254f;
+    .pr-card b { font-size: calc(17 * var(--u)); font-weight: 700; color: #16254f;
         line-height: 1.3; align-self: center; }
-    .pr-card .amt { font-size: clamp(20px, 1.95vw, 27px); font-weight: 800; color: #02022f;
-        line-height: 1.1; margin-top: 6px; }
-    .pr-card .when { display: block; margin-top: 14px; font-size: clamp(12px, 1.1vw, 15px);
+    .pr-card .amt { font-size: calc(27 * var(--u)); font-weight: 800; color: #02022f;
+        line-height: 1.1; margin-top: calc(6 * var(--u)); }
+    .pr-card .when { display: block; margin-top: calc(14 * var(--u)); font-size: calc(15 * var(--u));
         color: #55607a; line-height: 1.48; }
 
     /* ── 4. Membership plans ──────────────────────────────────── */
-    .pr-plans { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px;
+    .pr-plans { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: calc(14 * var(--u));
         align-items: stretch; }
     .pr-plan { position: relative; display: flex; flex-direction: column;
         border: 1.5px solid var(--pl-line); background: var(--pl-bg);
-        border-radius: 14px; padding: 18px 34px 8px; }
+        border-radius: calc(14 * var(--u)); padding: calc(18 * var(--u)) calc(34 * var(--u)) calc(8 * var(--u)); }
     .pr-plan.starter { --pl-line: #efe0cc; --pl-bg: #fef8f1; --pl-tint: #faecdf; --pl-key: #fb3c02; }
     .pr-plan.mid     { --pl-line: #005afd; --pl-bg: #f2f8fd; --pl-tint: #e2ebf8; --pl-key: #005afd; }
     .pr-plan.top     { --pl-line: #ce87ec; --pl-bg: #f8f7fe; --pl-tint: #ede6f8; --pl-key: #901acb; }
-    .pr-badge { position: absolute; top: -14px; left: 50%; transform: translateX(-50%);
-        font-size: 12.5px; font-weight: 700; letter-spacing: .3px; color: #fff;
-        padding: 6px 18px; border-radius: 999px; white-space: nowrap; }
+    .pr-badge { position: absolute; top: calc(-14 * var(--u)); left: 50%; transform: translateX(-50%);
+        font-size: calc(12.5 * var(--u)); font-weight: 700; letter-spacing: .3px; color: #fff;
+        padding: calc(6 * var(--u)) calc(18 * var(--u)); border-radius: calc(999 * var(--u)); white-space: nowrap; }
     .pr-plan.mid .pr-badge { background: #1255d6; }
     .pr-plan.top .pr-badge { background: #0c8d68; }
 
-    .pr-plan .head { display: grid; grid-template-columns: 95px minmax(0, 1fr); align-items: start; }
-    .pr-plan .head .ic { grid-row: span 2; align-self: center; width: 70px; height: 58px;
+    .pr-plan .head { display: grid; grid-template-columns: calc(95 * var(--u)) minmax(0, 1fr); align-items: start; }
+    .pr-plan .head .ic { grid-row: span 2; align-self: center; width: calc(70 * var(--u)); height: calc(58 * var(--u));
         background-repeat: no-repeat; background-position: left center; }
-    .pr-plan h3 { font-size: clamp(16px, 1.65vw, 22px); font-weight: 800; color: #11204a; margin: 0; line-height: 1.2; }
-    .pr-plan .blurb { font-size: clamp(12px, 1.1vw, 15px); color: #5a6679; line-height: 1.3; margin: 3px 0 0; }
-    .pr-price { font-size: clamp(22px, 2.4vw, 33px); font-weight: 800; color: #02022f;
-        margin: 17px 0 0; line-height: .95; }
-    .pr-price span { font-size: clamp(12px, 1.1vw, 16px); font-weight: 500; color: #5a6679; }
+    .pr-plan h3 { font-size: calc(22 * var(--u)); font-weight: 800; color: #11204a; margin: 0; line-height: 1.2; }
+    .pr-plan .blurb { font-size: calc(15 * var(--u)); color: #5a6679; line-height: 1.3; margin: calc(3 * var(--u)) 0 0; }
+    .pr-price { font-size: calc(33 * var(--u)); font-weight: 800; color: #02022f;
+        margin: calc(17 * var(--u)) 0 0; line-height: .95; }
+    .pr-price span { font-size: calc(16 * var(--u)); font-weight: 500; color: #5a6679; }
 
-    .pr-share { margin: 6px 0 13px; padding: 7px 10px 8px; border-radius: 9px;
+    .pr-share { margin: calc(6 * var(--u)) 0 calc(13 * var(--u)); padding: calc(7 * var(--u)) calc(10 * var(--u)) calc(8 * var(--u)); border-radius: calc(9 * var(--u));
         background: var(--pl-tint); text-align: center; }
-    .pr-share b { display: block; font-size: clamp(17px, 1.8vw, 24px); font-weight: 700; color: #11204a; line-height: 1.2; }
-    .pr-share span { display: block; margin-top: 3px; font-size: clamp(11px, 1.05vw, 14.5px); color: #55607a; }
+    .pr-share b { display: block; font-size: calc(24 * var(--u)); font-weight: 700; color: #11204a; line-height: 1.2; }
+    .pr-share span { display: block; margin-top: calc(3 * var(--u)); font-size: calc(14.5 * var(--u)); color: #55607a; }
 
     .pr-feats { list-style: none; margin: 0; padding: 0; }
-    .pr-feats li { position: relative; padding-left: 30px; font-size: clamp(12px, 1.16vw, 16px);
-        color: #30405f; line-height: 1.36; margin-bottom: 4px; }
-    .pr-feats li svg { position: absolute; left: 2px; top: 1px; width: 15px; height: 15px; color: var(--pl-key); }
-    .pr-more { background: none; border: 0; padding: 0; margin: 2px 0 0; cursor: pointer;
-        display: inline-flex; align-items: center; gap: 6px;
-        font-size: clamp(12px, 1.1vw, 15px); font-weight: 700; color: #0259fb; }
-    .pr-more svg { width: 13px; height: 13px; }
+    .pr-feats li { position: relative; padding-left: calc(30 * var(--u)); font-size: calc(16 * var(--u));
+        color: #30405f; line-height: 1.36; margin-bottom: calc(4 * var(--u)); }
+    .pr-feats li svg { position: absolute; left: calc(2 * var(--u)); top: calc(1 * var(--u)); width: calc(15 * var(--u)); height: calc(15 * var(--u)); color: var(--pl-key); }
+    .pr-more { background: none; border: 0; padding: 0; margin: calc(2 * var(--u)) 0 0; cursor: pointer;
+        display: inline-flex; align-items: center; gap: calc(6 * var(--u));
+        font-size: calc(15 * var(--u)); font-weight: 700; color: #0259fb; }
+    .pr-more svg { width: calc(13 * var(--u)); height: calc(13 * var(--u)); }
     .pr-plan details[open] .pr-more svg { transform: rotate(180deg); }
-    .pr-plan .foot { margin-top: auto; padding-top: 8px; }
-    .pr-cta { display: block; text-align: center; border-radius: 9px; text-decoration: none;
-        font-size: clamp(13px, 1.25vw, 17px); font-weight: 700; padding: 11px 10px;
+    .pr-plan .foot { margin-top: auto; padding-top: calc(8 * var(--u)); }
+    .pr-cta { display: block; text-align: center; border-radius: calc(9 * var(--u)); text-decoration: none;
+        font-size: calc(17 * var(--u)); font-weight: 700; padding: calc(11 * var(--u)) calc(10 * var(--u));
         border: 1.5px solid var(--pl-key); background: #fff; color: var(--pl-key); }
     .pr-plan.mid .pr-cta { background: #005afd; color: #fff; }
 
     /* ── 5. The two notes ─────────────────────────────────────── */
-    .pr-notes { display: grid; gap: 9px; margin-top: 14px; }
-    .pr-note { display: grid; grid-template-columns: 83px minmax(0, 1fr); align-items: start;
-        border-radius: 11px; padding: 13px 23px; }
-    .pr-note .ic { width: 34px; height: 34px; }
-    .pr-note .ic svg { width: 34px; height: 34px; display: block; }
-    .pr-note b { display: block; font-size: clamp(13px, 1.35vw, 19px); font-weight: 700; margin-bottom: 3px; }
-    .pr-note p { font-size: clamp(12px, 1.1vw, 15px); line-height: 1.5; margin: 0; }
+    .pr-notes { display: grid; gap: calc(9 * var(--u)); margin-top: calc(14 * var(--u)); }
+    .pr-note { display: grid; grid-template-columns: calc(83 * var(--u)) minmax(0, 1fr); align-items: start;
+        border-radius: calc(11 * var(--u)); padding: calc(14 * var(--u)) calc(23 * var(--u)); }
+    .pr-note .ic { width: calc(34 * var(--u)); height: calc(34 * var(--u)); }
+    .pr-note .ic svg { width: calc(34 * var(--u)); height: calc(34 * var(--u)); display: block; }
+    .pr-note b { display: block; font-size: calc(19 * var(--u)); font-weight: 700; margin-bottom: calc(3 * var(--u)); }
+    .pr-note p { font-size: calc(15 * var(--u)); line-height: 1.5; margin: 0; }
     .pr-note.policy { background: #fdebea; }
     .pr-note.policy .ic { color: #ed1b0c; }
     .pr-note.policy b { color: #ed1b0c; }
@@ -121,7 +137,7 @@
     .pr-note.plain p { color: #3b4663; }
 
     /* ── 6. The band above the footer ─────────────────────────── */
-    .pr-ready { position: relative; margin-top: 10px; background: #e3eefc; overflow: hidden; }
+    .pr-ready { position: relative; margin-top: calc(10 * var(--u)); background: #e3eefc; overflow: hidden; }
     /* Both pieces are cut from the design file: the photograph with its fade
        already in it, and the handwriting with its underline. */
     .pr-ready-art { position: absolute; left: 0; top: 0; bottom: 0; width: 29.3%;
@@ -134,29 +150,29 @@
         background-position: right center; background-size: 100% 100%;
         -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 12%);
         mask-image: linear-gradient(90deg, transparent 0, #000 12%); }
-    .pr-ready-in { position: relative; z-index: 2; text-align: center; padding: 10px 0 8px; }
-    .pr-ready h2 { font-size: clamp(19px, 2.1vw, 29px); font-weight: 800; color: #11204a; margin: 0 0 8px; line-height: 1.2; }
-    .pr-ready p { font-size: clamp(12.5px, 1.15vw, 16px); color: #44506a; line-height: 1.45;
-        margin: 0 auto 15px; max-width: 540px; }
-    .pr-ready-btns { display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; }
-    .pr-rbtn { display: inline-flex; align-items: center; gap: 11px; text-decoration: none;
-        color: #fff; font-size: clamp(13px, 1.2vw, 16.5px); font-weight: 700;
-        padding: 14px 26px; border-radius: 9px; }
-    .pr-rbtn svg { width: 20px; height: 20px; }
-    .pr-rbtn .go { width: 17px; height: 17px; }
+    .pr-ready-in { position: relative; z-index: 2; text-align: center; padding: calc(10 * var(--u)) 0 calc(8 * var(--u)); }
+    .pr-ready h2 { font-size: calc(29 * var(--u)); font-weight: 800; color: #11204a; margin: 0 0 calc(8 * var(--u)); line-height: 1.2; }
+    .pr-ready p { font-size: calc(16 * var(--u)); color: #44506a; line-height: 1.45;
+        margin: 0 auto calc(15 * var(--u)); max-width: calc(540 * var(--u)); }
+    .pr-ready-btns { display: flex; justify-content: center; gap: calc(16 * var(--u)); flex-wrap: wrap; }
+    .pr-rbtn { display: inline-flex; align-items: center; gap: calc(11 * var(--u)); text-decoration: none;
+        color: #fff; font-size: calc(16.5 * var(--u)); font-weight: 700;
+        padding: calc(14 * var(--u)) calc(26 * var(--u)); border-radius: calc(9 * var(--u)); }
+    .pr-rbtn svg { width: calc(20 * var(--u)); height: calc(20 * var(--u)); }
+    .pr-rbtn .go { width: calc(17 * var(--u)); height: calc(17 * var(--u)); }
     .pr-rbtn.orange { background: #f04e19; }
     .pr-rbtn.blue { background: #0d5bea; }
 
     @media (max-width: 980px) {
         .pr-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
         .pr-plans { grid-template-columns: minmax(0, 1fr); }
-        .pr-hero-in { max-width: none; padding: 38px 0 34px; }
+        .pr-hero-in { max-width: none; padding: calc(38 * var(--u)) 0 calc(34 * var(--u)); }
         .pr-hero-art, .pr-ready-art, .pr-ready-script { display: none; }
-        .pr-ready-in { padding: 30px 0; }
+        .pr-ready-in { padding: calc(30 * var(--u)) 0; }
     }
     @media (max-width: 560px) {
         .pr-cards { grid-template-columns: minmax(0, 1fr); }
-        .pr-card .top, .pr-plan .head, .pr-note { grid-template-columns: 54px minmax(0, 1fr); }
+        .pr-card .top, .pr-plan .head, .pr-note { grid-template-columns: calc(54 * var(--u)) minmax(0, 1fr); }
     }
 </style>
 @endpush
@@ -210,6 +226,8 @@
     $arrow   = '<svg class="go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h15"/><path d="m13 6 6 6-6 6"/></svg>';
 
 @endphp
+
+<div class="pr-page">
 
 {{-- ── 1. Hero band ─────────────────────────────────────────── --}}
 <section class="pr-hero">
@@ -422,4 +440,5 @@
     </div>
 </section>
 
+</div>
 @endsection

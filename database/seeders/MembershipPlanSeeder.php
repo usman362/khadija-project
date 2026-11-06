@@ -31,7 +31,7 @@ class MembershipPlanSeeder extends Seeder
                  * customers yet. We first need people to sign up, get hired,
                  * and see that the site helps them."
                  */
-                'description' => 'Free to join. GigResource takes a share only when you are paid.',
+                'description' => 'Perfect for new professionals building their business.',
                 'price' => 0,
                 'billing_cycle' => 'monthly',
                 'duration_days' => 30,
