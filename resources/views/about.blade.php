@@ -241,7 +241,7 @@
             <div class="ab-story-txt">
                 <span class="ab-eyebrow pill">Our Story</span>
                 <h2 class="ab-h2">Built for Better<br>Event Experiences</h2>
-                <p>Planning an event should be exciting—not stressful. GigResource was created to help clients find the right professionals, communicate easily, and manage bookings with confidence.</p>
+                <p>Planning an event should be exciting, not stressful. GigResource was created to help clients find the right professionals, communicate easily, and manage bookings with confidence.</p>
                 <p>Whether it's a corporate event, wedding, private celebration, or live experience, our goal is to simplify every step of the process.</p>
             </div>
         </div>
@@ -315,7 +315,7 @@
                     <path d="M28 31a8 8 0 0 0 14 0" stroke="#ea580c" stroke-width="2.5" stroke-linecap="round" fill="none"/>
                 </svg>
                 <h4>Simplicity</h4>
-                <p>Finding and hiring event professionals should be straightforward and stress-free.</p>
+                <p>Finding and hiring event professionals should take fewer steps, not more.</p>
             </div>
             {{-- Community --}}
             <div class="ab-value">
@@ -397,7 +397,7 @@
                 <img src="https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=600&q=80&auto=format&fit=crop" alt="Event professional" loading="lazy">
                 <div class="ab-serve-body">
                     <span class="ab-serve-ico" style="background:linear-gradient(135deg,#fb923c,#ea580c);box-shadow:0 8px 16px rgba(234,88,12,0.3);"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg></span>
-                    <div><h4>Event Professionals</h4><p>Showcase your expertise and grow your business.</p></div>
+                    <div><h4>Event Professionals</h4><p>Show your work, quote for jobs and manage the ones you win.</p></div>
                 </div>
             </div>
             <div class="ab-serve-card">

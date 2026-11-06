@@ -8,7 +8,7 @@
     $topicMeta = [
         'Getting Started'    => ['desc' => 'Learn the basics of GigResource',    'accent' => 'blue'],
         'For Clients'        => ['desc' => 'Hiring and booking professionals',   'accent' => 'orange'],
-        'For Professionals'  => ['desc' => 'Grow your business on GigResource',   'accent' => 'blue'],
+        'For Professionals'  => ['desc' => 'Bidding, commission and getting paid', 'accent' => 'blue'],
         'Payments'           => ['desc' => 'Secure payments and transactions',    'accent' => 'orange'],
         'Account & Security' => ['desc' => 'Manage your account and privacy',     'accent' => 'blue'],
         'Support'            => ['desc' => 'Getting help and contacting us',      'accent' => 'orange'],
@@ -71,6 +71,14 @@
     .fq-3d-chat { position: absolute; left: 86px; bottom: 70px; width: 64px; height: 64px; z-index: 4; filter: drop-shadow(0 12px 20px rgba(249,115,22,0.35)); }
     .fq-3d-mug { position: absolute; right: 96px; bottom: -4px; width: 60px; height: 60px; z-index: 4; filter: drop-shadow(0 10px 16px rgba(37,99,235,0.25)); }
     .fq-3d-plant { position: absolute; right: 18px; bottom: -6px; width: 66px; height: 88px; z-index: 2; filter: drop-shadow(0 10px 16px rgba(15,27,53,0.12)); }
+
+    /* ── START HERE ─────────────────────────────────── */
+    .fq-start { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px; }
+    .fq-startcard { text-align: left; font: inherit; cursor: pointer; background: #fff;
+        border: 1px solid var(--line-soft); border-radius: 14px; padding: 15px 16px; }
+    .fq-startcard:hover { border-color: #2563eb; }
+    .fq-startcard b { display: block; font-size: 13.5px; font-weight: 800; color: var(--ink); line-height: 1.35; }
+    .fq-startcard span { display: block; font-size: 12px; color: var(--muted); margin-top: 6px; line-height: 1.55; }
 
     /* ── BROWSE BY TOPIC ────────────────────────────── */
     .fq-topics { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 16px; }
@@ -179,6 +187,35 @@
         </div>
     </div>
 </section>
+
+{{-- Khadijah's 28 October screen opens with a row of the questions people
+     ask first.
+
+     It calls them Popular Questions. Nothing counts how often a question is
+     read, so "popular" would be a claim nobody measured. These are the ones
+     the admin put at the top of the list, which is a real decision somebody
+     made, so the heading says that instead. --}}
+@php
+    $fqStart = $faqs->sortBy('sort_order')->take(5);
+@endphp
+@if($fqStart->isNotEmpty())
+<section class="fq-section" style="padding-bottom: 0;">
+    <div class="lp-container">
+        <div class="fq-head" style="margin-bottom: 22px;">
+            <span class="fq-eyebrow pill">Start here</span>
+        </div>
+        <div class="fq-start">
+            @foreach($fqStart as $faq)
+                <button type="button" class="fq-startcard" data-jump="{{ $faq->category ?: 'General' }}"
+                        data-q="{{ \Illuminate\Support\Str::lower($faq->question) }}">
+                    <b>{{ $faq->question }}</b>
+                    <span>{{ \Illuminate\Support\Str::limit(strip_tags($faq->answer), 92) }}</span>
+                </button>
+            @endforeach
+        </div>
+    </div>
+</section>
+@endif
 
 {{-- ════════════ BROWSE BY TOPIC ════════════ --}}
 <section class="fq-section" style="padding-bottom: 10px;">
@@ -295,6 +332,25 @@
             document.getElementById('fqAccordion').scrollIntoView({ behavior: 'smooth', block: 'start' });
         });
         t.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); t.click(); } });
+    });
+
+    /* A Start here card opens its own answer, rather than only moving to the
+       right tab and leaving the reader to find the question again. */
+    Array.prototype.slice.call(document.querySelectorAll('.fq-startcard')).forEach(function (card) {
+        card.addEventListener('click', function () {
+            activate(card.dataset.jump);
+
+            var wanted = card.dataset.q;
+            items.forEach(function (item) {
+                var open = item.dataset.q.indexOf(wanted) === 0;
+                item.classList.toggle('open', open);
+                if (open) {
+                    setTimeout(function () {
+                        item.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }, 60);
+                }
+            });
+        });
     });
 
     // Accordion toggle

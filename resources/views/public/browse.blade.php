@@ -313,8 +313,16 @@
                          contain it. --}}
                     <select name="category" aria-label="Category">
                         <option value="">All Services</option>
-                        @foreach($categories as $cat)
-                            <option value="{{ $cat->slug }}" @selected(($f['category'] ?? null) === $cat->slug)>{{ Str::title($cat->name) }}</option>
+                        {{-- Grouped under their category, and services only.
+                             The flat version listed every specialty and every
+                             event type as well, which repeated names and
+                             offered occasions as though they were services. --}}
+                        @foreach($categories as $groupName => $group)
+                            <optgroup label="{{ Str::title($groupName) }}">
+                                @foreach($group as $cat)
+                                    <option value="{{ $cat->slug }}" @selected(($f['category'] ?? null) === $cat->slug)>{{ Str::title($cat->name) }}</option>
+                                @endforeach
+                            </optgroup>
                         @endforeach
                     </select>
                 </div>

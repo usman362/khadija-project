@@ -301,7 +301,12 @@
             </div>
 
             <div class="et-all-foot">
-                <span>Showing {{ $wall->firstItem() ?? 0 }} to {{ $wall->lastItem() ?? 0 }} of {{ $wall->total() }} event types</span>
+
+                {{-- The paginator prints its own "Showing 1 to 12 of 106" and
+                     this page printed the same sentence directly above it, so
+                     the page said it twice. One of them had to go, and the
+                     paginator's is the one that stays in step with the pages
+                     beside it. --}}
                 {{ $wall->onEachSide(1)->links() }}
             </div>
         </div>

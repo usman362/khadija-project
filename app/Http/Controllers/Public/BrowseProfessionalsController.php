@@ -239,9 +239,24 @@ class BrowseProfessionalsController extends Controller
         // Sidebar data: popular categories (for the filter nav) + a list
         // of distinct cities so we can power a city picker without a
         // separate autocomplete endpoint.
+        /*
+         * The services a client can actually look for, grouped under the
+         * category they belong to.
+         *
+         * This used to be every active row of every kind: 27 categories, 241
+         * services, 860 specialties and 106 event types in one flat list of
+         * 1,234 options. It read as nonsense, because the specialties repeat
+         * ("Attendant" appeared seven times, under seven different services)
+         * and because an occasion like "Baby Shower" is not a service anybody
+         * offers.
+         */
         $categories = Category::active()
+            ->ofKind(Category::SERVICE)
+            ->with('parent:id,name')
             ->orderBy('name')
-            ->get(['id', 'name', 'slug', 'icon']);
+            ->get(['id', 'name', 'slug', 'icon', 'parent_id'])
+            ->groupBy(fn (Category $c) => $c->parent?->name ?: 'Other services')
+            ->sortKeys();
 
         // Slider bounds come from the data — a hardcoded $5,000 ceiling meant the
         // handle sat in dead space when nobody charges near it.
