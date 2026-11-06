@@ -2,238 +2,212 @@
 
 @php
     $seoTitle       = 'FAQs: Questions? We\'ve Got Answers | GigResource';
-    $seoDescription = 'Find quick answers to the most common questions about using GigResource, getting started, clients, professionals, payments, account security, and support.';
+    $seoDescription = 'Find quick answers to the most common questions about using GigResource, getting started, requests, payments, account security, and support.';
 @endphp
 
 @push('styles')
 <style>
     /* ══════ FAQ, against the 2026 design file ══════
-       The file's content column is 90.8% of the viewport (936px in a 1031px
-       screenshot). Every length below is that file's own number multiplied
-       by 1.359, the ratio between its column and a 1272px one, and the unit
-       carries the rest: it is 1px at a 1272 column and grows with it, so
-       the page keeps the file's proportions at any width rather than
-       stopping at one. --}} */
-    .fq-page { --u: clamp(0.78px, 0.0705vw, 1.34px); }
+       Its content column is 90.8% of the viewport (930px in a 1024px
+       screenshot). Every number below is that file's own multiplied by
+       1.368, the ratio between its column and a 1272px one, and the unit
+       carries the rest: 1px at a 1272 column, growing with it. */
+    .fq-page { --u: clamp(0.78px, 0.0714vw, 1.34px); }
 
     /* On this page the header, the content and the footer share the file's
        column. Pushed from here, so no other page is affected. */
     .lp-container { max-width: min(calc(90.8% + 48px), 1620px); }
 
-    /* ── Hero ─────────────────────────────────────────────────── */
-    .fq-hero { position: relative;
+    /* ── Hero, with the search inside it ──────────────────────── */
+    .fq-hero { position: relative; overflow: hidden;
         background: linear-gradient(103deg, #ecf3fe 0%, #eef4fe 46%, #f4f8fe 100%); }
-    .fq-hero-in { position: relative; z-index: 2; padding: calc(28 * var(--u)) 0 calc(39 * var(--u));
-        max-width: calc(580 * var(--u)); }
-    .fq-eyebrow { display: block; font-size: calc(15 * var(--u)); font-weight: 800;
-        letter-spacing: calc(1 * var(--u)); color: #fb4404; margin: 0 0 calc(6 * var(--u)); }
-    .fq-hero h1 { font-size: calc(55 * var(--u)); font-weight: 800; letter-spacing: calc(-1.4 * var(--u));
-        line-height: 1.1; margin: 0; color: #0b1340; }
-    .fq-hero h1 .o { color: #f4400a; }
-    .fq-hero h1 .b { color: #1565e8; }
-    .fq-hero p { font-size: calc(20 * var(--u)); color: #3f4a63; line-height: 1.45;
-        margin: calc(14 * var(--u)) 0 0; max-width: calc(560 * var(--u)); }
-
-    /* The whole right-hand composition is cut from the design file: the
-       photograph, the FAQ card, the four ticks and the handwriting are one
-       picture there, so they are one picture here. */
-    .fq-hero-art { position: absolute; top: 0; right: 0; bottom: 0; width: 52%;
+    /* The photograph, the FAQ card, the four ticks and the handwriting are
+       one picture on the file, so they are one picture here. */
+    .fq-hero-art { position: absolute; top: 0; right: 0; bottom: 0; width: 54.1%;
         background-image: url('{{ asset('images/faq/hero.png') }}');
         background-position: right top; background-size: 100% 100%; z-index: 1;
         -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 9%);
         mask-image: linear-gradient(90deg, transparent 0, #000 9%); }
+    .fq-hero-in { position: relative; z-index: 2; padding: calc(18 * var(--u)) 0 calc(24 * var(--u));
+        max-width: calc(620 * var(--u)); }
+    .fq-eyebrow { display: block; font-size: calc(15 * var(--u)); font-weight: 800;
+        letter-spacing: calc(1 * var(--u)); color: #fb4404; margin: 0 0 calc(5 * var(--u)); }
+    .fq-hero h1 { font-size: calc(52 * var(--u)); font-weight: 800; letter-spacing: calc(-1.4 * var(--u));
+        line-height: 1.1; margin: 0; color: #0b1340; }
+    .fq-hero h1 .o { color: #f4400a; }
+    .fq-hero h1 .b { color: #1565e8; }
+    .fq-hero p { font-size: calc(17 * var(--u)); color: #3f4a63; line-height: 1.5;
+        margin: calc(11 * var(--u)) 0 0; max-width: calc(470 * var(--u)); }
 
-    /* On the file the band does not end in one straight line: its right end
-       carries on about 26 of its pixels lower, so the last line of the
-       handwriting and the orange stroke under it run across the top corner
-       of the search card and past its right edge. That piece is its own
-       cut, laid over the card. */
-    .fq-script-tail { position: absolute; right: calc(-70 * var(--u)); top: calc(-7 * var(--u));
-        width: calc(198 * var(--u)); height: calc(67 * var(--u)); z-index: 4;
-        background-image: url('{{ asset('images/faq/script-tail.png') }}');
-        background-size: 100% 100%; }
-
-    .fq-body { background: #f8fdfe; padding-bottom: calc(10 * var(--u)); overflow-x: clip; }
-
-    /* ── Search card ──────────────────────────────────────────── */
-    /* The card is NOT white on the file. It is #f0f7fe, a light blue, and
-       that single wrong value is what made the drawing look like a
-       rectangle pasted on top: the drawing is a flat cut carrying the
-       file's own card colour around its edges, so against a whiter card
-       its edges showed. On the right colour there is no edge to see.
-       The right-hand padding is the drawing's lane, 179 of the file's
-       pixels, which is what stops the field and the pills running under
-       it. The field has no width of its own any more; it fills what the
-       card leaves, which is how the file's proportions hold at any size. */
-    .fq-search { position: relative; z-index: 3; margin-top: calc(-12 * var(--u));
-        background: #f0f7fe; border: 1px solid #e2edfb; border-radius: calc(14 * var(--u));
-        padding: calc(16 * var(--u)) calc(273 * var(--u)) calc(14 * var(--u)) calc(30 * var(--u)); }
-    /* Decorative, and taller than the card it sits in, which is why it is
-       laid over the card rather than placed in it: as a grid or flex item
-       it would set the card's height and the card would grow 15 taller
-       than the file's. Its lane is the padding above. */
-    .fq-search-art { position: absolute; right: calc(98 * var(--u)); top: calc(12 * var(--u));
-        width: calc(159 * var(--u)); height: calc(124 * var(--u));
-        background-image: url('{{ asset('images/faq/search-art.png') }}');
-        background-size: 100% 100%; background-repeat: no-repeat; }
-    .fq-searchrow { position: relative; z-index: 2; display: flex;
-        border-radius: calc(10 * var(--u)); overflow: hidden; border: 1px solid #dde7f4; background: #fff; }
-    .fq-searchrow .ic { display: flex; align-items: center; padding: 0 calc(6 * var(--u)) 0 calc(18 * var(--u)); color: #0b1340; }
-    .fq-searchrow .ic svg { width: calc(34 * var(--u)); height: calc(34 * var(--u)); }
+    .fq-searchrow { position: relative; z-index: 2; display: flex; margin: calc(16 * var(--u)) 0 0;
+        max-width: calc(560 * var(--u)); border-radius: calc(10 * var(--u)); overflow: hidden;
+        border: 1px solid #cfe0fb; background: #fff; }
+    .fq-searchrow .ic { display: flex; align-items: center; padding: 0 calc(5 * var(--u)) 0 calc(15 * var(--u)); color: #0b1340; }
+    .fq-searchrow .ic svg { width: calc(22 * var(--u)); height: calc(22 * var(--u)); }
     .fq-searchrow input { flex: 1 1 auto; min-width: 0; border: 0; outline: 0; background: transparent;
-        font-size: calc(19 * var(--u)); color: #0b1340; padding: calc(15 * var(--u)) calc(10 * var(--u)); }
+        font-family: inherit; font-size: calc(16 * var(--u)); color: #0b1340;
+        padding: calc(12 * var(--u)) calc(8 * var(--u)); }
     .fq-searchrow input::placeholder { color: #7b879c; }
-    .fq-searchrow button { flex: none; border: 0; cursor: pointer; background: #005afd; color: #fff;
-        font-size: calc(18 * var(--u)); font-weight: 700; padding: 0 calc(55 * var(--u)); }
+    .fq-searchrow button { flex: none; border: 0; cursor: pointer; background: #1565e8; color: #fff;
+        font-family: inherit; font-size: calc(16 * var(--u)); font-weight: 700; padding: 0 calc(34 * var(--u)); }
     .fq-pop { position: relative; z-index: 2; display: flex; align-items: center; flex-wrap: wrap;
-        gap: calc(10 * var(--u)); margin-top: calc(14 * var(--u)); }
-    .fq-pop > b { font-size: calc(16 * var(--u)); font-weight: 700; color: #0b1340; }
+        gap: calc(8 * var(--u)); margin-top: calc(11 * var(--u)); }
+    .fq-pop > b { font-size: calc(13.5 * var(--u)); font-weight: 600; color: #3f4a63; }
     .fq-pop button { cursor: pointer; background: #fff; border: 1px solid #dfe8f5;
-        border-radius: calc(999 * var(--u)); padding: calc(9 * var(--u)) calc(18 * var(--u));
-        font-size: calc(16 * var(--u)); color: #2f3b55; }
-    .fq-pop button:hover { border-color: #005afd; color: #005afd; }
+        border-radius: calc(999 * var(--u)); padding: calc(5 * var(--u)) calc(15 * var(--u));
+        font-family: inherit; font-size: calc(13.5 * var(--u)); color: #2f3b55; }
+    .fq-pop button:hover { border-color: #1565e8; color: #1565e8; }
+
+    .fq-body { background: #f7fbfe; padding-bottom: calc(14 * var(--u)); }
 
     /* ── Section headings ─────────────────────────────────────── */
-    .fq-sec { margin-top: calc(16 * var(--u)); }
-    .fq-sec h2 { font-size: calc(30 * var(--u)); font-weight: 800; color: #0b1340;
+    .fq-sec { padding-top: calc(22 * var(--u)); }
+    .fq-sec h2 { font-size: calc(26 * var(--u)); font-weight: 800; color: #0b1340;
         margin: 0; line-height: 1.2; letter-spacing: calc(-.4 * var(--u)); }
-    .fq-sec > p.lede { font-size: calc(17 * var(--u)); color: #5a6679; margin: calc(3 * var(--u)) 0 calc(13 * var(--u)); }
+    .fq-sec > p.lede { font-size: calc(15 * var(--u)); color: #5a6679; margin: calc(3 * var(--u)) 0 calc(13 * var(--u)); }
     .fq-sechead { display: flex; align-items: flex-start; justify-content: space-between; gap: calc(20 * var(--u)); }
-    .fq-viewall { font-size: calc(16 * var(--u)); font-weight: 700; color: #1565e8; text-decoration: none;
+    .fq-viewall { font-size: calc(14.5 * var(--u)); font-weight: 700; color: #1565e8; text-decoration: none;
         display: inline-flex; align-items: center; gap: calc(7 * var(--u)); white-space: nowrap; }
-    .fq-viewall svg { width: calc(17 * var(--u)); height: calc(17 * var(--u)); }
+    .fq-viewall svg { width: calc(15 * var(--u)); height: calc(15 * var(--u)); }
 
     /* ── I am a… ──────────────────────────────────────────────── */
-    .fq-roles { display: grid; grid-template-columns: repeat(auto-fit, minmax(calc(230 * var(--u)), 1fr));
-        gap: calc(11 * var(--u)); }
-    .fq-role { display: grid; grid-template-columns: calc(78 * var(--u)) minmax(0, 1fr) calc(22 * var(--u));
+    .fq-roles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: calc(13 * var(--u)); }
+    .fq-role { display: grid; grid-template-columns: calc(72 * var(--u)) minmax(0, 1fr) calc(20 * var(--u));
         align-items: center; text-decoration: none; border-radius: calc(12 * var(--u));
-        padding: calc(16 * var(--u)) calc(14 * var(--u)); background: var(--t); }
-    .fq-role .circ { width: calc(58 * var(--u)); height: calc(58 * var(--u)); border-radius: 50%;
+        padding: calc(15 * var(--u)) calc(13 * var(--u)); background: var(--t); }
+    .fq-role .circ { width: calc(52 * var(--u)); height: calc(52 * var(--u)); border-radius: 50%;
         background: var(--k); display: flex; align-items: center; justify-content: center; color: #fff; }
-    .fq-role .circ svg { width: calc(30 * var(--u)); height: calc(30 * var(--u)); }
-    .fq-role b { display: block; font-size: calc(20 * var(--u)); font-weight: 700; color: var(--k);
-        line-height: 1.2; margin-bottom: calc(4 * var(--u)); }
-    .fq-role span { display: block; font-size: calc(16 * var(--u)); color: #3f4a63; line-height: 1.4; }
+    .fq-role .circ svg { width: calc(27 * var(--u)); height: calc(27 * var(--u)); }
+    .fq-role b { display: block; font-size: calc(18 * var(--u)); font-weight: 700; color: var(--k);
+        line-height: 1.2; margin-bottom: calc(3 * var(--u)); }
+    .fq-role span { display: block; font-size: calc(14 * var(--u)); color: #3f4a63; line-height: 1.4; }
     .fq-role .go { color: var(--k); display: flex; justify-content: flex-end; }
-    .fq-role .go svg { width: calc(16 * var(--u)); height: calc(16 * var(--u)); }
+    .fq-role .go svg { width: calc(15 * var(--u)); height: calc(15 * var(--u)); }
 
     /* ── Browse help topics ───────────────────────────────────── */
-    .fq-topics { display: grid; grid-template-columns: repeat(auto-fit, minmax(calc(118 * var(--u)), 1fr));
-        gap: calc(11 * var(--u)); }
-    .fq-topic { text-decoration: none; background: #fefefe; border: 1px solid #e7eef8;
-        border-radius: calc(12 * var(--u)); padding: calc(16 * var(--u)) calc(8 * var(--u)) calc(14 * var(--u));
+    .fq-topics { display: grid; grid-template-columns: repeat(8, minmax(0, 1fr)); gap: calc(11 * var(--u)); }
+    .fq-topic { text-decoration: none; background: #fff; border: 1px solid #e7eef8;
+        border-radius: calc(12 * var(--u)); padding: calc(16 * var(--u)) calc(6 * var(--u)) calc(14 * var(--u));
         text-align: center; display: block; }
     .fq-topic:hover { border-color: #b9d1f7; }
-    .fq-topic svg { width: calc(36 * var(--u)); height: calc(36 * var(--u)); color: var(--k); }
-    .fq-topic b { display: block; margin-top: calc(10 * var(--u)); font-size: calc(16 * var(--u));
+    .fq-topic svg { width: calc(32 * var(--u)); height: calc(32 * var(--u)); color: var(--k); }
+    .fq-topic b { display: block; margin-top: calc(9 * var(--u)); font-size: calc(14.5 * var(--u));
         font-weight: 700; color: #0b1340; line-height: 1.25; }
 
     /* ── Popular questions ────────────────────────────────────── */
-    .fq-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(calc(185 * var(--u)), 1fr));
-        gap: calc(11 * var(--u)); }
-    .fq-card { position: relative; text-decoration: none; background: #fefefe; border: 1px solid #e7eef8;
-        border-radius: calc(12 * var(--u)); padding: calc(13 * var(--u)) calc(15 * var(--u)) calc(11 * var(--u));
-        display: grid; grid-template-columns: calc(54 * var(--u)) minmax(0, 1fr); column-gap: calc(4 * var(--u)); }
+    .fq-cards { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: calc(11 * var(--u)); }
+    .fq-card { position: relative; text-decoration: none; background: #fff; border: 1px solid #dde9f8;
+        border-radius: calc(12 * var(--u)); padding: calc(13 * var(--u)) calc(14 * var(--u)) calc(26 * var(--u));
+        display: grid; grid-template-columns: calc(52 * var(--u)) minmax(0, 1fr); column-gap: calc(3 * var(--u)); }
     .fq-card:hover { border-color: #b9d1f7; }
     .fq-card .circ { width: calc(42 * var(--u)); height: calc(42 * var(--u)); border-radius: 50%;
         background: var(--k); color: #fff; display: flex; align-items: center; justify-content: center; }
-    .fq-card .circ svg { width: calc(22 * var(--u)); height: calc(22 * var(--u)); }
-    .fq-card b { font-size: calc(16 * var(--u)); font-weight: 700; color: #0b1340; line-height: 1.18; }
-    .fq-card p { grid-column: 2; margin: calc(10 * var(--u)) 0 0; font-size: calc(14 * var(--u));
-        color: #5a6679; line-height: 1.36; }
-    .fq-card .go { position: absolute; right: calc(13 * var(--u)); bottom: calc(13 * var(--u)); color: #1565e8; }
-    .fq-card .go svg { width: calc(16 * var(--u)); height: calc(16 * var(--u)); }
+    .fq-card .circ svg { width: calc(21 * var(--u)); height: calc(21 * var(--u)); }
+    .fq-card b { font-size: calc(15.5 * var(--u)); font-weight: 700; color: #0b1340; line-height: 1.2; }
+    .fq-card p { grid-column: 2; margin: calc(8 * var(--u)) 0 0; font-size: calc(13.5 * var(--u));
+        color: #5a6679; line-height: 1.4; }
+    .fq-card .go { position: absolute; right: calc(12 * var(--u)); bottom: calc(10 * var(--u)); color: #1565e8; }
+    .fq-card .go svg { width: calc(15 * var(--u)); height: calc(15 * var(--u)); }
 
     /* ── All questions ────────────────────────────────────────── */
     .fq-sort { border: 1px solid #dfe8f5; background: #fff; border-radius: calc(9 * var(--u));
-        padding: calc(9 * var(--u)) calc(14 * var(--u)); font-size: calc(16 * var(--u)); color: #0b1340; }
-    .fq-qa { display: grid; grid-template-columns: calc(230 * var(--u)) minmax(0, 1fr);
-        gap: calc(14 * var(--u)); background: #fefefe; border: 1px solid #e7eef8;
-        border-radius: calc(13 * var(--u)); padding: calc(13 * var(--u)); }
+        padding: calc(8 * var(--u)) calc(13 * var(--u)); font-family: inherit;
+        font-size: calc(14.5 * var(--u)); color: #0b1340; }
+    .fq-qa { display: grid; grid-template-columns: calc(228 * var(--u)) minmax(0, 1fr);
+        gap: calc(13 * var(--u)); background: #fff; border: 1px solid #dde9f8;
+        border-radius: calc(13 * var(--u)); padding: calc(12 * var(--u)); }
     .fq-side { display: flex; flex-direction: column; gap: calc(2 * var(--u)); }
-    .fq-side button { display: grid; grid-template-columns: calc(34 * var(--u)) minmax(0, 1fr);
+    .fq-side button { display: grid; grid-template-columns: calc(32 * var(--u)) minmax(0, 1fr);
         align-items: center; text-align: left; cursor: pointer; background: none; border: 0;
         border-left: calc(3 * var(--u)) solid transparent; border-radius: calc(8 * var(--u));
-        padding: calc(11 * var(--u)) calc(10 * var(--u)); font-size: calc(17 * var(--u));
-        font-weight: 600; color: #2f3b55; }
-    .fq-side button svg { width: calc(20 * var(--u)); height: calc(20 * var(--u)); color: var(--k); }
-    .fq-side button.on { background: #e4effe; border-left-color: #005afd; color: #1565e8; font-weight: 700; }
+        padding: calc(10 * var(--u)) calc(9 * var(--u)); font-family: inherit;
+        font-size: calc(15.5 * var(--u)); font-weight: 600; color: #2f3b55; }
+    .fq-side button svg { width: calc(19 * var(--u)); height: calc(19 * var(--u)); color: var(--k); }
+    .fq-side button.on { background: #e4effe; border-left-color: #1565e8; color: #1565e8; font-weight: 700; }
 
-    .fq-list { display: flex; flex-direction: column; gap: calc(9 * var(--u)); }
+    .fq-list { display: flex; flex-direction: column; gap: calc(7 * var(--u)); }
     .fq-item { border: 1px solid #e7eef8; border-radius: calc(10 * var(--u)); overflow: hidden; background: #fff; }
     .fq-item > summary { list-style: none; cursor: pointer; display: grid;
-        grid-template-columns: calc(26 * var(--u)) minmax(0, 1fr) calc(26 * var(--u));
+        grid-template-columns: calc(24 * var(--u)) minmax(0, 1fr) calc(24 * var(--u));
         align-items: center; gap: calc(4 * var(--u));
-        padding: calc(13 * var(--u)) calc(16 * var(--u)); font-size: calc(17.5 * var(--u));
+        padding: calc(11 * var(--u)) calc(15 * var(--u)); font-size: calc(15.5 * var(--u));
         font-weight: 700; color: #0b1340; }
     .fq-item > summary::-webkit-details-marker { display: none; }
-    .fq-item > summary svg { width: calc(15 * var(--u)); height: calc(15 * var(--u)); color: #1565e8; }
-    .fq-item > summary .sign { justify-self: end; font-size: calc(22 * var(--u)); color: #1565e8; line-height: 1; }
+    .fq-item > summary svg { width: calc(14 * var(--u)); height: calc(14 * var(--u)); color: #1565e8; }
+    .fq-item > summary .sign { justify-self: end; font-size: calc(20 * var(--u)); color: #1565e8; line-height: 1; }
     .fq-item[open] { border-color: #cfe0fb; }
-    .fq-item[open] > summary { background: #e4effe; color: #0b1340; }
+    .fq-item[open] > summary { background: #e4effe; }
     .fq-item[open] > summary .chev { transform: rotate(180deg); }
-    .fq-item .ans { padding: calc(10 * var(--u)) calc(16 * var(--u)) calc(16 * var(--u)) calc(46 * var(--u));
-        font-size: calc(16.5 * var(--u)); color: #4a5670; line-height: 1.55; background: #f4f8ff; }
-    .fq-none { padding: calc(26 * var(--u)) calc(16 * var(--u)); font-size: calc(17 * var(--u)); color: #5a6679; }
+    .fq-item .ans { padding: calc(9 * var(--u)) calc(15 * var(--u)) calc(14 * var(--u)) calc(43 * var(--u));
+        font-size: calc(15 * var(--u)); color: #4a5670; line-height: 1.55; background: #f4f8ff; }
+    .fq-none { padding: calc(24 * var(--u)) calc(15 * var(--u)); font-size: calc(15 * var(--u)); color: #5a6679; }
 
     /* ── Still need help ──────────────────────────────────────── */
-    /* She stands past the card on the file, above its top edge and a little
-       past its right, so the card does not clip her. */
-    .fq-help { position: relative; margin-top: calc(22 * var(--u)); background: #fafcfe;
+    .fq-help { position: relative; margin-top: calc(20 * var(--u)); background: #fff;
         border: 1px solid #e7eef8; border-radius: calc(13 * var(--u));
-        display: grid; grid-template-columns: calc(120 * var(--u)) minmax(0, 1fr) auto;
-        align-items: center; gap: calc(14 * var(--u));
-        padding: calc(26 * var(--u)) calc(198 * var(--u)) calc(26 * var(--u)) calc(20 * var(--u)); }
+        display: grid; grid-template-columns: calc(110 * var(--u)) minmax(0, 1fr) auto;
+        align-items: center; gap: calc(12 * var(--u));
+        padding: calc(22 * var(--u)) calc(250 * var(--u)) calc(22 * var(--u)) calc(18 * var(--u)); }
     .fq-help .head { display: flex; justify-content: center; color: #1565e8; }
-    .fq-help .head svg { width: calc(66 * var(--u)); height: calc(66 * var(--u)); }
-    .fq-help h3 { font-size: calc(25 * var(--u)); font-weight: 800; color: #0b1340; margin: 0 0 calc(4 * var(--u)); }
-    .fq-help p { font-size: calc(16 * var(--u)); color: #5a6679; line-height: 1.45; margin: 0;
-        max-width: calc(470 * var(--u)); }
-    .fq-help .btns { display: flex; gap: calc(12 * var(--u)); flex-wrap: wrap; }
-    .fq-hbtn { display: inline-flex; align-items: center; gap: calc(10 * var(--u)); text-decoration: none;
-        font-size: calc(17 * var(--u)); font-weight: 700; padding: calc(13 * var(--u)) calc(22 * var(--u));
+    .fq-help .head svg { width: calc(60 * var(--u)); height: calc(60 * var(--u)); }
+    .fq-help h3 { font-size: calc(23 * var(--u)); font-weight: 800; color: #0b1340; margin: 0 0 calc(4 * var(--u)); }
+    .fq-help p { font-size: calc(14.5 * var(--u)); color: #5a6679; line-height: 1.45; margin: 0;
+        max-width: calc(430 * var(--u)); }
+    .fq-help .btns { display: flex; gap: calc(11 * var(--u)); flex-wrap: wrap; }
+    .fq-hbtn { display: inline-flex; align-items: center; gap: calc(9 * var(--u)); text-decoration: none;
+        font-size: calc(15.5 * var(--u)); font-weight: 700; padding: calc(12 * var(--u)) calc(20 * var(--u));
         border-radius: calc(9 * var(--u)); border: 1px solid transparent; white-space: nowrap; }
-    .fq-hbtn svg { width: calc(19 * var(--u)); height: calc(19 * var(--u)); }
-    .fq-hbtn.solid { background: #005afd; color: #fff; }
+    .fq-hbtn svg { width: calc(18 * var(--u)); height: calc(18 * var(--u)); flex: none; }
+    .fq-hbtn.solid { background: #1565e8; color: #fff; }
     .fq-hbtn.ghost { background: #fff; color: #1565e8; border-color: #bed5fa; }
-    .fq-help .agent { position: absolute; right: calc(-10 * var(--u)); top: 50%;
-        transform: translateY(-50%); width: calc(198 * var(--u)); height: calc(152 * var(--u));
+    .fq-help .agent { position: absolute; right: calc(-6 * var(--u)); top: 50%;
+        transform: translateY(-50%); width: calc(200 * var(--u)); height: calc(150 * var(--u));
         background-image: url('{{ asset('images/faq/agent.png') }}');
         background-size: contain; background-position: right center; background-repeat: no-repeat; }
 
     /* ── The band above the footer ────────────────────────────── */
-    .fq-cta { position: relative; margin-top: calc(14 * var(--u)); background: #fef2ea; overflow: hidden; }
-    .fq-cta-art { position: absolute; left: 0; top: 0; bottom: 0; width: 24.1%;
+    .fq-cta { position: relative; margin-top: calc(14 * var(--u)); overflow: hidden;
+        background: linear-gradient(100deg, #dde9fd 0%, #e8f0fe 52%, #eaf2ff 100%); }
+    .fq-cta-art { position: absolute; left: 0; top: 0; bottom: 0; width: 29.3%;
         background-image: url('{{ asset('images/faq/cta-left.png') }}');
         background-position: left center; background-size: 100% 100%;
-        -webkit-mask-image: linear-gradient(270deg, transparent 0, #000 18%);
-        mask-image: linear-gradient(270deg, transparent 0, #000 18%); }
-    .fq-cta-in { position: relative; z-index: 2; display: flex; align-items: center; justify-content: flex-end;
-        gap: calc(28 * var(--u)); padding: calc(12 * var(--u)) 0 calc(12 * var(--u)) 17%; flex-wrap: nowrap; }
-    .fq-cta h2 { font-size: calc(28 * var(--u)); font-weight: 800; color: #0b1340; margin: 0 0 calc(7 * var(--u)); }
-    .fq-cta p { font-size: calc(16.5 * var(--u)); color: #3f4a63; line-height: 1.45; margin: 0;
-        max-width: calc(500 * var(--u)); }
-    .fq-cta-btns { display: flex; gap: calc(14 * var(--u)); flex: none; }
-    .fq-cbtn { display: inline-flex; align-items: center; gap: calc(11 * var(--u)); text-decoration: none;
-        color: #fff; font-size: calc(17 * var(--u)); font-weight: 700;
-        padding: calc(14 * var(--u)) calc(24 * var(--u)); border-radius: calc(9 * var(--u)); white-space: nowrap; }
-    .fq-cbtn svg { width: calc(20 * var(--u)); height: calc(20 * var(--u)); }
-    .fq-cbtn .go { width: calc(16 * var(--u)); height: calc(16 * var(--u)); }
+        -webkit-mask-image: linear-gradient(270deg, transparent 0, #000 16%);
+        mask-image: linear-gradient(270deg, transparent 0, #000 16%); }
+    .fq-cta-script { position: absolute; right: 0; top: 0; bottom: 0; width: 20.7%;
+        background-image: url('{{ asset('images/faq/cta-script.png') }}');
+        background-position: right center; background-size: 100% 100%;
+        -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 12%);
+        mask-image: linear-gradient(90deg, transparent 0, #000 12%); }
+    .fq-cta-in { position: relative; z-index: 2; text-align: center;
+        padding: calc(20 * var(--u)) 0; max-width: calc(620 * var(--u)); margin: 0 auto; }
+    .fq-cta h2 { font-size: calc(26 * var(--u)); font-weight: 800; color: #0b1340; margin: 0 0 calc(6 * var(--u)); }
+    .fq-cta p { font-size: calc(15 * var(--u)); color: #3f4a63; line-height: 1.45;
+        margin: 0 auto calc(16 * var(--u)); max-width: calc(560 * var(--u)); }
+    .fq-cta-btns { display: flex; justify-content: center; gap: calc(14 * var(--u)); flex-wrap: wrap; }
+    .fq-cbtn { display: inline-flex; align-items: center; gap: calc(10 * var(--u)); text-decoration: none;
+        color: #fff; font-size: calc(15.5 * var(--u)); font-weight: 700;
+        padding: calc(13 * var(--u)) calc(22 * var(--u)); border-radius: calc(9 * var(--u)); white-space: nowrap; }
+    .fq-cbtn svg { width: calc(18 * var(--u)); height: calc(18 * var(--u)); flex: none; }
+    .fq-cbtn .go { width: calc(15 * var(--u)); height: calc(15 * var(--u)); }
     .fq-cbtn.orange { background: #f4400a; }
-    .fq-cbtn.blue { background: #0d6bf5; }
+    .fq-cbtn.blue { background: #0d5bea; }
 
-    @media (max-width: 980px) {
-        .fq-hero-art, .fq-script-tail, .fq-search-art, .fq-cta-art, .fq-help .agent { display: none; }
-        .fq-search { padding-right: calc(30 * var(--u)); }
+    @media (max-width: 1180px) {
+        .fq-topics { grid-template-columns: repeat(4, minmax(0, 1fr)); }
+        .fq-cards { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+        .fq-roles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .fq-help { padding-right: calc(18 * var(--u)); }
+        .fq-help .agent { display: none; }
+    }
+    @media (max-width: 760px) {
+        .fq-hero-art, .fq-cta-art, .fq-cta-script { display: none; }
         .fq-hero-in { max-width: none; }
+        .fq-searchrow { max-width: none; }
+        .fq-topics, .fq-cards, .fq-roles { grid-template-columns: minmax(0, 1fr); }
         .fq-qa { grid-template-columns: minmax(0, 1fr); }
         .fq-side { flex-direction: row; overflow-x: auto; }
-        .fq-help { grid-template-columns: minmax(0, 1fr); text-align: center;
-            padding-right: calc(20 * var(--u)); }
+        .fq-help { grid-template-columns: minmax(0, 1fr); text-align: center; }
         .fq-help .btns { justify-content: center; }
-        .fq-cta-in { justify-content: center; text-align: center; flex-wrap: wrap; padding-left: 0; }
-        .fq-cta-btns { justify-content: center; }
     }
 </style>
 @endpush
@@ -241,11 +215,6 @@
 @section('content')
 
 @php
-    /* The design file shows eight help topics and five popular questions.
-       The questions on this page are the ones the admin has actually
-       written, so the topics are the categories those questions carry and
-       the popular five are the five that sort first. Nothing is invented to
-       fill a card that the file happens to draw. */
     $icon = [
         'rocket'  => '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M14.6 2.4c2.7-.9 5.4-.6 6.5.5s1.4 3.8.5 6.5c-.8 2.4-2.3 4.7-4.3 6.5l-.4.3-.5 3.3a1 1 0 0 1-.5.75l-3 1.7a1 1 0 0 1-1.48-1l.3-2.9-3.3-3.3-2.9.3a1 1 0 0 1-1-1.48l1.7-3a1 1 0 0 1 .75-.5l3.3-.5.3-.4c1.8-2 4.1-3.5 6.5-4.3zm1.3 3.9a1.8 1.8 0 1 0 2.5 2.5 1.8 1.8 0 0 0-2.5-2.5zM6.2 16.2c.6.6.4 1.9-.5 2.8-.7.7-2.6 1.3-3.4 1.5-.2.05-.4-.15-.35-.35.2-.8.8-2.7 1.5-3.4.9-.9 2.2-1.1 2.75-.55z"/></svg>',
         'doc'     => '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zm-1 7V3.5L18.5 9zM8.3 12.3h7.4a.95.95 0 0 1 0 1.9H8.3a.95.95 0 0 1 0-1.9zm0 3.6h5a.95.95 0 0 1 0 1.9h-5a.95.95 0 0 1 0-1.9z"/></svg>',
@@ -262,60 +231,56 @@
         'mega'    => '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.6 3.3a1.3 1.3 0 0 1 2.2.95v15.5a1.3 1.3 0 0 1-2.2.95l-3.9-3.7H12v3.4a1.6 1.6 0 0 1-1.6 1.6H8.2a1.6 1.6 0 0 1-1.6-1.6V17H5A3 3 0 0 1 2 14v-4.1a3 3 0 0 1 3-3h8.7zM8.9 17v2.6h1.1V17z"/></svg>',
     ];
 
-    /* One icon and one accent per category, so a category that is renamed in
-       the admin still gets a card rather than disappearing. */
-    $topicLook = [
-        'Getting Started'     => ['rocket', '#1565e8'],
-        'General'             => ['rocket', '#1565e8'],
-        'Requests & Proposals'=> ['doc',    '#fb4404'],
-        'For Professionals'   => ['brief',  '#1565e8'],
-        'Agreements & Contracts' => ['pencil', '#9a1ae8'],
-        'Billing'             => ['card',   '#0f9d6b'],
-        'Payments & Payouts'  => ['card',   '#0f9d6b'],
-        'Bookings & Payments' => ['cal',    '#9a1ae8'],
-        'Messaging'           => ['chat',   '#1565e8'],
-        'Account & Settings'  => ['person', '#fb4404'],
-        'Account & Membership'=> ['person', '#fb4404'],
-        'Trust & Safety'      => ['lock',   '#fa035f'],
-        'Events & Bookings'   => ['cal',    '#9a1ae8'],
+    /* The eight topics her file draws, in her order, with her icons. The
+       questions already written were moved into them on 6 November, so the
+       labels below and the `category` column are the same eight words. A
+       topic nobody has written a question for yet says so rather than being
+       filled with invented policy. */
+    $topics = [
+        ['Getting Started',        'rocket', '#1565e8'],
+        ['Requests & Proposals',   'doc',    '#fb4404'],
+        ['Agreements & Contracts', 'pencil', '#9a1ae8'],
+        ['Payments & Payouts',     'card',   '#0f9d6b'],
+        ['Messaging',              'chat',   '#1565e8'],
+        ['Account & Settings',     'person', '#fb4404'],
+        ['Trust & Safety',         'lock',   '#fa035f'],
+        ['Events & Bookings',      'cal',    '#9a1ae8'],
     ];
-    $look = fn (string $cat) => $topicLook[$cat] ?? ['doc', '#1565e8'];
 
-    $cats = $grouped->keys()->values();
+    $byCat = collect($topics)->mapWithKeys(fn ($t) => [$t[0] => $grouped[$t[0]] ?? collect()]);
 
-    /* The five that sort first, which is what "Popular First" means here:
-       the order the admin put them in. */
-    $popular = $faqs->take(5);
+    /* Her five, each pointing at something real: a question that exists, or
+       the page that answers it. Nothing here invents an answer. */
+    $find = fn (string $needle) => $faqs->first(fn ($f) => str_contains(strtolower($f->question), $needle));
 
-    /* The file's pills are search words. These are only shown when they
-       actually match something somebody wrote, so a pill never leads to an
-       empty result. */
-    $terms = collect(['payment', 'cancel', 'commission', 'membership', 'bidding', 'refund', 'verify'])
+    $popular = [
+        ['How do I create an account?', 'Learn how to sign up as a Client, Professional, Influencer, or Affiliate.', 'users',  '#fb4404', $find('create an account')],
+        ['How do I post a request?',    'Step-by-step guide to creating a Single or Multi-Service Request.',        'doc',    '#1565e8', $find('multiple services')],
+        ['What does GigResource cost?', 'See our service fees, commissions, and payment options.',                  'dollar', '#1565e8', $find('fee to post')],
+        ['How do I message a user?',    'Find out the messaging rules and what each role can chat with.',           'chat',   '#9a1ae8', null],
+        ['How do bookings and payments work?', 'Understand the steps from agreement to payment and booking.',       'cal',    '#fa035f', $find('payment work when i book')],
+    ];
+
+    /* Her pills. Only shown when the word actually matches something
+       somebody wrote, so a pill never leads to an empty result. */
+    $terms = collect(['pricing', 'payments', 'proposals', 'cancellation', 'how it works'])
         ->filter(fn ($t) => $faqs->contains(
             fn ($f) => str_contains(strtolower($f->question . ' ' . $f->answer), $t)
         ))
-        ->take(5)
         ->values();
 
-    /* The four the file draws, each to where that account is actually
-       started. Affiliate is a real account type here: it has its own AFF-
-       reference (OA-163), its own sign-in and its own self-serve signup.
-       The colours are not sampled off the file but read from the table Sir
-       Peter set in stone on 2026-09-23 (OA-164), which everything that
-       tints by role reads, so these four cannot drift from the avatars and
-       badges that use the same pairs. */
-    $tint = fn (string $role) => \App\Support\RoleColours::ROLES[$role][0];
-    $key  = fn (string $role) => \App\Support\RoleColours::ROLES[$role][1];
+    /* The roles somebody can sign up as. All four exist here: Affiliate has
+       its own AFF- reference, its own sign-in and its own signup. The
+       colours are the table Sir Peter set in stone (OA-164), which every
+       avatar and badge reads, so these cannot drift from the rest. */
+    $tint = fn (string $r) => \App\Support\RoleColours::ROLES[$r][0];
+    $key  = fn (string $r) => \App\Support\RoleColours::ROLES[$r][1];
 
     $roles = [
-        ['Client', 'Plan and hire event services.', 'users', 'client',
-            route('register', ['role' => 'client'])],
-        ['Professional', 'Provide event services, submit bids, and grow your business.', 'brief', 'professional',
-            route('register', ['role' => 'professional'])],
-        ['Influencer', 'Create and share event experiences.', 'camera', 'influencer',
-            route('register', ['role' => 'influencer'])],
-        ['Affiliate', 'Refer new users and earn commissions.', 'mega', 'affiliate',
-            route('influencer.join')],
+        ['Client', 'Plan and hire event services.', 'users', 'client', route('register', ['role' => 'client'])],
+        ['Professional', 'Provide event services, submit bids, and grow your business.', 'brief', 'professional', route('register', ['role' => 'professional'])],
+        ['Influencer', 'Create and share event experiences.', 'camera', 'influencer', route('register', ['role' => 'influencer'])],
+        ['Affiliate', 'Refer new users and earn commissions.', 'mega', 'affiliate', route('influencer.join')],
     ];
 
     $chev  = '<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8.5 12 15.5 19 8.5"/></svg>';
@@ -325,14 +290,32 @@
 
 <div class="fq-page">
 
-{{-- ── Hero ─────────────────────────────────────────────────── --}}
+{{-- ── Hero, search inside it ───────────────────────────────── --}}
 <section class="fq-hero">
     <div class="fq-hero-art" role="presentation"></div>
     <div class="lp-container">
         <div class="fq-hero-in">
             <span class="fq-eyebrow">FAQ</span>
             <h1>Questions?<br><span class="o">We&rsquo;ve Got</span> <span class="b">Answers.</span></h1>
-            <p>Get quick answers to FAQs, or contact our support team anytime you need assistance.</p>
+            <p>Find quick answers to the most common questions about using GigResource. If you need more help, our support team is always here for you.</p>
+
+            <div class="fq-searchrow">
+                <span class="ic" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg>
+                </span>
+                <label for="fqSearch" style="position:absolute;left:-9999px;">Search questions</label>
+                <input id="fqSearch" type="search" placeholder="Search questions, keywords, or topics..." autocomplete="off">
+                <button type="button" id="fqSearchGo">Search</button>
+            </div>
+
+            @if($terms->isNotEmpty())
+                <div class="fq-pop">
+                    <b>Popular searches:</b>
+                    @foreach($terms as $term)
+                        <button type="button" data-term="{{ $term }}">{{ $term }}</button>
+                    @endforeach
+                </div>
+            @endif
         </div>
     </div>
 </section>
@@ -340,37 +323,13 @@
 <div class="fq-body">
 <div class="lp-container">
 
-    {{-- ── Search ───────────────────────────────────────────── --}}
-    <div class="fq-search">
-        <div class="fq-search-art" role="presentation"></div>
-        <span class="fq-script-tail" role="presentation"></span>
-        <div class="fq-searchrow">
-            <span class="ic" aria-hidden="true">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg>
-            </span>
-            <label for="fqSearch" class="visually-hidden" style="position:absolute;left:-9999px;">Search questions</label>
-            <input id="fqSearch" type="search" placeholder="Search questions, keywords, or topics&hellip;" autocomplete="off">
-            <button type="button" id="fqSearchGo">Search</button>
-        </div>
-
-        @if($terms->isNotEmpty())
-            <div class="fq-pop">
-                <b>Popular searches:</b>
-                @foreach($terms as $term)
-                    <button type="button" data-term="{{ $term }}">{{ $term }}</button>
-                @endforeach
-            </div>
-        @endif
-    </div>
-
     {{-- ── I am a… ──────────────────────────────────────────── --}}
     <section class="fq-sec">
         <h2>I am a&hellip;</h2>
         <p class="lede">Get answers tailored to your experience on GigResource.</p>
         <div class="fq-roles">
             @foreach($roles as [$name, $blurb, $ic, $role, $href])
-                <a class="fq-role" style="--k: {{ $key($role) }}; --t: {{ $tint($role) }};"
-                   href="{{ $href }}">
+                <a class="fq-role" style="--k: {{ $key($role) }}; --t: {{ $tint($role) }};" href="{{ $href }}">
                     <span class="circ" aria-hidden="true">{!! $icon[$ic] !!}</span>
                     <span>
                         <b>{{ $name }}</b>
@@ -387,9 +346,8 @@
         <h2>Browse Help Topics</h2>
         <p class="lede">Select a topic to find answers to common questions.</p>
         <div class="fq-topics">
-            @foreach($cats as $cat)
-                @php [$ic, $key] = $look($cat); @endphp
-                <a class="fq-topic" style="--k: {{ $key }};" href="#fqAll" data-jump="{{ $cat }}">
+            @foreach($topics as [$cat, $ic, $k])
+                <a class="fq-topic" style="--k: {{ $k }};" href="#fqAll" data-jump="{{ $cat }}">
                     {!! $icon[$ic] !!}
                     <b>{{ $cat }}</b>
                 </a>
@@ -398,30 +356,31 @@
     </section>
 
     {{-- ── Popular questions ────────────────────────────────── --}}
-    @if($popular->isNotEmpty())
-        <section class="fq-sec">
-            <div class="fq-sechead">
-                <div>
-                    <h2>Popular Questions</h2>
-                    <p class="lede">Quick answers to our most frequently asked questions.</p>
-                </div>
-                <a class="fq-viewall" href="#fqAll">View All Questions {!! $right !!}</a>
+    <section class="fq-sec">
+        <div class="fq-sechead">
+            <div>
+                <h2>Popular Questions</h2>
+                <p class="lede">Quick answers to our most frequently asked questions.</p>
             </div>
-            <div class="fq-cards">
-                @foreach($popular as $faq)
-                    @php [$ic, $key] = $look($faq->category ?: 'General'); @endphp
-                    <a class="fq-card" style="--k: {{ $key }};" href="#fqAll" data-open="{{ $faq->id }}">
-                        <span class="circ" aria-hidden="true">{!! $icon[$ic] !!}</span>
-                        <b>{{ $faq->question }}</b>
-                        {{-- The opening of the answer somebody actually wrote,
-                             not a blurb made up to sit under the title. --}}
-                        <p>{{ \Illuminate\Support\Str::limit(strip_tags($faq->answer), 66) }}</p>
-                        <span class="go" aria-hidden="true">{!! $right !!}</span>
-                    </a>
-                @endforeach
-            </div>
-        </section>
-    @endif
+            <a class="fq-viewall" href="#fqAll">View All Questions {!! $right !!}</a>
+        </div>
+        <div class="fq-cards">
+            @foreach($popular as [$title, $blurb, $ic, $k, $faq])
+                {{-- Where a question of this name exists it opens that one;
+                     where it does not, the card goes to the page that does
+                     answer it rather than to an answer nobody has written. --}}
+                <a class="fq-card" style="--k: {{ $k }};"
+                   @if($faq) href="#fqAll" data-open="{{ $faq->id }}"
+                   @elseif($ic === 'dollar') href="{{ route('pricing-and-rates') }}"
+                   @else href="#fqAll" data-jump="Messaging" @endif>
+                    <span class="circ" aria-hidden="true">{!! $icon[$ic] !!}</span>
+                    <b>{{ $title }}</b>
+                    <p>{{ $blurb }}</p>
+                    <span class="go" aria-hidden="true">{!! $right !!}</span>
+                </a>
+            @endforeach
+        </div>
+    </section>
 
     {{-- ── All questions ────────────────────────────────────── --}}
     <section class="fq-sec" id="fqAll">
@@ -441,9 +400,8 @@
 
         <div class="fq-qa">
             <div class="fq-side" role="tablist">
-                @foreach($cats as $i => $cat)
-                    @php [$ic, $key] = $look($cat); @endphp
-                    <button type="button" role="tab" style="--k: {{ $key }};"
+                @foreach($topics as $i => [$cat, $ic, $k])
+                    <button type="button" role="tab" style="--k: {{ $k }};"
                             class="{{ $i === 0 ? 'on' : '' }}"
                             aria-selected="{{ $i === 0 ? 'true' : 'false' }}"
                             data-cat="{{ $cat }}">
@@ -454,8 +412,8 @@
             </div>
 
             <div class="fq-list" id="fqList">
-                @foreach($cats as $i => $cat)
-                    @foreach($grouped[$cat] as $j => $faq)
+                @foreach($topics as $i => [$cat, $ic, $k])
+                    @foreach($byCat[$cat] as $j => $faq)
                         <details class="fq-item" data-cat="{{ $cat }}" data-id="{{ $faq->id }}"
                                  data-q="{{ \Illuminate\Support\Str::lower($faq->question . ' ' . strip_tags($faq->answer)) }}"
                                  @if($i !== 0) hidden @endif
@@ -469,7 +427,9 @@
                         </details>
                     @endforeach
                 @endforeach
-                <p class="fq-none" id="fqNone" hidden>No question here matches that yet. Try another word, or contact support below.</p>
+                {{-- Two of her eight topics have no question written for them
+                     yet. Saying so is better than filling them in. --}}
+                <p class="fq-none" id="fqNone" hidden>Nothing here yet. Try another topic, another word, or contact support below.</p>
             </div>
         </div>
     </section>
@@ -504,20 +464,19 @@
 {{-- ── The band above the footer ────────────────────────────── --}}
 <section class="fq-cta">
     <div class="fq-cta-art" role="presentation"></div>
+    <div class="fq-cta-script" role="presentation"></div>
     <div class="lp-container">
         <div class="fq-cta-in">
-            <div>
-                <h2>Ready to Build Amazing Events Together?</h2>
-                <p>Whether you&rsquo;re looking for trusted professionals or want to showcase your services, GigResource is here to help you succeed.</p>
-            </div>
+            <h2>Ready to Get Started with GigResource?</h2>
+            <p>Find event services or offer your services through the GigResource marketplace.</p>
             <div class="fq-cta-btns">
                 <a class="fq-cbtn orange" href="{{ auth()->check() ? route('client.post-event.event-info') : route('register') }}">
                     <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 2a1 1 0 0 1 1 1v1h6V3a1 1 0 1 1 2 0v1h1.5A2.5 2.5 0 0 1 21 6.5v12a2.5 2.5 0 0 1-2.5 2.5h-13A2.5 2.5 0 0 1 3 18.5v-12A2.5 2.5 0 0 1 5.5 4H7V3a1 1 0 0 1 1-1zM5 10v8.5c0 .3.2.5.5.5h13c.3 0 .5-.2.5-.5V10z"/></svg>
-                    Post an event {!! $arrow !!}
+                    Post an Event {!! $arrow !!}
                 </a>
-                <a class="fq-cbtn blue" href="{{ route('register') }}">
+                <a class="fq-cbtn blue" href="{{ route('register', ['role' => 'professional']) }}">
                     {!! $icon['brief'] !!}
-                    Join as professional {!! $arrow !!}
+                    Join as Professional {!! $arrow !!}
                 </a>
             </div>
         </div>
@@ -559,15 +518,18 @@
         none.hidden = seen > 0;
     }
 
-    tabs.forEach(function (btn) {
-        btn.addEventListener('click', function () {
-            tabs.forEach(function (b) {
-                b.classList.toggle('on', b === btn);
-                b.setAttribute('aria-selected', b === btn ? 'true' : 'false');
-            });
-            input.value = '';
-            apply();
+    function choose(cat) {
+        tabs.forEach(function (b) {
+            var on = b.getAttribute('data-cat') === cat;
+            b.classList.toggle('on', on);
+            b.setAttribute('aria-selected', on ? 'true' : 'false');
         });
+        input.value = '';
+        apply();
+    }
+
+    tabs.forEach(function (btn) {
+        btn.addEventListener('click', function () { choose(btn.getAttribute('data-cat')); });
     });
 
     input.addEventListener('input', apply);
@@ -584,34 +546,15 @@
         });
     });
 
-    // A topic card and a popular question both land on the same list below.
     document.querySelectorAll('[data-jump]').forEach(function (card) {
-        card.addEventListener('click', function () {
-            var want = card.getAttribute('data-jump');
-            tabs.forEach(function (b) {
-                var on = b.getAttribute('data-cat') === want;
-                b.classList.toggle('on', on);
-                b.setAttribute('aria-selected', on ? 'true' : 'false');
-            });
-            input.value = '';
-            apply();
-        });
+        card.addEventListener('click', function () { choose(card.getAttribute('data-jump')); });
     });
 
     document.querySelectorAll('[data-open]').forEach(function (card) {
         card.addEventListener('click', function () {
-            var id = card.getAttribute('data-open');
-            var want = list.querySelector('.fq-item[data-id="' + id + '"]');
+            var want = list.querySelector('.fq-item[data-id="' + card.getAttribute('data-open') + '"]');
             if (!want) { return; }
-
-            var cat = want.getAttribute('data-cat');
-            tabs.forEach(function (b) {
-                var on = b.getAttribute('data-cat') === cat;
-                b.classList.toggle('on', on);
-                b.setAttribute('aria-selected', on ? 'true' : 'false');
-            });
-            input.value = '';
-            apply();
+            choose(want.getAttribute('data-cat'));
             items.forEach(function (el) { el.open = el === want; });
         });
     });
