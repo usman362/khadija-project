@@ -29,15 +29,62 @@
 
     /* ── 1. Our Story hero ────────────────────────────────────── */
     .ab-hero { position: relative; overflow: hidden; background: #e9f1fd; }
-    /* The photograph, its warm light and the two floating panels over it
-       are one picture on the file, so they are one picture here. The words
-       inside those panels are not legible on it, and inventing words to put
-       on a page about trust is not something to do. */
+    /* The photograph, and only the photograph.
+       It used to carry the two floating panels baked into it, and the words
+       inside them had come out of an image generator as "Compae Cpins" and
+       "Boirg Optnas", under a wordmark reading "PAR". Words living in a JPEG
+       cannot be corrected, read aloud, translated, or kept in step with the
+       brand, and they go soft at every size but one. So the file was cut back
+       to the part of the frame the panels never covered (everything left of
+       x=1000 went, nothing was painted over), and the panels below are drawn
+       in markup with the words the spec actually asks for. */
     .ab-hero-art { position: absolute; top: 0; right: 0; bottom: 0; width: 54.1%;
         background-image: url('{{ asset('images/about/hero.jpg') }}');
-        background-position: right center; background-size: 100% 100%;
+        /* The source is portrait now, so it fills the box rather than being
+           stretched to its corners the way the old landscape frame was. Held
+           low in the frame: that is where the desk, the laptop and the
+           notebook are, and the panels float over them the way the design
+           intends. Centred, the crop is nothing but bokeh. */
+        background-position: center 82%; background-size: cover;
         -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 13%);
         mask-image: linear-gradient(90deg, transparent 0, #000 13%); }
+
+    /* The two panels, over the same area the art covers. */
+    .ab-hero-cards { position: absolute; top: 0; right: 0; bottom: 0; width: 54.1%;
+        z-index: 1; pointer-events: none; }
+    .ab-hc { position: absolute; background: #fff; border-radius: calc(16 * var(--u));
+        box-shadow: 0 calc(16 * var(--u)) calc(42 * var(--u)) rgba(11, 19, 64, .18); }
+
+    /* The brand panel: low and left, in front where the two meet. */
+    .ab-hc-brand { left: 20%; bottom: 17%; z-index: 2; text-align: center;
+        padding: calc(20 * var(--u)) calc(26 * var(--u)) calc(18 * var(--u)); }
+    .ab-hc-bubble { position: relative; display: inline-flex; align-items: center;
+        justify-content: center; min-width: calc(104 * var(--u)); height: calc(62 * var(--u));
+        padding: 0 calc(18 * var(--u)); border-radius: calc(14 * var(--u));
+        background: #1565e8; color: #fff; font-size: calc(32 * var(--u));
+        font-weight: 800; letter-spacing: calc(1.5 * var(--u)); }
+    /* The tail is a square turned on its corner and tucked under the bubble,
+       so only the point shows. */
+    .ab-hc-bubble::after { content: ''; position: absolute; left: calc(20 * var(--u));
+        bottom: calc(-6 * var(--u)); width: calc(16 * var(--u)); height: calc(16 * var(--u));
+        background: #1565e8; border-radius: calc(3 * var(--u)); transform: rotate(45deg); }
+    .ab-hc-brand b { display: block; margin-top: calc(15 * var(--u));
+        font-size: calc(18 * var(--u)); font-weight: 800; color: #1565e8; }
+
+    /* The four steps: high and right. */
+    .ab-hc-list { left: 41.5%; top: 8%;
+        padding: calc(22 * var(--u)) calc(26 * var(--u)) calc(22 * var(--u)) calc(21 * var(--u)); }
+    .ab-hc-list ol { margin: 0; padding: 0; list-style: none; }
+    .ab-hc-list li { display: flex; align-items: center; gap: calc(13 * var(--u));
+        font-size: calc(17 * var(--u)); font-weight: 700; color: #0b1340; white-space: nowrap; }
+    .ab-hc-list li + li { margin-top: calc(18 * var(--u)); }
+    /* Width and height on the icon itself: an inline SVG carrying only a
+       viewBox has no size of its own and grows to fill whatever holds it. */
+    .ab-hc-ic { flex: none; width: calc(32 * var(--u)); height: calc(32 * var(--u));
+        border-radius: 50%; background: #1565e8;
+        display: flex; align-items: center; justify-content: center; }
+    .ab-hc-ic svg { width: calc(17 * var(--u)); height: calc(17 * var(--u)); flex: none;
+        fill: none; stroke: #fff; stroke-width: 2.3; stroke-linecap: round; stroke-linejoin: round; }
     .ab-hero-in { position: relative; z-index: 2; padding: calc(30 * var(--u)) 0 calc(34 * var(--u));
         max-width: calc(620 * var(--u)); }
     .ab-hero h1 { font-size: calc(55 * var(--u)); font-weight: 800; letter-spacing: calc(-1.5 * var(--u));
@@ -138,7 +185,7 @@
         .ab-grid3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
     @media (max-width: 760px) {
-        .ab-hero-art { display: none; }
+        .ab-hero-art, .ab-hero-cards { display: none; }
         .ab-hero-in { max-width: none; }
         .ab-mv, .ab-grid4, .ab-grid3 { grid-template-columns: minmax(0, 1fr); }
         .ab-cta { grid-template-columns: minmax(0, 1fr); text-align: center; justify-items: center; }
@@ -189,6 +236,37 @@
 {{-- ── 1. Our Story ─────────────────────────────────────────── --}}
 <section class="ab-hero">
     <span class="ab-hero-art" role="presentation"></span>
+
+    {{-- What the picture used to say, said properly. These are real words:
+         they can be corrected, read aloud and translated, which is the whole
+         reason they are no longer pixels. --}}
+    <div class="ab-hero-cards" aria-hidden="true">
+        <div class="ab-hc ab-hc-brand">
+            <span class="ab-hc-bubble">GR</span>
+            <b>GigResource</b>
+        </div>
+
+        <div class="ab-hc ab-hc-list">
+            <ol>
+                <li>
+                    <span class="ab-hc-ic"><svg viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg></span>
+                    Browse Professionals
+                </li>
+                <li>
+                    <span class="ab-hc-ic"><svg viewBox="0 0 24 24"><path d="M4 7h7M4 12h11M4 17h6"/><path d="M17 14l3 3 3-4"/></svg></span>
+                    Compare Options
+                </li>
+                <li>
+                    <span class="ab-hc-ic"><svg viewBox="0 0 24 24"><path d="M21 12a7.5 7.5 0 0 1-7.5 7.5H8L3.5 22l1-4.3A7.5 7.5 0 1 1 21 12z"/></svg></span>
+                    Communicate Easily
+                </li>
+                <li>
+                    <span class="ab-hc-ic"><svg viewBox="0 0 24 24"><path d="M12 2.5l7.5 3v6c0 4.6-3.1 8.2-7.5 10-4.4-1.8-7.5-5.4-7.5-10v-6z"/><path d="M9 12l2.2 2.2L15.5 10"/></svg></span>
+                    Book with Confidence
+                </li>
+            </ol>
+        </div>
+    </div>
     <div class="lp-container">
         <div class="ab-hero-in">
             <span class="ab-badge peach">Our Story</span>
