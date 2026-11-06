@@ -1212,6 +1212,8 @@ Route::middleware('auth')->group(function () {
 
         // Lead Pipeline (Leads CRM — inquiry → proposal → negotiation → booked)
         Route::get('/leads', [\App\Http\Controllers\Professional\ProfessionalLeadController::class, 'index'])->name('professional.leads.index');
+        Route::get('/leads/export', [\App\Http\Controllers\Professional\ProfessionalLeadController::class, 'export'])->name('professional.leads.export');
+        Route::post('/leads/{event}/note', [\App\Http\Controllers\Professional\ProfessionalLeadController::class, 'saveNote'])->name('professional.leads.note');
 
         /*
          * Who hired me. Hired Talent read from the other end: the client has

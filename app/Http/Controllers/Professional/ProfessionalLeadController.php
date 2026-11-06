@@ -4,284 +4,197 @@ namespace App\Http\Controllers\Professional;
 
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
-use App\Models\Conversation;
 use App\Models\Event;
+use App\Models\LeadNote;
+use App\Support\LeadPipeline;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Symfony\Component\HttpFoundation\StreamedResponse;
 
 /**
- * Lead Pipeline (Leads CRM) — tracks a professional's prospective work from
- * first inquiry through to a confirmed booking, plus an explainer of how the
- * pipeline works and the tools that move a lead forward.
+ * Leads CRM, as Khadijah's 28 October screen lays it out: the five stages with
+ * a count and a weighted value each, a searchable table of the leads
+ * themselves, and the pipeline total, conversion rate and quick actions under
+ * it.
  *
- * REAL data mapping (this marketplace models a booking lifecycle of
- * requested → confirmed → completed | cancelled and has no separate "lead"
- * table, so the four CRM stages are derived honestly):
- *
- *   New Leads      → open marketplace opportunities (published events with no
- *                    supplier yet) — fresh inquiries the pro can pursue.
- *   Proposal Sent  → the pro's `requested` bookings that have NO conversation
- *                    yet (a request/offer is out, awaiting first contact).
- *   Negotiation    → `requested` bookings that already have an active
- *                    conversation (both sides are discussing details).
- *   Booked         → `confirmed` + `completed` bookings (won).
- *
- * The "Active Leads" list unifies open opportunities + the pro's live
- * requested bookings into prioritised lead rows. Value brackets are derived
- * from the event budget; priority is derived from how soon the event is and
- * its budget size. The "what happens if you click" cards are explainer UI.
+ * There is no leads table and there does not need to be. Every stage is read
+ * off requests, bids and bookings that already exist; see App\Support\LeadPipeline
+ * for which record puts a lead in which stage. The only thing stored is what
+ * belongs to the professional alone: their private note on a lead, when they
+ * last spoke to it and when they mean to chase it.
  *
  * Route: GET /professional/leads
  */
 class ProfessionalLeadController extends Controller
 {
+    private const PER_PAGE = 6;
+
     public function index(Request $request): View
     {
-        $user      = $request->user();
-        $now        = now();
-        $base       = fn () => Booking::where('supplier_id', $user->id);
-        $soonCutoff = $now->copy()->addDays(14);
+        $me = $request->user();
 
-        // ── Pipeline stage counts (real) ───────────────────────────
-        // requested bookings split by whether a conversation exists.
-        $requestedIds = $base()->where('status', 'requested')->pluck('id');
-        $negotiatingIds = collect();
-        if ($requestedIds->isNotEmpty()) {
-            $negotiatingIds = Conversation::whereIn('booking_id', $requestedIds)
-                ->has('messages')
-                ->pluck('booking_id')
-                ->unique();
-        }
-        $cProposal    = $requestedIds->reject(fn ($id) => $negotiatingIds->contains($id))->count();
-        $cNegotiation = $negotiatingIds->count();
+        // One "now" for the whole page, so every age on it is counted from
+        // the same instant rather than each row taking its own.
+        $today = now();
 
-        $cBooked = $base()->whereIn('status', ['confirmed', 'completed'])->count();
+        $all = LeadPipeline::forProfessional($me, $today);
 
-        /*
-         * Open marketplace opportunities = fresh leads.
-         *
-         * Checklist rows 135 and 136. Two faults, one cause: this counted
-         * every open event on the platform.
-         *
-         *   It counted events in other states, which R38 means this
-         *   professional can never work — a lead they cannot take is not a
-         *   lead.
-         *
-         *   It counted events they had ALREADY pursued, so a request they had
-         *   sent a proposal on appeared twice: once here as a new lead, and
-         *   again below as Proposal Sent. Those are the duplicate rows, and
-         *   they were also why the four stage counts summed past the pipeline.
-         *
-         * Excluded here rather than in the list, so the counter and the list
-         * are drawn from the same set — which is the whole of row 136.
-         */
-        $pursuedEventIds = $base()->pluck('event_id')
-            ->merge(\App\Models\Bid::where('supplier_id', $user->id)->pluck('event_id'))
-            ->filter()->unique();
-
-        $openLeadsQuery = Event::where('is_published', true)
-            ->whereNull('supplier_id')
-            ->whereIn('status', ['pending', 'published'])
-            ->when($pursuedEventIds->isNotEmpty(), fn ($q) => $q->whereNotIn('id', $pursuedEventIds));
-
-        \App\Support\StateMatching::scopeForViewer($openLeadsQuery, $user);
-
-        $cNew = (clone $openLeadsQuery)->count();
-
-        $pipeline = [
-            ['key' => 'new',        'label' => 'New Leads',     'count' => $cNew],
-            ['key' => 'proposal',   'label' => 'Proposal Sent', 'count' => $cProposal],
-            ['key' => 'negotiation','label' => 'Negotiation',   'count' => $cNegotiation],
-            ['key' => 'booked',     'label' => 'Booked',        'count' => $cBooked],
+        $filters = [
+            'q'       => trim((string) $request->query('q', '')),
+            'stage'   => (string) $request->query('stage', ''),
+            'source'  => (string) $request->query('source', ''),
+            'needs'   => $request->boolean('needs'),
         ];
 
-        // Conversion: booked / (all leads that entered the funnel).
-        $totalFunnel = $cNew + $cProposal + $cNegotiation + $cBooked;
-        $conversion  = $totalFunnel > 0 ? (int) round($cBooked / $totalFunnel * 100) : 0;
+        $shown = $this->filter($all, $filters);
 
-        // ── Active leads list (real) ───────────────────────────────
-        // Open opportunities (events) + live requested bookings, unified.
-        $leads = collect();
+        $page  = max(1, (int) $request->query('page', 1));
+        $pages = max(1, (int) ceil($shown->count() / self::PER_PAGE));
+        $page  = min($page, $pages);
 
-        $opportunities = (clone $openLeadsQuery)
-            ->with(['client:id,name', 'categories:id,name'])
-            ->select(['id', 'title', 'client_id', 'location', 'starts_at', 'budget', 'budget_min', 'budget_max', 'source', 'created_at', 'published_at', 'is_published'])
-            ->orderByRaw('starts_at is null, starts_at asc')
-            ->take(6)
-            ->get();
+        return view('professional.leads.index', [
+            'leads'      => $shown->forPage($page, self::PER_PAGE)->values(),
+            'shownTotal' => $shown->count(),
+            'total'      => $all->count(),
+            'page'       => $page,
+            'pages'      => $pages,
+            'filters'    => $filters,
+            'today'      => $today,
+            'summary'    => LeadPipeline::summary($all),
+            /*
+             * The same counts in the shape the funnel has always been
+             * checked in. The rules behind them are the ones that matter and
+             * they are pinned by tests: the stages partition the leads, a
+             * request already pursued is not also a new lead, and the list
+             * never shows more than the counters claim.
+             */
+            'stats'      => [
+                'new'         => $all->where('stage', 'new')->count(),
+                'proposal'    => $all->where('stage', 'proposal')->count(),
+                'negotiation' => $all->where('stage', 'negotiation')->count(),
+                'booked'      => $all->where('stage', 'booked')->count(),
+                'lost'        => $all->where('stage', 'lost')->count(),
+                'total'       => $all->count(),
+            ],
+            'conversion' => LeadPipeline::conversion($all),
+            'pipeline'   => round($all->sum('weighted'), 2),
+            'sources'    => $all->pluck('source')->unique()->sort()->values()->all(),
+            // Leads they said they would chase and have not.
+            'overdue'    => $all->where('overdue', true)->count(),
+            'lost'       => $all->where('stage', 'lost')->count(),
+        ]);
+    }
 
-        foreach ($opportunities as $ev) {
-            $leads->push($this->leadRow(
-                name: optional($ev->client)->name ?: $ev->title,
-                location: $ev->location,
-                date: $ev->starts_at,
-                event: $ev,
-                budget: $ev->budget,
-                soonCutoff: $soonCutoff,
-                now: $now,
-                stage: 'New Lead',
-                since: $ev->postedAt() ?? $ev->created_at,
-            ));
+    /** Save the private note, the last contact, or the follow-up date. */
+    public function saveNote(Request $request, Event $event): RedirectResponse
+    {
+        $me = $request->user();
+
+        if (! $this->isTheirLead($me, $event)) {
+            abort(404);
         }
 
-        $liveBookings = $base()->where('status', 'requested')
-            ->with(['client:id,name', 'event:id,title,location,starts_at,budget,budget_min,budget_max,source'])
-            ->with('event.categories:id,name')
-            ->latest()
-            ->take(6)
-            ->get();
+        $data = $request->validate([
+            'note'              => ['nullable', 'string', 'max:600'],
+            'next_follow_up_on' => ['nullable', 'date'],
+            'contacted'         => ['nullable', 'boolean'],
+        ]);
 
-        foreach ($liveBookings as $bk) {
-            $leads->push($this->leadRow(
-                name: optional($bk->client)->name ?: optional($bk->event)->title ?: 'Prospective client',
-                location: optional($bk->event)->location,
-                date: optional($bk->event)->starts_at,
-                event: $bk->event,
-                budget: $bk->price ?: optional($bk->event)->budget,
-                soonCutoff: $soonCutoff,
-                now: $now,
-                stage: $negotiatingIds->contains($bk->id) ? 'Negotiation' : 'Proposal Sent',
-                // How long this lead has been sitting — measured from when the
-                // professional acted, not from when the row was written.
-                since: $bk->created_at,
-            ));
+        $note = LeadNote::firstOrNew(['supplier_id' => $me->id, 'event_id' => $event->id]);
+
+        $note->supplier_id = $me->id;
+        $note->event_id    = $event->id;
+        $note->note        = $data['note'] ?: null;
+
+        if ($request->has('next_follow_up_on')) {
+            $note->next_follow_up_on = $data['next_follow_up_on'] ?: null;
         }
 
-        // Highest-value / hottest first, cap at 5 for the list.
-        $leads = $leads->sortByDesc('valueHigh')->values()->take(5);
+        // Ticking the box means "I have just spoken to them", so the time is
+        // now rather than a date they have to type.
+        if ($request->boolean('contacted')) {
+            $note->last_contacted_at = now();
+        }
 
-        $stats = [
-            'new'         => $cNew,
-            'proposal'    => $cProposal,
-            'negotiation' => $cNegotiation,
-            'booked'      => $cBooked,
-            'total'       => $totalFunnel,
-            'conversion'  => $conversion,
-        ];
+        $note->save();
 
-        // Row 134 — one "now" for the page, so the lead ages and the pipeline
-        // numbers are all measured from the same instant.
-        $today = $now;
+        return back()->with('status', 'Saved your note on this lead.');
+    }
 
-        /*
-         * How many leads the rate is out of.
-         *
-         * The gauge needs to tell "nothing has booked yet" from "nothing has
-         * come in yet". It had neither: it read `$conversion ?: 82`, so a
-         * professional with no leads at all was shown 82% and the word High.
-         */
-        return view('professional.leads.index', compact('pipeline', 'leads', 'stats', 'conversion', 'totalFunnel', 'today'));
+    /** The leads as they are filtered on screen, as a file. */
+    public function export(Request $request): StreamedResponse
+    {
+        $me = $request->user();
+
+        $rows = $this->filter(LeadPipeline::forProfessional($me), [
+            'q'      => trim((string) $request->query('q', '')),
+            'stage'  => (string) $request->query('stage', ''),
+            'source' => (string) $request->query('source', ''),
+            'needs'  => $request->boolean('needs'),
+        ]);
+
+        $name = 'leads-' . now()->format('Y-m-d') . '.csv';
+
+        return response()->streamDownload(function () use ($rows) {
+            $out = fopen('php://output', 'wb');
+
+            fputcsv($out, ['Event', 'Client', 'Stage', 'Source', 'Location',
+                           'Event date', 'Budget low', 'Budget high',
+                           'Last contacted', 'Next follow up', 'Note']);
+
+            foreach ($rows as $lead) {
+                fputcsv($out, [
+                    $lead['title'],
+                    $lead['client'],
+                    $lead['stage_label'],
+                    $lead['source'],
+                    $lead['where'],
+                    $lead['when']?->format('Y-m-d'),
+                    $lead['low'],
+                    $lead['high'],
+                    $lead['last_contacted']?->format('Y-m-d'),
+                    $lead['next_follow_up']?->format('Y-m-d'),
+                    $lead['note'],
+                ]);
+            }
+
+            fclose($out);
+        }, $name, ['Content-Type' => 'text/csv']);
     }
 
     /**
-     * Build one normalised lead row: value, priority, stage and age.
+     * A lead is theirs when it is an open request anyone could take, or one
+     * they have already acted on. Otherwise a note could be attached to
+     * somebody else's booked job.
      */
-    private function leadRow(
-        ?string $name,
-        ?string $location,
-        $date,
-        ?Event $event,
-        $budget,
-        $soonCutoff,
-        $now,
-        string $stage,
-        $since = null,
-    ): array {
-        $budget = (float) ($budget ?: 0);
+    private function isTheirLead($me, Event $event): bool
+    {
+        $open = $event->is_published
+            && $event->supplier_id === null
+            && in_array($event->status, ['pending', 'published'], true);
 
-        /*
-         * Checklist row 138 — the value reads the way the request was made.
-         *
-         * Every row used to print a ±20% band around whatever single figure
-         * was on record: a client who stated $4,000 was shown to the
-         * professional as "$3,200 – $4,800". Nobody said that. The band was
-         * arithmetic the platform did to a number it had been given exactly,
-         * and on a rush job or a fixed-fee direct offer it is worse than
-         * useless, because those quote one figure by design.
-         *
-         * A range is now shown only where the client actually gave one.
-         */
-        $low = $high = null;
+        return $open
+            || Booking::where('supplier_id', $me->id)->where('event_id', $event->id)->exists()
+            || \App\Models\Bid::where('supplier_id', $me->id)->where('event_id', $event->id)->exists();
+    }
 
-        $statedRange = $event
-            && $event->budget_min !== null
-            && $event->budget_max !== null
-            && (float) $event->budget_max > (float) $event->budget_min;
+    /** @param  \Illuminate\Support\Collection<int, array>  $leads */
+    private function filter($leads, array $f)
+    {
+        return $leads
+            ->when($f['q'] !== '', fn ($rows) => $rows->filter(function (array $lead) use ($f) {
+                $hay = mb_strtolower(implode(' ', array_filter([
+                    $lead['title'], $lead['client'], $lead['where'], $lead['type'],
+                ])));
 
-        // A rush request and a direct offer name one figure; so does anything
-        // whose client filled in a single budget.
-        $fixedByType = $event && in_array($event->source, ['esr', 'direct_offer'], true);
-
-        if ($statedRange && ! $fixedByType) {
-            $low  = (float) $event->budget_min;
-            $high = (float) $event->budget_max;
-        } elseif ($budget > 0) {
-            $low = $high = $budget;
-        }
-        // Otherwise both stay null: no budget on record means no value to
-        // show. This used to print a "typical event band" of $2,500–$4,500,
-        // a figure invented about somebody else's event and shown to a
-        // professional deciding whether to chase it.
-
-        // Priority: soon + high budget = High, else Medium, else Low.
-        $daysOut = $date ? $now->diffInDays($date, false) : null;
-        $soon    = $daysOut !== null && $daysOut >= 0 && $date <= $soonCutoff;
-        $big     = $budget >= 5000;
-
-        if ($big || $soon) {
-            $priority = 'High';
-        } elseif ($budget >= 2500 || $daysOut === null) {
-            $priority = 'Medium';
-        } else {
-            $priority = 'Low';
-        }
-
-        /*
-         * Why it came out that way, in the same two tests that decided it.
-         *
-         * Khadijah's 28 October screen shows a priority score out of 100 with
-         * a list of reasons under it. The score is not here: nothing weighs
-         * these against each other, so a number out of 100 would be invented.
-         * The reasons are, because they are exactly what the branch above
-         * looked at, and a professional can check them.
-         */
-        $why = [
-            ['Budget is $5,000 or more', $big],
-            ['Event is within two weeks', $soon],
-            ['Has a budget on record', $budget > 0],
-            ['Has a date on record', $date !== null],
-        ];
-
-        return [
-            'name'      => $name ?: 'Prospective client',
-            'location'  => $location ?: 'Location TBD',
-            'date'      => $date,
-            'valueLow'  => $low,
-            'valueHigh' => $high,
-            // A single stated figure and a stated range are different things,
-            // so the view is told which it has rather than inferring it from
-            // two numbers that happen to be equal.
-            'isRange'   => $low !== null && $high !== null && $high > $low,
-            'priority'  => $priority,
-            'stage'     => $stage,
-            // Row 134 — how long this lead has been waiting, measured from the
-            // page's one shared "now" so every age on the screen is counted
-            // from the same instant.
-            'ageDays'   => $since ? (int) floor($since->diffInDays($now)) : null,
-
-            // What opening the row shows. All of it read from the request the
-            // client actually wrote.
-            'why'       => $why,
-            'eventType' => $event?->event_type,
-            'guests'    => $event?->guest_count,
-            'venue'     => $event?->venue,
-            'summary'   => $event?->description
-                ? \Illuminate\Support\Str::limit($event->description, 260)
-                : null,
-            'services'  => $event?->relationLoaded('categories')
-                ? $event->categories->pluck('name')->filter()->values()->all()
-                : [],
-            'eventId'   => $event?->id,
-        ];
+                return str_contains($hay, mb_strtolower($f['q']));
+            }))
+            ->when($f['stage'] !== '', fn ($rows) => $rows->where('stage', $f['stage']))
+            ->when($f['source'] !== '', fn ($rows) => $rows->where('source', $f['source']))
+            // "Needs attention" is a promise they made and have not kept, not
+            // a score: the follow-up date they set has passed.
+            ->when($f['needs'], fn ($rows) => $rows->where('overdue', true))
+            ->values();
     }
 }
