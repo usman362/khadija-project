@@ -3,394 +3,592 @@
 @php
     $seoTitle       = 'FAQs: Questions? We\'ve Got Answers | GigResource';
     $seoDescription = 'Find quick answers to the most common questions about using GigResource, getting started, clients, professionals, payments, account security, and support.';
-
-    // Topic metadata (description + accent) for the 6 known categories.
-    $topicMeta = [
-        'Getting Started'    => ['desc' => 'Learn the basics of GigResource',    'accent' => 'blue'],
-        'For Clients'        => ['desc' => 'Hiring and booking professionals',   'accent' => 'orange'],
-        'For Professionals'  => ['desc' => 'Bidding, commission and getting paid', 'accent' => 'blue'],
-        'Payments'           => ['desc' => 'Secure payments and transactions',    'accent' => 'orange'],
-        'Account & Security' => ['desc' => 'Manage your account and privacy',     'accent' => 'blue'],
-        'Support'            => ['desc' => 'Getting help and contacting us',      'accent' => 'orange'],
-    ];
-
-    // Self-contained 3D-style icons per category.
-    $icons = [
-        'Getting Started'    => '<svg viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="fqGs" x1="0" y1="0" x2="60" y2="60" gradientUnits="userSpaceOnUse"><stop stop-color="#3b82f6"/><stop offset="1" stop-color="#1d4ed8"/></linearGradient></defs><circle cx="30" cy="21" r="11" fill="url(#fqGs)"/><circle cx="30" cy="18.5" r="4.6" fill="#fff"/><path d="M22 27a8 8 0 0 1 16 0Z" fill="#fff"/><path d="M14 52c0-9 7-15 16-15s16 6 16 15v2H14v-2Z" fill="url(#fqGs)"/><path d="M30 37c9 0 16 6 16 15v2H30V37Z" fill="#1d4ed8" opacity=".3"/></svg>',
-        'For Clients'        => '<svg viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="fqCl" x1="0" y1="0" x2="60" y2="60" gradientUnits="userSpaceOnUse"><stop stop-color="#fb923c"/><stop offset="1" stop-color="#ea580c"/></linearGradient></defs><rect x="10" y="22" width="40" height="28" rx="6" fill="url(#fqCl)"/><path d="M22 22v-4a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v4" stroke="#ea580c" stroke-width="3.4" fill="none"/><rect x="10" y="30" width="40" height="6" fill="#c2410c" opacity=".5"/><rect x="26" y="31" width="8" height="5" rx="2" fill="#fff"/></svg>',
-        'For Professionals'  => '<svg viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="fqPr" x1="0" y1="0" x2="60" y2="60" gradientUnits="userSpaceOnUse"><stop stop-color="#3b82f6"/><stop offset="1" stop-color="#1d4ed8"/></linearGradient></defs><circle cx="30" cy="20" r="8" fill="url(#fqPr)"/><path d="M18 50c0-9 5-15 12-15s12 6 12 15v2H18v-2Z" fill="url(#fqPr)"/><path d="M14 24l6-7 4 4M46 24l-6-7-4 4" stroke="#fb923c" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>',
-        'Payments'           => '<svg viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="fqPa" x1="0" y1="0" x2="60" y2="60" gradientUnits="userSpaceOnUse"><stop stop-color="#fb923c"/><stop offset="1" stop-color="#ea580c"/></linearGradient></defs><rect x="9" y="16" width="42" height="28" rx="6" fill="url(#fqPa)"/><rect x="9" y="23" width="42" height="6" fill="#c2410c" opacity=".55"/><rect x="15" y="34" width="16" height="4" rx="2" fill="#fff"/><rect x="35" y="34" width="10" height="4" rx="2" fill="#fff" opacity=".7"/></svg>',
-        'Account & Security' => '<svg viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="fqAc" x1="0" y1="0" x2="60" y2="60" gradientUnits="userSpaceOnUse"><stop stop-color="#3b82f6"/><stop offset="1" stop-color="#1d4ed8"/></linearGradient></defs><path d="M30 8l18 7v13c0 12-8 19-18 23-10-4-18-11-18-23V15l18-7Z" fill="url(#fqAc)"/><path d="M30 8l18 7v13c0 12-8 19-18 23V8Z" fill="#1d4ed8" opacity=".3"/><path d="M22 30l5 5 11-11" stroke="#fff" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/></svg>',
-        'Support'            => '<svg viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg"><defs><linearGradient id="fqSu" x1="0" y1="0" x2="60" y2="60" gradientUnits="userSpaceOnUse"><stop stop-color="#fb923c"/><stop offset="1" stop-color="#ea580c"/></linearGradient></defs><path d="M14 34v-4a16 16 0 0 1 32 0v4" stroke="url(#fqSu)" stroke-width="4.5" fill="none" stroke-linecap="round"/><rect x="9" y="32" width="11" height="16" rx="5" fill="url(#fqSu)"/><rect x="40" y="32" width="11" height="16" rx="5" fill="url(#fqSu)"/><path d="M40 46v2a6 6 0 0 1-6 6h-6" stroke="#ea580c" stroke-width="3.4" fill="none" stroke-linecap="round"/></svg>',
-    ];
-
-    $order = array_keys($topicMeta);
-    $cats  = collect($order)->filter(fn ($c) => $grouped->has($c))
-        ->merge($grouped->keys()->reject(fn ($c) => in_array($c, $order)))
-        ->values();
 @endphp
-
-@section('content')
 
 @push('styles')
 <style>
-    /* ════════ FAQ page (light) — page-scoped ════════ */
-    .fq-section { padding: 56px 0; }
-    .fq-head { text-align: center; max-width: 640px; margin: 0 auto 40px; }
-    .fq-eyebrow { display: inline-flex; align-items: center; gap: 7px; font-size: 12px; font-weight: 800; letter-spacing: 1.2px; text-transform: uppercase; }
-    .fq-eyebrow.orange { color: var(--orange-onwhite, #c2410c); }
-    .fq-eyebrow.pill { background: var(--bg-soft-2); color: var(--blue); padding: 6px 14px; border-radius: 999px; }
-    .fq-eyebrow.pill.orange { background: rgba(249,115,22,0.1); color: var(--orange-onwhite, #c2410c); }
-    .fq-h2 { font-size: 33px; font-weight: 800; letter-spacing: -0.6px; color: var(--ink); line-height: 1.15; margin-top: 14px; }
+    /* ══════ FAQ, against the 2026 design file ══════
+       The file's content column is 90.8% of the viewport (936px in a 1031px
+       screenshot). Every length below is that file's own number multiplied
+       by 1.359, the ratio between its column and a 1272px one, and the unit
+       carries the rest: it is 1px at a 1272 column and grows with it, so
+       the page keeps the file's proportions at any width rather than
+       stopping at one. --}} */
+    .fq-page { --u: clamp(0.78px, 0.0705vw, 1.34px); }
 
-    /* ── HERO ───────────────────────────────────────── */
-    .fq-hero { padding: 48px 0 44px; position: relative; overflow: hidden; }
-    .fq-hero::before { content: ''; position: absolute; inset: 0; background: linear-gradient(180deg, var(--bg-soft-2) 0%, transparent 100%); z-index: 0; }
-    .fq-hero-grid { position: relative; z-index: 1; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr); gap: 44px; align-items: center; }
-    .fq-h1 { font-size: 52px; font-weight: 800; letter-spacing: -1.4px; line-height: 1.06; color: var(--ink); margin: 14px 0 0; }
-    .fq-h1 .o { color: var(--orange-dark); }
-    .fq-h1 .b { color: var(--blue); }
-    .fq-hero p.sub { font-size: 16px; color: var(--muted); line-height: 1.65; margin: 22px 0 26px; max-width: 430px; }
-    .fq-search { position: relative; max-width: 440px; }
-    .fq-search svg { position: absolute; left: 16px; top: 50%; transform: translateY(-50%); width: 18px; height: 18px; color: var(--faint); }
-    .fq-search input { width: 100%; box-sizing: border-box; padding: 15px 18px 15px 46px; border: 1px solid var(--line); border-radius: 12px; background: #fff; font-size: 14.5px; font-family: inherit; color: var(--ink); box-shadow: var(--shadow-sm); }
-    .fq-search input:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 3px rgba(37,99,235,0.12); }
+    /* On this page the header, the content and the footer share the file's
+       column. Pushed from here, so no other page is affected. */
+    .lp-container { max-width: min(calc(90.8% + 48px), 1620px); }
 
-    /* hero illustration */
-    .fq-hero-art { position: relative; min-height: 360px; display: flex; align-items: center; justify-content: center; }
-    .fq-art-dots { position: absolute; top: 20px; right: 30px; width: 100px; height: 100px; opacity: 0.5; background-image: radial-gradient(var(--blue) 1.6px, transparent 1.6px); background-size: 16px 16px; z-index: 0; }
-    .fq-doc { position: absolute; right: 40px; top: 24px; width: 240px; background: #fff; border: 1px solid var(--line); border-radius: 16px; box-shadow: var(--shadow-lg); padding: 16px; z-index: 1; }
-    .fq-doc-bar { display: flex; gap: 6px; margin-bottom: 14px; }
-    .fq-doc-bar i { width: 8px; height: 8px; border-radius: 50%; }
-    .fq-doc-bar .l1 { background: #ff5f57; } .fq-doc-bar .l2 { background: #febc2e; } .fq-doc-bar .l3 { background: #28c840; }
-    .fq-doc-row { display: flex; align-items: center; gap: 10px; margin-bottom: 11px; }
-    .fq-doc-row i { width: 13px; height: 13px; border-radius: 50%; background: var(--bg-soft-2); flex-shrink: 0; }
-    .fq-doc-row span { flex: 1; height: 8px; border-radius: 5px; background: var(--bg-soft-2); }
-    .fq-doc-row span.s { max-width: 60%; }
-    .fq-faqbubble { position: relative; z-index: 3; width: 190px; height: 130px; filter: drop-shadow(0 18px 30px rgba(37,99,235,0.35)); margin-right: 80px; margin-bottom: 30px; }
-    .fq-3d-chat { position: absolute; left: 86px; bottom: 70px; width: 64px; height: 64px; z-index: 4; filter: drop-shadow(0 12px 20px rgba(249,115,22,0.35)); }
-    .fq-3d-mug { position: absolute; right: 96px; bottom: -4px; width: 60px; height: 60px; z-index: 4; filter: drop-shadow(0 10px 16px rgba(37,99,235,0.25)); }
-    .fq-3d-plant { position: absolute; right: 18px; bottom: -6px; width: 66px; height: 88px; z-index: 2; filter: drop-shadow(0 10px 16px rgba(15,27,53,0.12)); }
+    /* ── Hero ─────────────────────────────────────────────────── */
+    .fq-hero { position: relative; overflow: hidden;
+        background: linear-gradient(103deg, #ecf3fe 0%, #eef4fe 46%, #f4f8fe 100%); }
+    .fq-hero-in { position: relative; z-index: 2; padding: calc(28 * var(--u)) 0 calc(39 * var(--u));
+        max-width: calc(580 * var(--u)); }
+    .fq-eyebrow { display: block; font-size: calc(15 * var(--u)); font-weight: 800;
+        letter-spacing: calc(1 * var(--u)); color: #fb4404; margin: 0 0 calc(6 * var(--u)); }
+    .fq-hero h1 { font-size: calc(55 * var(--u)); font-weight: 800; letter-spacing: calc(-1.4 * var(--u));
+        line-height: 1.1; margin: 0; color: #0b1340; }
+    .fq-hero h1 .o { color: #f4400a; }
+    .fq-hero h1 .b { color: #1565e8; }
+    .fq-hero p { font-size: calc(20 * var(--u)); color: #3f4a63; line-height: 1.45;
+        margin: calc(14 * var(--u)) 0 0; max-width: calc(560 * var(--u)); }
 
-    /* ── START HERE ─────────────────────────────────── */
-    .fq-start { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 14px; }
-    .fq-startcard { text-align: left; font: inherit; cursor: pointer; background: #fff;
-        border: 1px solid var(--line-soft); border-radius: 14px; padding: 15px 16px; }
-    .fq-startcard:hover { border-color: #2563eb; }
-    .fq-startcard b { display: block; font-size: 13.5px; font-weight: 800; color: var(--ink); line-height: 1.35; }
-    .fq-startcard span { display: block; font-size: 12px; color: var(--muted); margin-top: 6px; line-height: 1.55; }
+    /* The whole right-hand composition is cut from the design file: the
+       photograph, the FAQ card, the four ticks and the handwriting are one
+       picture there, so they are one picture here. */
+    .fq-hero-art { position: absolute; top: 0; right: 0; bottom: 0; width: 52%;
+        background-image: url('{{ asset('images/faq/hero.png') }}');
+        background-position: right top; background-size: 100% 100%; z-index: 1;
+        -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 9%);
+        mask-image: linear-gradient(90deg, transparent 0, #000 9%); }
 
-    /* ── BROWSE BY TOPIC ────────────────────────────── */
-    .fq-topics { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 16px; }
-    .fq-topic { background: #fff; border: 1px solid var(--line); border-radius: var(--radius); padding: 24px 16px; text-align: center; cursor: pointer; box-shadow: var(--shadow-sm); transition: transform .2s, box-shadow .2s, border-color .2s; }
-    .fq-topic:hover { transform: translateY(-4px); box-shadow: var(--shadow); border-color: rgba(37,99,235,0.3); }
-    .fq-topic-ic { width: 56px; height: 56px; margin: 0 auto 14px; }
-    .fq-topic b { font-size: 14.5px; font-weight: 800; color: var(--ink); display: block; margin-bottom: 7px; }
-    .fq-topic span { font-size: 12px; color: var(--muted); line-height: 1.45; }
+    .fq-body { background: #f8fdfe; padding-bottom: calc(10 * var(--u)); }
 
-    /* ── ACCORDION ──────────────────────────────────── */
-    .fq-box { display: grid; grid-template-columns: minmax(0, 0.32fr) minmax(0, 1fr); gap: 30px; background: var(--bg-soft); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 30px; }
-    .fq-tabs { display: flex; flex-direction: column; gap: 2px; }
-    .fq-tab { text-align: left; padding: 12px 16px; border: none; background: none; font-family: inherit; font-size: 14.5px; font-weight: 700; color: var(--muted); cursor: pointer; border-radius: 10px; border-left: 3px solid transparent; transition: all .15s; }
-    .fq-tab:hover { color: var(--ink); background: rgba(37,99,235,0.04); }
-    .fq-tab.on { color: var(--blue); border-left-color: var(--blue); background: rgba(37,99,235,0.06); }
-    .fq-panel { display: none; flex-direction: column; gap: 12px; }
-    .fq-panel.on { display: flex; }
-    .fq-item { background: #fff; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; transition: border-color .15s, box-shadow .15s; }
-    .fq-item.open { border-color: rgba(37,99,235,0.35); box-shadow: var(--shadow-sm); }
-    .fq-q { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 17px 20px; background: none; border: none; font-family: inherit; font-size: 15px; font-weight: 700; color: var(--ink); cursor: pointer; text-align: left; }
-    .fq-item.open .fq-q { color: var(--blue); }
-    .fq-q .chev { width: 18px; height: 18px; flex-shrink: 0; color: var(--muted); transition: transform .25s; }
-    .fq-item.open .fq-q .chev { transform: rotate(180deg); color: var(--blue); }
-    .fq-a { max-height: 0; overflow: hidden; transition: max-height .3s ease; }
-    .fq-item.open .fq-a { max-height: 320px; }
-    .fq-a p { font-size: 14px; color: var(--muted); line-height: 1.7; margin: 0; padding: 0 20px 18px; }
-    .fq-noresult { display: none; text-align: center; padding: 40px; color: var(--muted); font-size: 14px; }
+    /* ── Search card ──────────────────────────────────────────── */
+    .fq-search { position: relative; z-index: 3; margin-top: calc(-12 * var(--u));
+        background: #fefdff; border: 1px solid #e4effc; border-radius: calc(14 * var(--u));
+        padding: calc(18 * var(--u)) calc(22 * var(--u)) calc(20 * var(--u)); overflow: hidden; }
+    .fq-search-art { position: absolute; right: calc(16 * var(--u)); top: calc(10 * var(--u));
+        width: calc(175 * var(--u)); height: calc(88 * var(--u));
+        background-image: url('{{ asset('images/faq/search-art.png') }}');
+        background-size: 100% 100%; background-repeat: no-repeat; }
+    .fq-searchrow { position: relative; z-index: 2; display: flex; max-width: calc(760 * var(--u));
+        border-radius: calc(10 * var(--u)); overflow: hidden; border: 1px solid #dde7f4; background: #fff; }
+    .fq-searchrow .ic { display: flex; align-items: center; padding: 0 calc(6 * var(--u)) 0 calc(18 * var(--u)); color: #0b1340; }
+    .fq-searchrow .ic svg { width: calc(26 * var(--u)); height: calc(26 * var(--u)); }
+    .fq-searchrow input { flex: 1 1 auto; min-width: 0; border: 0; outline: 0; background: transparent;
+        font-size: calc(19 * var(--u)); color: #0b1340; padding: calc(15 * var(--u)) calc(10 * var(--u)); }
+    .fq-searchrow input::placeholder { color: #7b879c; }
+    .fq-searchrow button { flex: none; border: 0; cursor: pointer; background: #005afd; color: #fff;
+        font-size: calc(18 * var(--u)); font-weight: 700; padding: 0 calc(42 * var(--u)); }
+    .fq-pop { position: relative; z-index: 2; display: flex; align-items: center; flex-wrap: wrap;
+        gap: calc(10 * var(--u)); margin-top: calc(14 * var(--u)); }
+    .fq-pop > b { font-size: calc(16 * var(--u)); font-weight: 700; color: #0b1340; }
+    .fq-pop button { cursor: pointer; background: #fff; border: 1px solid #dfe8f5;
+        border-radius: calc(999 * var(--u)); padding: calc(7 * var(--u)) calc(18 * var(--u));
+        font-size: calc(16 * var(--u)); color: #2f3b55; }
+    .fq-pop button:hover { border-color: #005afd; color: #005afd; }
 
-    /* ── STILL NEED HELP ────────────────────────────── */
-    .fq-help-wrap { padding: 14px 0; }
-    .fq-help { background: var(--bg-soft); border: 1px solid var(--line); border-radius: var(--radius-lg); padding: 34px 40px; display: flex; align-items: center; gap: 26px; position: relative; overflow: hidden; }
-    .fq-help-ic { width: 96px; height: 96px; flex-shrink: 0; filter: drop-shadow(0 14px 22px rgba(37,99,235,0.28)); }
-    .fq-help-txt { flex: 1; min-width: 0; }
-    .fq-help-txt h3 { font-size: 23px; font-weight: 800; color: var(--ink); }
-    .fq-help-txt p { font-size: 14px; color: var(--muted); margin: 8px 0 16px; max-width: 360px; line-height: 1.55; }
-    .fq-help-env { width: 88px; height: 88px; flex-shrink: 0; filter: drop-shadow(0 12px 20px rgba(37,99,235,0.22)); }
+    /* ── Section headings ─────────────────────────────────────── */
+    .fq-sec { margin-top: calc(16 * var(--u)); }
+    .fq-sec h2 { font-size: calc(30 * var(--u)); font-weight: 800; color: #0b1340;
+        margin: 0; line-height: 1.2; letter-spacing: calc(-.4 * var(--u)); }
+    .fq-sec > p.lede { font-size: calc(17 * var(--u)); color: #5a6679; margin: calc(3 * var(--u)) 0 calc(13 * var(--u)); }
+    .fq-sechead { display: flex; align-items: flex-start; justify-content: space-between; gap: calc(20 * var(--u)); }
+    .fq-viewall { font-size: calc(16 * var(--u)); font-weight: 700; color: #1565e8; text-decoration: none;
+        display: inline-flex; align-items: center; gap: calc(7 * var(--u)); white-space: nowrap; }
+    .fq-viewall svg { width: calc(17 * var(--u)); height: calc(17 * var(--u)); }
 
-    /* ── READY CTA ──────────────────────────────────── */
-    .fq-ready { text-align: center; padding: 44px 0 80px; }
-    .fq-ready h2 { font-size: 30px; font-weight: 800; color: var(--ink); letter-spacing: -0.5px; margin-top: 14px; }
-    .fq-ready p { font-size: 15px; color: var(--muted); margin: 12px 0 26px; }
-    .fq-ready-btns { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; }
+    /* ── I am a… ──────────────────────────────────────────────── */
+    .fq-roles { display: grid; grid-template-columns: repeat(auto-fit, minmax(calc(230 * var(--u)), 1fr));
+        gap: calc(11 * var(--u)); }
+    .fq-role { display: grid; grid-template-columns: calc(78 * var(--u)) minmax(0, 1fr) calc(22 * var(--u));
+        align-items: center; text-decoration: none; border-radius: calc(12 * var(--u));
+        padding: calc(16 * var(--u)) calc(14 * var(--u)); background: var(--t); }
+    .fq-role .circ { width: calc(58 * var(--u)); height: calc(58 * var(--u)); border-radius: 50%;
+        background: var(--k); display: flex; align-items: center; justify-content: center; color: #fff; }
+    .fq-role .circ svg { width: calc(30 * var(--u)); height: calc(30 * var(--u)); }
+    .fq-role b { display: block; font-size: calc(20 * var(--u)); font-weight: 700; color: var(--k);
+        line-height: 1.2; margin-bottom: calc(4 * var(--u)); }
+    .fq-role span { display: block; font-size: calc(16 * var(--u)); color: #3f4a63; line-height: 1.4; }
+    .fq-role .go { color: var(--k); display: flex; justify-content: flex-end; }
+    .fq-role .go svg { width: calc(16 * var(--u)); height: calc(16 * var(--u)); }
+
+    /* ── Browse help topics ───────────────────────────────────── */
+    .fq-topics { display: grid; grid-template-columns: repeat(auto-fit, minmax(calc(118 * var(--u)), 1fr));
+        gap: calc(11 * var(--u)); }
+    .fq-topic { text-decoration: none; background: #fefefe; border: 1px solid #e7eef8;
+        border-radius: calc(12 * var(--u)); padding: calc(16 * var(--u)) calc(8 * var(--u)) calc(14 * var(--u));
+        text-align: center; display: block; }
+    .fq-topic:hover { border-color: #b9d1f7; }
+    .fq-topic svg { width: calc(36 * var(--u)); height: calc(36 * var(--u)); color: var(--k); }
+    .fq-topic b { display: block; margin-top: calc(10 * var(--u)); font-size: calc(16 * var(--u));
+        font-weight: 700; color: #0b1340; line-height: 1.25; }
+
+    /* ── Popular questions ────────────────────────────────────── */
+    .fq-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(calc(185 * var(--u)), 1fr));
+        gap: calc(11 * var(--u)); }
+    .fq-card { position: relative; text-decoration: none; background: #fefefe; border: 1px solid #e7eef8;
+        border-radius: calc(12 * var(--u)); padding: calc(13 * var(--u)) calc(15 * var(--u)) calc(11 * var(--u));
+        display: grid; grid-template-columns: calc(54 * var(--u)) minmax(0, 1fr); column-gap: calc(4 * var(--u)); }
+    .fq-card:hover { border-color: #b9d1f7; }
+    .fq-card .circ { width: calc(42 * var(--u)); height: calc(42 * var(--u)); border-radius: 50%;
+        background: var(--k); color: #fff; display: flex; align-items: center; justify-content: center; }
+    .fq-card .circ svg { width: calc(22 * var(--u)); height: calc(22 * var(--u)); }
+    .fq-card b { font-size: calc(16 * var(--u)); font-weight: 700; color: #0b1340; line-height: 1.18; }
+    .fq-card p { grid-column: 2; margin: calc(10 * var(--u)) 0 0; font-size: calc(14 * var(--u));
+        color: #5a6679; line-height: 1.36; }
+    .fq-card .go { position: absolute; right: calc(13 * var(--u)); bottom: calc(13 * var(--u)); color: #1565e8; }
+    .fq-card .go svg { width: calc(16 * var(--u)); height: calc(16 * var(--u)); }
+
+    /* ── All questions ────────────────────────────────────────── */
+    .fq-sort { border: 1px solid #dfe8f5; background: #fff; border-radius: calc(9 * var(--u));
+        padding: calc(9 * var(--u)) calc(14 * var(--u)); font-size: calc(16 * var(--u)); color: #0b1340; }
+    .fq-qa { display: grid; grid-template-columns: calc(230 * var(--u)) minmax(0, 1fr);
+        gap: calc(14 * var(--u)); background: #fefefe; border: 1px solid #e7eef8;
+        border-radius: calc(13 * var(--u)); padding: calc(13 * var(--u)); }
+    .fq-side { display: flex; flex-direction: column; gap: calc(2 * var(--u)); }
+    .fq-side button { display: grid; grid-template-columns: calc(34 * var(--u)) minmax(0, 1fr);
+        align-items: center; text-align: left; cursor: pointer; background: none; border: 0;
+        border-left: calc(3 * var(--u)) solid transparent; border-radius: calc(8 * var(--u));
+        padding: calc(11 * var(--u)) calc(10 * var(--u)); font-size: calc(17 * var(--u));
+        font-weight: 600; color: #2f3b55; }
+    .fq-side button svg { width: calc(20 * var(--u)); height: calc(20 * var(--u)); color: var(--k); }
+    .fq-side button.on { background: #e4effe; border-left-color: #005afd; color: #1565e8; font-weight: 700; }
+
+    .fq-list { display: flex; flex-direction: column; gap: calc(9 * var(--u)); }
+    .fq-item { border: 1px solid #e7eef8; border-radius: calc(10 * var(--u)); overflow: hidden; background: #fff; }
+    .fq-item > summary { list-style: none; cursor: pointer; display: grid;
+        grid-template-columns: calc(26 * var(--u)) minmax(0, 1fr) calc(26 * var(--u));
+        align-items: center; gap: calc(4 * var(--u));
+        padding: calc(13 * var(--u)) calc(16 * var(--u)); font-size: calc(17.5 * var(--u));
+        font-weight: 700; color: #0b1340; }
+    .fq-item > summary::-webkit-details-marker { display: none; }
+    .fq-item > summary svg { width: calc(15 * var(--u)); height: calc(15 * var(--u)); color: #1565e8; }
+    .fq-item > summary .sign { justify-self: end; font-size: calc(22 * var(--u)); color: #1565e8; line-height: 1; }
+    .fq-item[open] { border-color: #cfe0fb; }
+    .fq-item[open] > summary { background: #e4effe; color: #0b1340; }
+    .fq-item[open] > summary .chev { transform: rotate(180deg); }
+    .fq-item .ans { padding: calc(10 * var(--u)) calc(16 * var(--u)) calc(16 * var(--u)) calc(46 * var(--u));
+        font-size: calc(16.5 * var(--u)); color: #4a5670; line-height: 1.55; background: #f4f8ff; }
+    .fq-none { padding: calc(26 * var(--u)) calc(16 * var(--u)); font-size: calc(17 * var(--u)); color: #5a6679; }
+
+    /* ── Still need help ──────────────────────────────────────── */
+    .fq-help { position: relative; margin-top: calc(22 * var(--u)); background: #fafcfe;
+        border: 1px solid #e7eef8; border-radius: calc(13 * var(--u)); overflow: hidden;
+        display: grid; grid-template-columns: calc(120 * var(--u)) minmax(0, 1fr) auto calc(120 * var(--u));
+        align-items: center; gap: calc(14 * var(--u)); padding: calc(26 * var(--u)) calc(20 * var(--u)); }
+    .fq-help .head { display: flex; justify-content: center; color: #1565e8; }
+    .fq-help .head svg { width: calc(66 * var(--u)); height: calc(66 * var(--u)); }
+    .fq-help h3 { font-size: calc(25 * var(--u)); font-weight: 800; color: #0b1340; margin: 0 0 calc(4 * var(--u)); }
+    .fq-help p { font-size: calc(16 * var(--u)); color: #5a6679; line-height: 1.45; margin: 0;
+        max-width: calc(470 * var(--u)); }
+    .fq-help .btns { display: flex; gap: calc(12 * var(--u)); flex-wrap: wrap; }
+    .fq-hbtn { display: inline-flex; align-items: center; gap: calc(10 * var(--u)); text-decoration: none;
+        font-size: calc(17 * var(--u)); font-weight: 700; padding: calc(13 * var(--u)) calc(22 * var(--u));
+        border-radius: calc(9 * var(--u)); border: 1px solid transparent; white-space: nowrap; }
+    .fq-hbtn svg { width: calc(19 * var(--u)); height: calc(19 * var(--u)); }
+    .fq-hbtn.solid { background: #005afd; color: #fff; }
+    .fq-hbtn.ghost { background: #fff; color: #1565e8; border-color: #bed5fa; }
+    .fq-help .agent { align-self: stretch; background-image: url('{{ asset('images/faq/agent.png') }}');
+        background-size: auto 100%; background-position: right bottom; background-repeat: no-repeat;
+        min-height: calc(100 * var(--u)); margin: calc(-26 * var(--u)) calc(-20 * var(--u)) calc(-26 * var(--u)) 0; }
+
+    /* ── The band above the footer ────────────────────────────── */
+    .fq-cta { position: relative; margin-top: calc(14 * var(--u)); background: #fef2ea; overflow: hidden; }
+    .fq-cta-art { position: absolute; left: 0; top: 0; bottom: 0; width: 24.1%;
+        background-image: url('{{ asset('images/faq/cta-left.png') }}');
+        background-position: left center; background-size: 100% 100%;
+        -webkit-mask-image: linear-gradient(270deg, transparent 0, #000 18%);
+        mask-image: linear-gradient(270deg, transparent 0, #000 18%); }
+    .fq-cta-in { position: relative; z-index: 2; display: flex; align-items: center; justify-content: flex-end;
+        gap: calc(28 * var(--u)); padding: calc(18 * var(--u)) 0 calc(18 * var(--u)) 17%; flex-wrap: nowrap; }
+    .fq-cta h2 { font-size: calc(28 * var(--u)); font-weight: 800; color: #0b1340; margin: 0 0 calc(7 * var(--u)); }
+    .fq-cta p { font-size: calc(16.5 * var(--u)); color: #3f4a63; line-height: 1.45; margin: 0;
+        max-width: calc(500 * var(--u)); }
+    .fq-cta-btns { display: flex; gap: calc(14 * var(--u)); flex: none; }
+    .fq-cbtn { display: inline-flex; align-items: center; gap: calc(11 * var(--u)); text-decoration: none;
+        color: #fff; font-size: calc(17 * var(--u)); font-weight: 700;
+        padding: calc(14 * var(--u)) calc(24 * var(--u)); border-radius: calc(9 * var(--u)); white-space: nowrap; }
+    .fq-cbtn svg { width: calc(20 * var(--u)); height: calc(20 * var(--u)); }
+    .fq-cbtn .go { width: calc(16 * var(--u)); height: calc(16 * var(--u)); }
+    .fq-cbtn.orange { background: #f4400a; }
+    .fq-cbtn.blue { background: #0d6bf5; }
 
     @media (max-width: 980px) {
-        .fq-hero-grid { grid-template-columns: 1fr; gap: 28px; }
-        .fq-hero-art { display: none; }
-        .fq-topics { grid-template-columns: repeat(3, 1fr); }
-        .fq-box { grid-template-columns: 1fr; gap: 20px; }
-        .fq-tabs { flex-direction: row; flex-wrap: wrap; gap: 8px; }
-        .fq-tab { border-left: none; border: 1px solid var(--line); }
-        .fq-tab.on { border-color: var(--blue); }
-        .fq-help { flex-direction: column; text-align: center; }
-        .fq-h1 { font-size: 40px; }
-    }
-    @media (max-width: 560px) {
-        .fq-topics { grid-template-columns: 1fr 1fr; }
+        .fq-hero-art, .fq-search-art, .fq-cta-art, .fq-help .agent { display: none; }
+        .fq-hero-in { max-width: none; }
+        .fq-qa { grid-template-columns: minmax(0, 1fr); }
+        .fq-side { flex-direction: row; overflow-x: auto; }
+        .fq-help { grid-template-columns: minmax(0, 1fr); text-align: center; }
+        .fq-help .btns { justify-content: center; }
+        .fq-cta-in { justify-content: center; text-align: center; flex-wrap: wrap; padding-left: 0; }
+        .fq-cta-btns { justify-content: center; }
     }
 </style>
 @endpush
 
-{{-- ════════════ HERO ════════════ --}}
-<section class="fq-hero">
-    <div class="lp-container fq-hero-grid">
-        <div class="fq-hero-left">
-            <span class="fq-eyebrow orange">FAQs</span>
-            <h1 class="fq-h1">Questions?<br><span class="o">We've</span> <span class="b">Got Answers.</span></h1>
-            <p class="sub">Find quick answers to the most common questions about using GigResource. If you need more help, our support team is always here for you.</p>
-            <div class="fq-search">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-                <input type="text" id="fqSearch" placeholder="Search questions...">
-            </div>
-        </div>
+@section('content')
 
-        <div class="fq-hero-art">
-            <span class="fq-art-dots"></span>
-            <div class="fq-doc">
-                <div class="fq-doc-bar"><i class="l1"></i><i class="l2"></i><i class="l3"></i></div>
-                <div class="fq-doc-row"><i></i><span></span></div>
-                <div class="fq-doc-row"><i></i><span class="s"></span></div>
-                <div class="fq-doc-row"><i></i><span></span></div>
-                <div class="fq-doc-row"><i></i><span class="s"></span></div>
-                <div class="fq-doc-row"><i></i><span></span></div>
-            </div>
-            <svg class="fq-faqbubble" viewBox="0 0 190 130" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <defs><linearGradient id="fqBub" x1="0" y1="0" x2="190" y2="130" gradientUnits="userSpaceOnUse"><stop stop-color="#3b82f6"/><stop offset="1" stop-color="#1d4ed8"/></linearGradient></defs>
-                <path d="M20 8h150a16 16 0 0 1 16 16v60a16 16 0 0 1-16 16H70l-34 26 4-26H20A16 16 0 0 1 4 100V24A16 16 0 0 1 20 8Z" fill="url(#fqBub)"/>
-                <text x="95" y="72" font-family="Plus Jakarta Sans, Inter, sans-serif" font-size="48" font-weight="800" fill="#fff" text-anchor="middle">FAQ</text>
-            </svg>
-            <svg class="fq-3d-chat" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <defs><linearGradient id="fqChat" x1="0" y1="0" x2="64" y2="64" gradientUnits="userSpaceOnUse"><stop stop-color="#fb923c"/><stop offset="1" stop-color="#ea580c"/></linearGradient></defs>
-                <path d="M12 8h40a6 6 0 0 1 6 6v22a6 6 0 0 1-6 6H28L16 52V42h-4a6 6 0 0 1-6-6V14a6 6 0 0 1 6-6Z" fill="url(#fqChat)"/>
-                <circle cx="22" cy="25" r="3.4" fill="#fff"/><circle cx="32" cy="25" r="3.4" fill="#fff"/><circle cx="42" cy="25" r="3.4" fill="#fff"/>
-            </svg>
-            <svg class="fq-3d-mug" viewBox="0 0 60 60" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M11 19h32v21a11 11 0 0 1-11 11H22a11 11 0 0 1-11-11V19Z" fill="#3b82f6"/>
-                <path d="M43 23h4a7 7 0 0 1 0 14h-4" stroke="#2563eb" stroke-width="4" fill="none"/>
-                <rect x="11" y="19" width="32" height="6" fill="#60a5fa"/>
-            </svg>
-            <svg class="fq-3d-plant" viewBox="0 0 66 88" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M33 48C28 39 20 35 13 37c2 8 10 14 20 14Z" fill="#10b981"/>
-                <path d="M33 48c4-12 13-16 20-13-2 8-12 15-20 15Z" fill="#34d399"/>
-                <path d="M33 50c-2-14 3-24 9-27 3 10-1 22-9 27Z" fill="#059669"/>
-                <path d="M20 54h26l-3 26a4 4 0 0 1-4 3.5H27a4 4 0 0 1-4-3.5L20 54Z" fill="#fff" stroke="#e2e8f0"/>
-                <path d="M18 50h30v6H18z" fill="#cbd5e1"/>
-            </svg>
+@php
+    /* The design file shows eight help topics and five popular questions.
+       The questions on this page are the ones the admin has actually
+       written, so the topics are the categories those questions carry and
+       the popular five are the five that sort first. Nothing is invented to
+       fill a card that the file happens to draw. */
+    $icon = [
+        'rocket'  => '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M14.6 2.4c2.7-.9 5.4-.6 6.5.5s1.4 3.8.5 6.5c-.8 2.4-2.3 4.7-4.3 6.5l-.4.3-.5 3.3a1 1 0 0 1-.5.75l-3 1.7a1 1 0 0 1-1.48-1l.3-2.9-3.3-3.3-2.9.3a1 1 0 0 1-1-1.48l1.7-3a1 1 0 0 1 .75-.5l3.3-.5.3-.4c1.8-2 4.1-3.5 6.5-4.3zm1.3 3.9a1.8 1.8 0 1 0 2.5 2.5 1.8 1.8 0 0 0-2.5-2.5zM6.2 16.2c.6.6.4 1.9-.5 2.8-.7.7-2.6 1.3-3.4 1.5-.2.05-.4-.15-.35-.35.2-.8.8-2.7 1.5-3.4.9-.9 2.2-1.1 2.75-.55z"/></svg>',
+        'doc'     => '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zm-1 7V3.5L18.5 9zM8.3 12.3h7.4a.95.95 0 0 1 0 1.9H8.3a.95.95 0 0 1 0-1.9zm0 3.6h5a.95.95 0 0 1 0 1.9h-5a.95.95 0 0 1 0-1.9z"/></svg>',
+        'pencil'  => '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M5 3h9.2l-2.1 2.1H5.3a.3.3 0 0 0-.3.3v13.3c0 .16.14.3.3.3h13.4c.16 0 .3-.14.3-.3v-6.9L21 9.7V19a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2zm13.9-.6 2.7 2.7a1 1 0 0 1 0 1.4l-8.5 8.5a1 1 0 0 1-.45.26l-3.4.85a.6.6 0 0 1-.73-.73l.85-3.4a1 1 0 0 1 .26-.45l8.5-8.5a1 1 0 0 1 1.4 0z"/></svg>',
+        'card'    => '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3.5 5h17A1.5 1.5 0 0 1 22 6.5v11a1.5 1.5 0 0 1-1.5 1.5h-17A1.5 1.5 0 0 1 2 17.5v-11A1.5 1.5 0 0 1 3.5 5zm.4 6.4a1.7 1.7 0 1 0 0 3.4 1.7 1.7 0 0 0 0-3.4zm4.4.35a1.35 1.35 0 0 0 0 2.7h2.1a1.35 1.35 0 0 0 0-2.7z"/></svg>',
+        'chat'    => '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M9.6 2.5c4.2 0 7.6 2.7 7.6 6.1s-3.4 6.1-7.6 6.1c-.86 0-1.7-.11-2.47-.32l-3.5 1.5a.5.5 0 0 1-.68-.6l.8-2.7C2.6 11.5 2 10.2 2 8.6 2 5.2 5.4 2.5 9.6 2.5zm7.1 5.3c3 .4 5.3 2.5 5.3 5.1 0 1.3-.6 2.5-1.6 3.4l.7 2.3a.5.5 0 0 1-.68.6l-3-1.3c-.65.17-1.35.26-2.07.26-2.6 0-4.8-1.3-5.6-3.2.3.02.6.03.9.03 4.9 0 8.9-3.3 8.9-7.4 0-.26-.02-.52-.05-.77z"/></svg>',
+        'person'  => '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.6a4.9 4.9 0 1 1 0 9.8 4.9 4.9 0 0 1 0-9.8zm0 11.3c4.4 0 8 2.5 8 5.6 0 1.1-.9 1.9-2 1.9H6c-1.1 0-2-.8-2-1.9 0-3.1 3.6-5.6 8-5.6z"/></svg>',
+        'lock'    => '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 1.8A5.2 5.2 0 0 0 6.8 7v2.3H6A2.5 2.5 0 0 0 3.5 11.8v7.7A2.5 2.5 0 0 0 6 22h12a2.5 2.5 0 0 0 2.5-2.5v-7.7A2.5 2.5 0 0 0 18 9.3h-.8V7A5.2 5.2 0 0 0 12 1.8zm0 2.4A2.8 2.8 0 0 1 14.8 7v2.3H9.2V7A2.8 2.8 0 0 1 12 4.2z"/></svg>',
+        'cal'     => '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8 2a1 1 0 0 1 1 1v1h6V3a1 1 0 1 1 2 0v1h1.5A2.5 2.5 0 0 1 21 6.5v12a2.5 2.5 0 0 1-2.5 2.5h-13A2.5 2.5 0 0 1 3 18.5v-12A2.5 2.5 0 0 1 5.5 4H7V3a1 1 0 0 1 1-1zM5 10v8.5c0 .3.2.5.5.5h13c.3 0 .5-.2.5-.5V10zm2.6 1.8h2v2h-2zm3.4 0h2v2h-2zm3.4 0h2v2h-2zm-6.8 3.4h2v2h-2zm3.4 0h2v2h-2zm3.4 0h2v2h-2z"/></svg>',
+        'dollar'  => '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.9 2.6v1.7c1.6.2 2.9.9 3.7 2a1.2 1.2 0 0 1-1.95 1.4c-.6-.8-1.6-1.2-2.95-1.2-1.6 0-2.6.6-2.6 1.55 0 .9.7 1.3 3 1.8 3.1.65 4.6 1.7 4.6 4 0 2.1-1.5 3.6-3.8 4v1.6a1.2 1.2 0 0 1-2.4 0v-1.6c-1.8-.25-3.2-1.05-4-2.3a1.2 1.2 0 0 1 2-1.3c.6.95 1.7 1.4 3.2 1.4 1.8 0 2.8-.65 2.8-1.65 0-.95-.7-1.35-3.1-1.9-3-.65-4.5-1.7-4.5-3.9 0-2 1.4-3.45 3.6-3.85V2.6a1.2 1.2 0 0 1 2.4 0z"/></svg>',
+        'brief'   => '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 2h6a2.5 2.5 0 0 1 2.5 2.5V6h2A2.5 2.5 0 0 1 22 8.5v10A2.5 2.5 0 0 1 19.5 21h-15A2.5 2.5 0 0 1 2 18.5v-10A2.5 2.5 0 0 1 4.5 6h2V4.5A2.5 2.5 0 0 1 9 2zm.4 2.4a.6.6 0 0 0-.6.6V6h6.4V5a.6.6 0 0 0-.6-.6zM10.8 12a1.2 1.2 0 0 0 0 2.4h2.4a1.2 1.2 0 0 0 0-2.4z"/></svg>',
+        'camera'  => '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M9.3 3h5.4a2 2 0 0 1 1.7.95l.75 1.25h2.35A2.5 2.5 0 0 1 22 7.7v10A2.5 2.5 0 0 1 19.5 20h-15A2.5 2.5 0 0 1 2 17.5v-10A2.5 2.5 0 0 1 4.5 5.2h2.35l.75-1.25A2 2 0 0 1 9.3 3zm2.7 4.6a4.9 4.9 0 1 0 0 9.8 4.9 4.9 0 0 0 0-9.8zm0 2.3a2.6 2.6 0 1 1 0 5.2 2.6 2.6 0 0 1 0-5.2z"/></svg>',
+        'users'   => '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8.3 3.4a3.6 3.6 0 1 1 0 7.2 3.6 3.6 0 0 1 0-7.2zm8 1a3 3 0 1 1 0 6 3 3 0 0 1 0-6zM8.3 12.3c3.6 0 6.5 2 6.5 4.6 0 1-.8 1.8-1.8 1.8H3.6c-1 0-1.8-.8-1.8-1.8 0-2.6 2.9-4.6 6.5-4.6zm8 .4c3.1 0 5.5 1.7 5.5 3.9 0 .9-.7 1.6-1.6 1.6h-3.9c.2-.4.3-.85.3-1.3 0-1.7-.85-3.2-2.2-4.1a9 9 0 0 1 1.9-.1z"/></svg>',
+    ];
+
+    /* One icon and one accent per category, so a category that is renamed in
+       the admin still gets a card rather than disappearing. */
+    $topicLook = [
+        'Getting Started'     => ['rocket', '#1565e8'],
+        'General'             => ['rocket', '#1565e8'],
+        'Requests & Proposals'=> ['doc',    '#fb4404'],
+        'For Professionals'   => ['brief',  '#1565e8'],
+        'Agreements & Contracts' => ['pencil', '#9a1ae8'],
+        'Billing'             => ['card',   '#0f9d6b'],
+        'Payments & Payouts'  => ['card',   '#0f9d6b'],
+        'Bookings & Payments' => ['cal',    '#9a1ae8'],
+        'Messaging'           => ['chat',   '#1565e8'],
+        'Account & Settings'  => ['person', '#fb4404'],
+        'Account & Membership'=> ['person', '#fb4404'],
+        'Trust & Safety'      => ['lock',   '#fa035f'],
+        'Events & Bookings'   => ['cal',    '#9a1ae8'],
+    ];
+    $look = fn (string $cat) => $topicLook[$cat] ?? ['doc', '#1565e8'];
+
+    $cats = $grouped->keys()->values();
+
+    /* The five that sort first, which is what "Popular First" means here:
+       the order the admin put them in. */
+    $popular = $faqs->take(5);
+
+    /* The file's pills are search words. These are only shown when they
+       actually match something somebody wrote, so a pill never leads to an
+       empty result. */
+    $terms = collect(['payment', 'cancel', 'commission', 'membership', 'bidding', 'refund', 'verify'])
+        ->filter(fn ($t) => $faqs->contains(
+            fn ($f) => str_contains(strtolower($f->question . ' ' . $f->answer), $t)
+        ))
+        ->take(5)
+        ->values();
+
+    /* The roles somebody can actually sign up as. The file draws a fourth,
+       Affiliate, which this platform does not have yet, so it is not drawn
+       here: a card leading nowhere is worse than three cards. */
+    $roles = [
+        ['Client', 'Plan and hire event services.', 'users', '#f4400a', '#fef3ee'],
+        ['Professional', 'Provide event services, submit bids, and grow your business.', 'brief', '#1565e8', '#edf5fd'],
+        ['Influencer', 'Create and share event experiences.', 'camera', '#9a1ae8', '#f3f1fd'],
+    ];
+
+    $chev  = '<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8.5 12 15.5 19 8.5"/></svg>';
+    $right = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5 7 7-7 7"/></svg>';
+    $arrow = '<svg class="go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12h15"/><path d="m13 6 6 6-6 6"/></svg>';
+@endphp
+
+<div class="fq-page">
+
+{{-- ── Hero ─────────────────────────────────────────────────── --}}
+<section class="fq-hero">
+    <div class="fq-hero-art" role="presentation"></div>
+    <div class="lp-container">
+        <div class="fq-hero-in">
+            <span class="fq-eyebrow">FAQ</span>
+            <h1>Questions?<br><span class="o">We&rsquo;ve Got</span> <span class="b">Answers.</span></h1>
+            <p>Get quick answers to FAQs, or contact our support team anytime you need assistance.</p>
         </div>
     </div>
 </section>
 
-{{-- Khadijah's 28 October screen opens with a row of the questions people
-     ask first.
+<div class="fq-body">
+<div class="lp-container">
 
-     It calls them Popular Questions. Nothing counts how often a question is
-     read, so "popular" would be a claim nobody measured. These are the ones
-     the admin put at the top of the list, which is a real decision somebody
-     made, so the heading says that instead. --}}
-@php
-    $fqStart = $faqs->sortBy('sort_order')->take(5);
-@endphp
-@if($fqStart->isNotEmpty())
-<section class="fq-section" style="padding-bottom: 0;">
-    <div class="lp-container">
-        <div class="fq-head" style="margin-bottom: 22px;">
-            <span class="fq-eyebrow pill">Start here</span>
+    {{-- ── Search ───────────────────────────────────────────── --}}
+    <div class="fq-search">
+        <div class="fq-search-art" role="presentation"></div>
+        <div class="fq-searchrow">
+            <span class="ic" aria-hidden="true">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg>
+            </span>
+            <label for="fqSearch" class="visually-hidden" style="position:absolute;left:-9999px;">Search questions</label>
+            <input id="fqSearch" type="search" placeholder="Search questions, keywords, or topics&hellip;" autocomplete="off">
+            <button type="button" id="fqSearchGo">Search</button>
         </div>
-        <div class="fq-start">
-            @foreach($fqStart as $faq)
-                <button type="button" class="fq-startcard" data-jump="{{ $faq->category ?: 'General' }}"
-                        data-q="{{ \Illuminate\Support\Str::lower($faq->question) }}">
-                    <b>{{ $faq->question }}</b>
-                    <span>{{ \Illuminate\Support\Str::limit(strip_tags($faq->answer), 92) }}</span>
-                </button>
+
+        @if($terms->isNotEmpty())
+            <div class="fq-pop">
+                <b>Popular searches:</b>
+                @foreach($terms as $term)
+                    <button type="button" data-term="{{ $term }}">{{ $term }}</button>
+                @endforeach
+            </div>
+        @endif
+    </div>
+
+    {{-- ── I am a… ──────────────────────────────────────────── --}}
+    <section class="fq-sec">
+        <h2>I am a&hellip;</h2>
+        <p class="lede">Get answers tailored to your experience on GigResource.</p>
+        <div class="fq-roles">
+            @foreach($roles as [$name, $blurb, $ic, $key, $tint])
+                <a class="fq-role" style="--k: {{ $key }}; --t: {{ $tint }};"
+                   href="{{ auth()->check() ? url('/dashboard') : route('register') }}">
+                    <span class="circ" aria-hidden="true">{!! $icon[$ic] !!}</span>
+                    <span>
+                        <b>{{ $name }}</b>
+                        <span>{{ $blurb }}</span>
+                    </span>
+                    <span class="go" aria-hidden="true">{!! $right !!}</span>
+                </a>
             @endforeach
         </div>
-    </div>
-</section>
-@endif
+    </section>
 
-{{-- ════════════ BROWSE BY TOPIC ════════════ --}}
-<section class="fq-section" style="padding-bottom: 10px;">
-    <div class="lp-container">
-        <div class="fq-head" style="margin-bottom: 30px;">
-            <span class="fq-eyebrow pill">Browse by Topic</span>
-        </div>
+    {{-- ── Browse help topics ───────────────────────────────── --}}
+    <section class="fq-sec">
+        <h2>Browse Help Topics</h2>
+        <p class="lede">Select a topic to find answers to common questions.</p>
         <div class="fq-topics">
             @foreach($cats as $cat)
-                <div class="fq-topic" data-cat="{{ $cat }}" role="button" tabindex="0">
-                    <div class="fq-topic-ic">{!! $icons[$cat] ?? '' !!}</div>
+                @php [$ic, $key] = $look($cat); @endphp
+                <a class="fq-topic" style="--k: {{ $key }};" href="#fqAll" data-jump="{{ $cat }}">
+                    {!! $icon[$ic] !!}
                     <b>{{ $cat }}</b>
-                    <span>{{ $topicMeta[$cat]['desc'] ?? '' }}</span>
-                </div>
+                </a>
             @endforeach
         </div>
+    </section>
+
+    {{-- ── Popular questions ────────────────────────────────── --}}
+    @if($popular->isNotEmpty())
+        <section class="fq-sec">
+            <div class="fq-sechead">
+                <div>
+                    <h2>Popular Questions</h2>
+                    <p class="lede">Quick answers to our most frequently asked questions.</p>
+                </div>
+                <a class="fq-viewall" href="#fqAll">View All Questions {!! $right !!}</a>
+            </div>
+            <div class="fq-cards">
+                @foreach($popular as $faq)
+                    @php [$ic, $key] = $look($faq->category ?: 'General'); @endphp
+                    <a class="fq-card" style="--k: {{ $key }};" href="#fqAll" data-open="{{ $faq->id }}">
+                        <span class="circ" aria-hidden="true">{!! $icon[$ic] !!}</span>
+                        <b>{{ $faq->question }}</b>
+                        {{-- The opening of the answer somebody actually wrote,
+                             not a blurb made up to sit under the title. --}}
+                        <p>{{ \Illuminate\Support\Str::limit(strip_tags($faq->answer), 66) }}</p>
+                        <span class="go" aria-hidden="true">{!! $right !!}</span>
+                    </a>
+                @endforeach
+            </div>
+        </section>
+    @endif
+
+    {{-- ── All questions ────────────────────────────────────── --}}
+    <section class="fq-sec" id="fqAll">
+        <div class="fq-sechead">
+            <div>
+                <h2>All Questions &amp; Answers</h2>
+                <p class="lede">Browse questions by topic or use the search bar above.</p>
+            </div>
+            <label>
+                <span style="position:absolute;left:-9999px;">Order questions</span>
+                <select class="fq-sort" id="fqSort">
+                    <option value="popular">Popular First</option>
+                    <option value="az">A to Z</option>
+                </select>
+            </label>
+        </div>
+
+        <div class="fq-qa">
+            <div class="fq-side" role="tablist">
+                @foreach($cats as $i => $cat)
+                    @php [$ic, $key] = $look($cat); @endphp
+                    <button type="button" role="tab" style="--k: {{ $key }};"
+                            class="{{ $i === 0 ? 'on' : '' }}"
+                            aria-selected="{{ $i === 0 ? 'true' : 'false' }}"
+                            data-cat="{{ $cat }}">
+                        {!! $icon[$ic] !!}
+                        <span>{{ $cat }}</span>
+                    </button>
+                @endforeach
+            </div>
+
+            <div class="fq-list" id="fqList">
+                @foreach($cats as $i => $cat)
+                    @foreach($grouped[$cat] as $j => $faq)
+                        <details class="fq-item" data-cat="{{ $cat }}" data-id="{{ $faq->id }}"
+                                 data-q="{{ \Illuminate\Support\Str::lower($faq->question . ' ' . strip_tags($faq->answer)) }}"
+                                 @if($i !== 0) hidden @endif
+                                 @if($i === 0 && $j === 0) open @endif>
+                            <summary>
+                                {!! $chev !!}
+                                <span>{{ $faq->question }}</span>
+                                <span class="sign" aria-hidden="true">+</span>
+                            </summary>
+                            <div class="ans">{!! nl2br(e($faq->answer)) !!}</div>
+                        </details>
+                    @endforeach
+                @endforeach
+                <p class="fq-none" id="fqNone" hidden>No question here matches that yet. Try another word, or contact support below.</p>
+            </div>
+        </div>
+    </section>
+
+    {{-- ── Still need help ──────────────────────────────────── --}}
+    <div class="fq-help">
+        <span class="head" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.2A9.3 9.3 0 0 0 2.7 11.5v5.1A3.4 3.4 0 0 0 6.1 20h.8a1.6 1.6 0 0 0 1.6-1.6v-5.2a1.6 1.6 0 0 0-1.6-1.6H5.1v-.1a6.9 6.9 0 1 1 13.8 0v.1h-1.8a1.6 1.6 0 0 0-1.6 1.6v5.2a1.6 1.6 0 0 0 1.6 1.6h1.4a4.6 4.6 0 0 1-3.9 2.2h-1.2a1.15 1.15 0 0 0 0 2.3h1.2a6.9 6.9 0 0 0 6.7-5.2c.07-.3.1-.6.1-.9v-6.4A9.3 9.3 0 0 0 12 2.2z"/></svg>
+        </span>
+        <div>
+            <h3>Still Need Help?</h3>
+            <p>Our support team is here to help. Get in touch or visit our Help Center for guides, tips, and detailed resources.</p>
+        </div>
+        <div class="btns">
+            {{-- The support form, not the about page: a button that says
+                 Contact Support and opens something else is the fault this
+                 project already fixed once. --}}
+            <a href="{{ \App\Domain\Forms\FormRegistry::url('support_request') }}" class="fq-hbtn solid">
+                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2.6c5.2 0 9.4 3.5 9.4 7.9s-4.2 7.9-9.4 7.9c-1 0-2-.13-2.9-.37l-4.2 1.8a.6.6 0 0 1-.82-.72l1-3.3c-1.3-1.45-2.08-3.26-2.08-5.3 0-4.4 4.2-7.9 9.4-7.9z"/></svg>
+                Contact Support
+            </a>
+            <a class="fq-hbtn ghost" href="{{ route('public.how-it-works') }}">
+                <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 2a1 1 0 0 1 1 1v1h6V3a1 1 0 1 1 2 0v1h1.5A2.5 2.5 0 0 1 21 6.5v12a2.5 2.5 0 0 1-2.5 2.5h-13A2.5 2.5 0 0 1 3 18.5v-12A2.5 2.5 0 0 1 5.5 4H7V3a1 1 0 0 1 1-1zM5 10v8.5c0 .3.2.5.5.5h13c.3 0 .5-.2.5-.5V10z"/></svg>
+                Visit Help Center
+            </a>
+        </div>
+        <span class="agent" role="presentation"></span>
+    </div>
+</div>
+</div>
+
+{{-- ── The band above the footer ────────────────────────────── --}}
+<section class="fq-cta">
+    <div class="fq-cta-art" role="presentation"></div>
+    <div class="lp-container">
+        <div class="fq-cta-in">
+            <div>
+                <h2>Ready to Build Amazing Events Together?</h2>
+                <p>Whether you&rsquo;re looking for trusted professionals or want to showcase your services, GigResource is here to help you succeed.</p>
+            </div>
+            <div class="fq-cta-btns">
+                <a class="fq-cbtn orange" href="{{ auth()->check() ? route('client.post-event.event-info') : route('register') }}">
+                    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M8 2a1 1 0 0 1 1 1v1h6V3a1 1 0 1 1 2 0v1h1.5A2.5 2.5 0 0 1 21 6.5v12a2.5 2.5 0 0 1-2.5 2.5h-13A2.5 2.5 0 0 1 3 18.5v-12A2.5 2.5 0 0 1 5.5 4H7V3a1 1 0 0 1 1-1zM5 10v8.5c0 .3.2.5.5.5h13c.3 0 .5-.2.5-.5V10z"/></svg>
+                    Post an event {!! $arrow !!}
+                </a>
+                <a class="fq-cbtn blue" href="{{ route('register') }}">
+                    {!! $icon['brief'] !!}
+                    Join as professional {!! $arrow !!}
+                </a>
+            </div>
+        </div>
     </div>
 </section>
 
-{{-- ════════════ ACCORDION ════════════ --}}
-<section class="fq-section" id="fqAccordion">
-    <div class="lp-container">
-        <div class="fq-box">
-            <div class="fq-tabs">
-                @foreach($cats as $i => $cat)
-                    <button type="button" class="fq-tab {{ $i === 0 ? 'on' : '' }}" data-cat="{{ $cat }}">{{ $cat }}</button>
-                @endforeach
-            </div>
-            <div class="fq-panels">
-                @foreach($cats as $i => $cat)
-                    <div class="fq-panel {{ $i === 0 ? 'on' : '' }}" data-cat="{{ $cat }}">
-                        @foreach($grouped[$cat] as $j => $faq)
-                            <div class="fq-item {{ $i === 0 && $j === 0 ? 'open' : '' }}" data-q="{{ \Illuminate\Support\Str::lower($faq->question.' '.$faq->answer) }}">
-                                <button type="button" class="fq-q">
-                                    {{ $faq->question }}
-                                    <svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>
-                                </button>
-                                <div class="fq-a"><p>{{ $faq->answer }}</p></div>
-                            </div>
-                        @endforeach
-                    </div>
-                @endforeach
-                <div class="fq-noresult" id="fqNoResult">No questions match your search. Try a different keyword or <a href="#" id="fqClear" style="color:var(--blue);font-weight:700;">view all</a>.</div>
-            </div>
-        </div>
-    </div>
-</section>
-
-{{-- ════════════ STILL NEED HELP ════════════ --}}
-<div class="fq-help-wrap">
-    <div class="lp-container">
-        <div class="fq-help">
-            <svg class="fq-help-ic" viewBox="0 0 96 96" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <defs><linearGradient id="fqHs" x1="0" y1="0" x2="96" y2="96" gradientUnits="userSpaceOnUse"><stop stop-color="#3b82f6"/><stop offset="1" stop-color="#1d4ed8"/></linearGradient></defs>
-                <path d="M22 54v-6a26 26 0 0 1 52 0v6" stroke="url(#fqHs)" stroke-width="7" fill="none" stroke-linecap="round"/>
-                <rect x="12" y="50" width="18" height="26" rx="9" fill="url(#fqHs)"/>
-                <rect x="66" y="50" width="18" height="26" rx="9" fill="url(#fqHs)"/>
-                <path d="M40 40h22a6 6 0 0 1 6 6v14a6 6 0 0 1-6 6H50l-9 7 1.5-7H40a6 6 0 0 1-6-6V46a6 6 0 0 1 6-6Z" fill="#fff" stroke="#e2e8f0"/>
-                <circle cx="44" cy="53" r="2.4" fill="#2563eb"/><circle cx="51" cy="53" r="2.4" fill="#2563eb"/><circle cx="58" cy="53" r="2.4" fill="#2563eb"/>
-            </svg>
-            <div class="fq-help-txt">
-                <h3>Still Need Help?</h3>
-                <p>Can't find the answer you're looking for? Our support team is ready to assist you.</p>
-                {{-- Row 122 — pointed at the About page, which is not support. --}}
-                <a href="{{ \App\Domain\Forms\FormRegistry::url('support_request') }}" class="lp-btn lp-btn-blue">Contact Support
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
-            </div>
-            <svg class="fq-help-env" viewBox="0 0 88 88" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <defs><linearGradient id="fqEnv" x1="0" y1="0" x2="88" y2="88" gradientUnits="userSpaceOnUse"><stop stop-color="#60a5fa"/><stop offset="1" stop-color="#2563eb"/></linearGradient></defs>
-                <rect x="12" y="26" width="64" height="46" rx="8" fill="url(#fqEnv)"/>
-                <path d="M12 32l32 22 32-22" stroke="#fff" stroke-width="3.5" fill="none" stroke-linejoin="round"/>
-                <path d="M12 32l32 22 32-22v-2a4 4 0 0 0-4-4H16a4 4 0 0 0-4 4v2Z" fill="#1d4ed8"/>
-                <circle cx="68" cy="28" r="12" fill="#fbbf24"/>
-                <path d="M68 22l1.7 3.5 3.8.5-2.8 2.7.7 3.8L68 30.8l-3.4 1.7.7-3.8-2.8-2.7 3.8-.5L68 22Z" fill="#fff"/>
-                <path d="M80 60c6 4 9 2 12 8" stroke="#3b82f6" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-dasharray="1 5"/>
-            </svg>
-        </div>
-    </div>
 </div>
 
-{{-- ════════════ READY CTA ════════════ --}}
-<div class="fq-ready">
-    <div class="lp-container">
-        <span class="fq-eyebrow pill orange">Ready to Get Started?</span>
-        <h2>Join Thousands of Event Professionals and Clients</h2>
-        <p>Create your account today and start building incredible events together.</p>
-        <div class="fq-ready-btns">
-            <a href="{{ route('public.browse') }}" class="lp-btn lp-btn-blue">Find Professionals</a>
-            <a href="{{ route('register') }}" class="lp-btn lp-btn-orange">Sign Up Now
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
-        </div>
-    </div>
-</div>
-
-@push('scripts')
 <script>
 (function () {
-    var tabs    = Array.prototype.slice.call(document.querySelectorAll('.fq-tab'));
-    var panels  = Array.prototype.slice.call(document.querySelectorAll('.fq-panel'));
-    var topics  = Array.prototype.slice.call(document.querySelectorAll('.fq-topic'));
-    var items   = Array.prototype.slice.call(document.querySelectorAll('.fq-item'));
-    var search  = document.getElementById('fqSearch');
-    var noResult = document.getElementById('fqNoResult');
+    var list  = document.getElementById('fqList');
+    if (!list) { return; }
 
-    function activate(cat) {
-        tabs.forEach(function (t) { t.classList.toggle('on', t.dataset.cat === cat); });
-        panels.forEach(function (p) { p.classList.toggle('on', p.dataset.cat === cat); });
+    var items = Array.prototype.slice.call(list.querySelectorAll('.fq-item'));
+    var tabs  = Array.prototype.slice.call(document.querySelectorAll('.fq-side button'));
+    var none  = document.getElementById('fqNone');
+    var input = document.getElementById('fqSearch');
+
+    function current() {
+        var on = document.querySelector('.fq-side button.on');
+        return on ? on.getAttribute('data-cat') : null;
     }
 
-    tabs.forEach(function (t) { t.addEventListener('click', function () { activate(t.dataset.cat); }); });
-    topics.forEach(function (t) {
-        t.addEventListener('click', function () {
-            activate(t.dataset.cat);
-            document.getElementById('fqAccordion').scrollIntoView({ behavior: 'smooth', block: 'start' });
+    // One rule for what is on screen: a search beats the chosen topic,
+    // because somebody who typed a word wants that word, not that topic.
+    function apply() {
+        var q   = (input.value || '').trim().toLowerCase();
+        var cat = current();
+        var seen = 0;
+
+        items.forEach(function (el) {
+            var show = q
+                ? el.getAttribute('data-q').indexOf(q) !== -1
+                : el.getAttribute('data-cat') === cat;
+            el.hidden = !show;
+            if (show) { seen++; }
         });
-        t.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); t.click(); } });
-    });
 
-    /* A Start here card opens its own answer, rather than only moving to the
-       right tab and leaving the reader to find the question again. */
-    Array.prototype.slice.call(document.querySelectorAll('.fq-startcard')).forEach(function (card) {
-        card.addEventListener('click', function () {
-            activate(card.dataset.jump);
+        none.hidden = seen > 0;
+    }
 
-            var wanted = card.dataset.q;
-            items.forEach(function (item) {
-                var open = item.dataset.q.indexOf(wanted) === 0;
-                item.classList.toggle('open', open);
-                if (open) {
-                    setTimeout(function () {
-                        item.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    }, 60);
-                }
+    tabs.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+            tabs.forEach(function (b) {
+                b.classList.toggle('on', b === btn);
+                b.setAttribute('aria-selected', b === btn ? 'true' : 'false');
             });
+            input.value = '';
+            apply();
         });
     });
 
-    // Accordion toggle
-    items.forEach(function (item) {
-        var q = item.querySelector('.fq-q');
-        q.addEventListener('click', function () { item.classList.toggle('open'); });
+    input.addEventListener('input', apply);
+    document.getElementById('fqSearchGo').addEventListener('click', apply);
+    input.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter') { e.preventDefault(); apply(); }
     });
 
-    // Global search
-    function runSearch(query) {
-        query = query.trim().toLowerCase();
-        var box = document.querySelector('.fq-panels');
-        if (!query) {
-            box.classList.remove('searching');
-            panels.forEach(function (p) { p.style.display = ''; });
-            tabs.forEach(function (t) { t.style.display = ''; });
-            items.forEach(function (it) { it.style.display = ''; it.classList.remove('open'); });
-            // restore active panel via classes
-            var active = tabs.find(function (t) { return t.classList.contains('on'); });
-            activate(active ? active.dataset.cat : (tabs[0] && tabs[0].dataset.cat));
-            if (noResult) noResult.style.display = 'none';
-            return;
+    document.querySelectorAll('.fq-pop button').forEach(function (pill) {
+        pill.addEventListener('click', function () {
+            input.value = pill.getAttribute('data-term');
+            apply();
+            document.getElementById('fqAll').scrollIntoView({ behavior: 'smooth' });
+        });
+    });
+
+    // A topic card and a popular question both land on the same list below.
+    document.querySelectorAll('[data-jump]').forEach(function (card) {
+        card.addEventListener('click', function () {
+            var want = card.getAttribute('data-jump');
+            tabs.forEach(function (b) {
+                var on = b.getAttribute('data-cat') === want;
+                b.classList.toggle('on', on);
+                b.setAttribute('aria-selected', on ? 'true' : 'false');
+            });
+            input.value = '';
+            apply();
+        });
+    });
+
+    document.querySelectorAll('[data-open]').forEach(function (card) {
+        card.addEventListener('click', function () {
+            var id = card.getAttribute('data-open');
+            var want = list.querySelector('.fq-item[data-id="' + id + '"]');
+            if (!want) { return; }
+
+            var cat = want.getAttribute('data-cat');
+            tabs.forEach(function (b) {
+                var on = b.getAttribute('data-cat') === cat;
+                b.classList.toggle('on', on);
+                b.setAttribute('aria-selected', on ? 'true' : 'false');
+            });
+            input.value = '';
+            apply();
+            items.forEach(function (el) { el.open = el === want; });
+        });
+    });
+
+    // The design file shows one answer open and the rest closed.
+    list.addEventListener('toggle', function (e) {
+        if (e.target.open) {
+            items.forEach(function (el) { if (el !== e.target) { el.open = false; } });
         }
-        // search mode: show all panels, filter items
-        var anyShown = 0;
-        panels.forEach(function (p) { p.classList.add('on'); p.style.display = 'flex'; });
-        tabs.forEach(function (t) { t.style.display = 'none'; });
-        items.forEach(function (it) {
-            var match = (it.dataset.q || '').indexOf(query) !== -1;
-            it.style.display = match ? '' : 'none';
-            it.classList.toggle('open', match);
-            if (match) anyShown++;
+    }, true);
+
+    document.getElementById('fqSort').addEventListener('change', function () {
+        var az = this.value === 'az';
+        var sorted = items.slice().sort(function (a, b) {
+            if (!az) { return items.indexOf(a) - items.indexOf(b); }
+            return a.querySelector('summary span').textContent
+                .localeCompare(b.querySelector('summary span').textContent);
         });
-        if (noResult) noResult.style.display = anyShown ? 'none' : 'block';
-    }
-    if (search) search.addEventListener('input', function () { runSearch(this.value); });
-    var clear = document.getElementById('fqClear');
-    if (clear) clear.addEventListener('click', function (e) { e.preventDefault(); if (search) { search.value = ''; runSearch(''); } });
+        sorted.forEach(function (el) { list.insertBefore(el, none); });
+    });
 })();
 </script>
-@endpush
-
 @endsection
