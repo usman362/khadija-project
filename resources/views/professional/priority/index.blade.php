@@ -406,7 +406,9 @@
                              improvement on nothing, and a word in the column
                              reads like a figure. --}}
                         <span class="c {{ $change === null ? 'flat' : ($change >= 0 ? 'up' : 'down') }}"
-                              @if($change === null) title="No earlier 30 days to compare against" @endif>
+                              title="{{ $change === null
+                                  ? 'No earlier 30 days to compare against'
+                                  : 'Against the 30 days before these' }}">
                             {{ $change === null ? '' : ($change >= 0 ? "↑ " : "↓ ") . abs($change) . '%' }}
                         </span>
                     </div>

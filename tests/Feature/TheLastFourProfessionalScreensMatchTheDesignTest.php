@@ -236,7 +236,11 @@ class TheLastFourProfessionalScreensMatchTheDesignTest extends TestCase
         $this->assertStringContainsString('Submitted Bids', $html);
         $this->assertStringContainsString('Accepted', $html);
         $this->assertStringContainsString('Bid Funnel Conversion', $html);
-        $this->assertStringContainsString('50% win rate on the 2 decided', $html);
+        // The tile carries the rate and the funnel card under it carries the
+        // two numbers it came from. It used to say "on the 2 decided" in the
+        // tile itself, which her sub-line has no room for.
+        $this->assertStringContainsString('50% win rate', $html);
+        $this->assertStringContainsString('Bid Funnel Conversion', $html);
     }
 
     /**
@@ -282,7 +286,7 @@ class TheLastFourProfessionalScreensMatchTheDesignTest extends TestCase
         $html = $this->page('professional.bid-intelligence.index');
 
         $this->assertStringContainsString('Response Timing Analysis', $html);
-        $this->assertStringContainsString('How long after a request was published your bid went in', $html);
+        $this->assertStringContainsString('how long after a request was published your bid went in', $html);
     }
 
     /** The quality checklist is a tally of their own accepted bids. */
@@ -317,8 +321,9 @@ class TheLastFourProfessionalScreensMatchTheDesignTest extends TestCase
     {
         $html = $this->page('professional.priority.index');
 
+        // "Agreement", singular, is what her screen has.
         foreach (['All (', 'Urgent (', 'Due Soon (', 'Client Activity (',
-                  'Payments (', 'Agreements ('] as $tab) {
+                  'Payments (', 'Agreement ('] as $tab) {
             $this->assertStringContainsString($tab, $html, "The tab \"{$tab}\" is missing.");
         }
     }
@@ -367,12 +372,33 @@ class TheLastFourProfessionalScreensMatchTheDesignTest extends TestCase
     /** The snapshot compares them with themselves, or says it cannot. */
     public function test_the_snapshot_compares_the_reader_with_themselves(): void
     {
+        // One request in each window, so a percentage can actually be worked
+        // out and the arrow it draws has a period to name.
+        foreach ([45, 5] as $daysAgo) {
+            Booking::create([
+                'event_id'   => $this->event()->id,
+                'client_id'  => $this->client->id,
+                'supplier_id' => $this->pro->id,
+                'created_by' => $this->client->id,
+                'status'     => 'requested',
+                'price'      => 1000,
+            ])->forceFill(['created_at' => now()->subDays($daysAgo)])->saveQuietly();
+        }
+
         $html = $this->page('professional.priority.index');
 
         $this->assertStringContainsString('Business Snapshot', $html);
-        $this->assertStringContainsString('Last 30 days, against your own 30 before.', $html);
-        // Nothing before, so no percentage is claimed.
-        $this->assertStringContainsString('first', $html);
+        $this->assertStringContainsString('Last 30 Days', $html);
+
+        // An arrow has to say what it is an arrow against, or the reader is
+        // left to assume one. Her card has no room for a second line, so the
+        // period is on the figure itself.
+        $this->assertStringContainsString('Against the 30 days before these', $html);
+
+        // Nothing before this account's first 30 days, so no percentage is
+        // claimed and the column is left empty rather than filled with a
+        // word that reads like a figure.
+        $this->assertStringContainsString('No earlier 30 days to compare against', $html);
     }
 
     // ─────────────────────────────────────── Gig Operations Hub ─────────

@@ -506,7 +506,12 @@
                     <span>{{ $band['label'] }}<br>({{ $band['won'] }}/{{ $band['placed'] }})</span>
                 @endforeach
             </div>
-            <p class="bi-note">Numbers under each bar are accepted bids / bids sent in that time range.
+            {{-- The bands are time ranges, and a range on its own does not
+                 say time since what. It is the gap between the request being
+                 published and the bid going in, which is the only thing a
+                 professional can change about their timing. --}}
+            <p class="bi-note">Each range is how long after a request was published your bid went in.
+               Numbers under each bar are accepted bids / bids sent in that range.
                A dash means nothing in that band has been decided yet.</p>
         @else
             <p class="bi-none">None of your bids can be timed yet: that needs a request with a published date and a bid against it.</p>
