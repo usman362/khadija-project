@@ -103,8 +103,10 @@
     .br-range-vals { display: flex; justify-content: space-between; font-size: 11.5px; color: var(--muted); margin-top: 4px; }
     .br-input { width: 100%; border: 1px solid var(--line); border-radius: 9px; padding: 8px 10px; font-size: 13px; color: var(--ink-2); font-family: inherit; }
     .br-switch { width: 38px; height: 21px; border-radius: 999px; background: var(--line); position: relative; cursor: pointer; transition: background .15s; flex-shrink: 0; }
-    .br-apply { display: block; border: none; border-radius: 11px; padding: 11px; margin: 14px 16px 16px; width: calc(100% - 32px);
-        background: linear-gradient(135deg, var(--blue), var(--blue-dark)); color: #fff; font-weight: 800; font-size: 13.5px; cursor: pointer; }
+    /* Orange on her file, not blue: it is the page's one commit action and
+       every other orange here is one too. */
+    .br-apply { display: block; border: none; border-radius: 11px; padding: 12px; margin: 14px 16px 16px; width: calc(100% - 32px);
+        background: linear-gradient(135deg, var(--orange), var(--orange-dark)); color: #fff; font-weight: 800; font-size: 14px; cursor: pointer; }
 
     /* results */
     .br-results-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 14px; flex-wrap: wrap; }
@@ -189,8 +191,11 @@
     .br-price b { font-size: 19px; color: var(--ink); font-weight: 800; }
     .br-pro-actions { display: flex; gap: 10px; }
     .br-pro-actions > * { flex: 1 1 0; justify-content: center; }
-    .br-btn-ghost { border: 1px solid var(--line); background: #fff; border-radius: 10px; padding: 11px 14px; font-size: 13.5px; font-weight: 700; color: var(--ink-2); text-decoration: none; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
-    .br-btn-msg { border: none; border-radius: 10px; padding: 11px 16px; font-size: 13.5px; font-weight: 800; color: #fff; background: linear-gradient(135deg, var(--orange), var(--orange-dark)); text-decoration: none; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+    .br-btn-ghost { border: 1px solid var(--line); background: #fff; border-radius: 10px; padding: 10px 14px; font-size: 13.5px; font-weight: 700; color: var(--ink-2); text-decoration: none; display: inline-flex; align-items: center; gap: 7px; cursor: pointer; }
+    .br-btn-msg { border: none; border-radius: 10px; padding: 10px 16px; font-size: 13.5px; font-weight: 800; color: #fff; background: linear-gradient(135deg, var(--orange), var(--orange-dark)); text-decoration: none; display: inline-flex; align-items: center; gap: 7px; cursor: pointer; }
+    /* Every icon in these two buttons is 15px and never flexes. Without this
+       an inline SVG has no size of its own and grows to fill the button. */
+    .br-btn-ghost svg, .br-btn-msg svg { width: 15px; height: 15px; flex: none; }
 
     .br-empty { padding: 60px 20px; text-align: center; color: var(--muted); }
     .br-empty svg { width: 46px; height: 46px; color: var(--line); margin-bottom: 14px; }
