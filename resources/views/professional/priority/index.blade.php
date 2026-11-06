@@ -30,6 +30,7 @@
     .pa-head .ic svg { width: 21px; height: 21px; }
     .pa-head h1 { font-size: 22px; font-weight: 800; color: var(--text-primary); margin: 0; }
     .pa-head p { font-size: 13px; color: var(--text-muted); margin: 3px 0 0; }
+    .pa-head .pa-count { font-weight: 700; color: var(--text-primary); }
 
     .pa-tabs { display: flex; gap: 7px; flex-wrap: wrap; margin-bottom: 16px; }
     .pa-tab { padding: 8px 14px; border-radius: 999px; font-size: 12.5px; font-weight: 700;
@@ -83,7 +84,10 @@
     </span>
     <div>
         <h1>Priority Actions</h1>
-        <p>
+        <p>Your most important tasks, all in one place. Stay on top of what needs your attention to keep
+           your business running smoothly.</p>
+        {{-- And how many there actually are, which the heading cannot say. --}}
+        <p class="pa-count">
             @if ($total === 0)
                 Nothing is waiting on you right now.
             @else

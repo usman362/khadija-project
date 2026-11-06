@@ -89,11 +89,7 @@
 <div class="sp-head">
     <div>
         <h1>My Services &amp; Pricing</h1>
-        <p>
-            What you charge for each service you offer. These prices are what Create a Package fills in
-            for you, and what a quick answer to a request is worked out from. Leave any of them blank
-            and that service simply has no price yet.
-        </p>
+        <p>Manage the services you offer, set your pricing, and customize options for Quick Bid, packages, and more.</p>
     </div>
     <a href="{{ route('professional.profile.index') }}" class="sp-save" style="text-decoration:none;">Preview public profile</a>
 </div>

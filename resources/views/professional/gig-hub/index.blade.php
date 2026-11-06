@@ -2,7 +2,7 @@
 
 @section('title', 'Gig Operations Hub')
 @section('page-title', 'Gig Operations Hub')
-@section('page-subtitle', 'Everything for a gig, in one place.')
+@section('page-subtitle', 'Everything for your event business, in one place.')
 
 {{-- The one workspace a professional runs a gig from.
      Contracts, My Gigs and this page all showed the same jobs in different

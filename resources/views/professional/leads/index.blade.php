@@ -179,7 +179,7 @@
 <div class="lc-head">
     <div>
         <h1>Leads CRM</h1>
-        <p>Every enquiry you could take or already have, and where each one has got to.</p>
+        <p>Track, manage, and convert your leads into bookings.</p>
     </div>
     <a class="lc-btn" href="{{ route('professional.bidding-board.index') }}">Browse open gigs</a>
 </div>
@@ -191,7 +191,7 @@
         <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg></span>
         <div>
             <b>Lead pipeline</b>
-            <span>Click a stage to filter the leads below. The counts and the table come from the same records.</span>
+            <span>Click a stage to filter the leads below. Counts and totals come from the same records.</span>
         </div>
     </div>
 

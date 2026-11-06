@@ -118,19 +118,11 @@
     <div>
         <h1>My Clients</h1>
         <p>
-            Everyone who has booked you, and what you have done for them. A client who has hired you
-            before is the shortest route to the next job, so this is sorted by who you worked for most
-            recently and marks the ones who came back.
+            Your client relationships, booking history, and important details to help you deliver great
+            experiences and build repeat business.
         </p>
     </div>
-    <a class="mc-btn" href="{{ route('professional.clients.export', request()->query()) }}">Download these clients</a>
-</div>
-
-<div class="mc-sums">
-    <div class="mc-sum"><div class="k">Clients</div><div class="v">{{ $summary['clients'] }}</div><div class="n">Have booked you at least once</div></div>
-    <div class="mc-sum"><div class="k">Came back</div><div class="v">{{ $summary['repeat'] }}</div><div class="n">Booked you more than once</div></div>
-    <div class="mc-sum"><div class="k">Still ahead</div><div class="v">{{ $summary['upcoming'] }}</div><div class="n">Bookings not yet finished</div></div>
-    <div class="mc-sum"><div class="k">Earned from them</div><div class="v">{{ $money($summary['earned']) }}</div><div class="n">Completed work, after commission</div></div>
+    <a class="mc-btn" href="{{ route('professional.clients.export', request()->query()) }}">Export CSV</a>
 </div>
 
 {{-- Filters first, then the tabs, which is the order her screen reads in:
