@@ -58,23 +58,25 @@
     /* ── Search card ──────────────────────────────────────────── */
     .fq-search { position: relative; z-index: 3; margin-top: calc(-12 * var(--u));
         background: #fefdff; border: 1px solid #e4effc; border-radius: calc(14 * var(--u));
-        padding: calc(18 * var(--u)) calc(22 * var(--u)) calc(20 * var(--u)); overflow: hidden; }
-    /* Where it sits on the file: 41 of its pixels below the card's top edge
-       and 64 in from its right, which puts it beside the pills rather than
-       against the top border. Its foot runs past the card there too. */
-    .fq-search-art { position: absolute; right: calc(87 * var(--u)); top: calc(56 * var(--u));
-        width: calc(156 * var(--u)); height: calc(84 * var(--u));
+        padding: calc(16 * var(--u)) calc(22 * var(--u)) calc(12 * var(--u)); overflow: hidden; }
+    /* The whole drawing, 117 by 94 of the file's pixels: the earlier cut
+       started 32 rows too low and lost its top and the orange marks beside
+       the magnifier. It sits 9 below the card's top edge and 69 in from its
+       right, which puts those marks against the handwriting's last stroke,
+       and its foot runs a little past the card. */
+    .fq-search-art { position: absolute; right: calc(94 * var(--u)); top: calc(12 * var(--u));
+        width: calc(159 * var(--u)); height: calc(128 * var(--u));
         background-image: url('{{ asset('images/faq/search-art.png') }}');
         background-size: 100% 100%; background-repeat: no-repeat; }
-    .fq-searchrow { position: relative; z-index: 2; display: flex; max-width: calc(760 * var(--u));
+    .fq-searchrow { position: relative; z-index: 2; display: flex; max-width: calc(963 * var(--u));
         border-radius: calc(10 * var(--u)); overflow: hidden; border: 1px solid #dde7f4; background: #fff; }
     .fq-searchrow .ic { display: flex; align-items: center; padding: 0 calc(6 * var(--u)) 0 calc(18 * var(--u)); color: #0b1340; }
-    .fq-searchrow .ic svg { width: calc(26 * var(--u)); height: calc(26 * var(--u)); }
+    .fq-searchrow .ic svg { width: calc(34 * var(--u)); height: calc(34 * var(--u)); }
     .fq-searchrow input { flex: 1 1 auto; min-width: 0; border: 0; outline: 0; background: transparent;
         font-size: calc(19 * var(--u)); color: #0b1340; padding: calc(15 * var(--u)) calc(10 * var(--u)); }
     .fq-searchrow input::placeholder { color: #7b879c; }
     .fq-searchrow button { flex: none; border: 0; cursor: pointer; background: #005afd; color: #fff;
-        font-size: calc(18 * var(--u)); font-weight: 700; padding: 0 calc(42 * var(--u)); }
+        font-size: calc(18 * var(--u)); font-weight: 700; padding: 0 calc(55 * var(--u)); }
     .fq-pop { position: relative; z-index: 2; display: flex; align-items: center; flex-wrap: wrap;
         gap: calc(10 * var(--u)); margin-top: calc(14 * var(--u)); }
     .fq-pop > b { font-size: calc(16 * var(--u)); font-weight: 700; color: #0b1340; }
