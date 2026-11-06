@@ -50,7 +50,7 @@
         background: #fefdff; border: 1px solid #e4effc; border-radius: calc(14 * var(--u));
         padding: calc(18 * var(--u)) calc(22 * var(--u)) calc(20 * var(--u)); overflow: hidden; }
     .fq-search-art { position: absolute; right: calc(16 * var(--u)); top: calc(10 * var(--u));
-        width: calc(175 * var(--u)); height: calc(88 * var(--u));
+        width: calc(156 * var(--u)); height: calc(84 * var(--u));
         background-image: url('{{ asset('images/faq/search-art.png') }}');
         background-size: 100% 100%; background-repeat: no-repeat; }
     .fq-searchrow { position: relative; z-index: 2; display: flex; max-width: calc(760 * var(--u));
@@ -157,8 +157,9 @@
     /* ── Still need help ──────────────────────────────────────── */
     .fq-help { position: relative; margin-top: calc(22 * var(--u)); background: #fafcfe;
         border: 1px solid #e7eef8; border-radius: calc(13 * var(--u)); overflow: hidden;
-        display: grid; grid-template-columns: calc(120 * var(--u)) minmax(0, 1fr) auto calc(120 * var(--u));
-        align-items: center; gap: calc(14 * var(--u)); padding: calc(26 * var(--u)) calc(20 * var(--u)); }
+        display: grid; grid-template-columns: calc(120 * var(--u)) minmax(0, 1fr) auto calc(92 * var(--u));
+        align-items: center; gap: calc(14 * var(--u)); padding: calc(26 * var(--u)) calc(20 * var(--u));
+        }
     .fq-help .head { display: flex; justify-content: center; color: #1565e8; }
     .fq-help .head svg { width: calc(66 * var(--u)); height: calc(66 * var(--u)); }
     .fq-help h3 { font-size: calc(25 * var(--u)); font-weight: 800; color: #0b1340; margin: 0 0 calc(4 * var(--u)); }
@@ -183,7 +184,7 @@
         -webkit-mask-image: linear-gradient(270deg, transparent 0, #000 18%);
         mask-image: linear-gradient(270deg, transparent 0, #000 18%); }
     .fq-cta-in { position: relative; z-index: 2; display: flex; align-items: center; justify-content: flex-end;
-        gap: calc(28 * var(--u)); padding: calc(18 * var(--u)) 0 calc(18 * var(--u)) 17%; flex-wrap: nowrap; }
+        gap: calc(28 * var(--u)); padding: calc(12 * var(--u)) 0 calc(12 * var(--u)) 17%; flex-wrap: nowrap; }
     .fq-cta h2 { font-size: calc(28 * var(--u)); font-weight: 800; color: #0b1340; margin: 0 0 calc(7 * var(--u)); }
     .fq-cta p { font-size: calc(16.5 * var(--u)); color: #3f4a63; line-height: 1.45; margin: 0;
         max-width: calc(500 * var(--u)); }
