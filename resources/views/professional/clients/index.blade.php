@@ -33,9 +33,12 @@
 
 @push('styles')
 <style>
-    .mc-head { display:flex; justify-content:space-between; align-items:flex-end; gap:16px; flex-wrap:wrap; margin-bottom:18px; }
+    .mc-head { display:flex; justify-content:space-between; align-items:flex-end; gap:24px; flex-wrap:wrap; margin-bottom:18px; }
+    .mc-head > div:first-child { flex:1 1 auto; min-width:0; }
     .mc-head h1 { font-size:24px; font-weight:800; color:var(--text-primary); margin:0 0 4px; }
-    .mc-head p { font-size:13px; color:var(--text-muted); margin:0; max-width:70ch; }
+    /* No max-width: the design runs this on one line, and a reading-width
+       cap was folding it onto two. */
+    .mc-head p { font-size:13px; color:var(--text-muted); margin:0; }
     .mc-btn { font-size:13px; font-weight:700; padding:10px 17px; border-radius:10px; text-decoration:none;
         background:var(--accent-blue, #2563eb); color:#fff; border:0; cursor:pointer; font-family:inherit; }
 
@@ -117,10 +120,7 @@
 <div class="mc-head">
     <div>
         <h1>My Clients</h1>
-        <p>
-            Your client relationships, booking history, and important details to help you deliver great
-            experiences and build repeat business.
-        </p>
+        <p>Your client relationships, booking history, and important details to help you deliver great experiences and build repeat business.</p>
     </div>
     <a class="mc-btn" href="{{ route('professional.clients.export', request()->query()) }}">Export CSV</a>
 </div>
