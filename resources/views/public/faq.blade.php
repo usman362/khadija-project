@@ -56,19 +56,28 @@
     .fq-body { background: #f8fdfe; padding-bottom: calc(10 * var(--u)); }
 
     /* ── Search card ──────────────────────────────────────────── */
+    /* The card is NOT white on the file. It is #f0f7fe, a light blue, and
+       that single wrong value is what made the drawing look like a
+       rectangle pasted on top: the drawing is a flat cut carrying the
+       file's own card colour around its edges, so against a whiter card
+       its edges showed. On the right colour there is no edge to see.
+       The right-hand padding is the drawing's lane, 179 of the file's
+       pixels, which is what stops the field and the pills running under
+       it. The field has no width of its own any more; it fills what the
+       card leaves, which is how the file's proportions hold at any size. */
     .fq-search { position: relative; z-index: 3; margin-top: calc(-12 * var(--u));
-        background: #fefdff; border: 1px solid #e4effc; border-radius: calc(14 * var(--u));
-        padding: calc(16 * var(--u)) calc(22 * var(--u)) calc(12 * var(--u)); overflow: hidden; }
-    /* The whole drawing, 117 by 94 of the file's pixels: the earlier cut
-       started 32 rows too low and lost its top and the orange marks beside
-       the magnifier. It sits 9 below the card's top edge and 69 in from its
-       right, which puts those marks against the handwriting's last stroke,
-       and its foot runs a little past the card. */
-    .fq-search-art { position: absolute; right: calc(94 * var(--u)); top: calc(12 * var(--u));
+        background: #f0f7fe; border: 1px solid #e2edfb; border-radius: calc(14 * var(--u));
+        padding: calc(16 * var(--u)) calc(273 * var(--u)) calc(14 * var(--u)) calc(30 * var(--u));
+        overflow: hidden; }
+    /* Decorative, and taller than the card it sits in, which is why it is
+       laid over the card rather than placed in it: as a grid or flex item
+       it would set the card's height and the card would grow 15 taller
+       than the file's. Its lane is the padding above. */
+    .fq-search-art { position: absolute; right: calc(98 * var(--u)); top: calc(12 * var(--u));
         width: calc(159 * var(--u)); height: calc(128 * var(--u));
         background-image: url('{{ asset('images/faq/search-art.png') }}');
         background-size: 100% 100%; background-repeat: no-repeat; }
-    .fq-searchrow { position: relative; z-index: 2; display: flex; max-width: calc(963 * var(--u));
+    .fq-searchrow { position: relative; z-index: 2; display: flex;
         border-radius: calc(10 * var(--u)); overflow: hidden; border: 1px solid #dde7f4; background: #fff; }
     .fq-searchrow .ic { display: flex; align-items: center; padding: 0 calc(6 * var(--u)) 0 calc(18 * var(--u)); color: #0b1340; }
     .fq-searchrow .ic svg { width: calc(34 * var(--u)); height: calc(34 * var(--u)); }
@@ -81,7 +90,7 @@
         gap: calc(10 * var(--u)); margin-top: calc(14 * var(--u)); }
     .fq-pop > b { font-size: calc(16 * var(--u)); font-weight: 700; color: #0b1340; }
     .fq-pop button { cursor: pointer; background: #fff; border: 1px solid #dfe8f5;
-        border-radius: calc(999 * var(--u)); padding: calc(7 * var(--u)) calc(18 * var(--u));
+        border-radius: calc(999 * var(--u)); padding: calc(9 * var(--u)) calc(18 * var(--u));
         font-size: calc(16 * var(--u)); color: #2f3b55; }
     .fq-pop button:hover { border-color: #005afd; color: #005afd; }
 
@@ -217,6 +226,7 @@
 
     @media (max-width: 980px) {
         .fq-hero-art, .fq-script-tail, .fq-search-art, .fq-cta-art, .fq-help .agent { display: none; }
+        .fq-search { padding-right: calc(30 * var(--u)); }
         .fq-hero-in { max-width: none; }
         .fq-qa { grid-template-columns: minmax(0, 1fr); }
         .fq-side { flex-direction: row; overflow-x: auto; }
