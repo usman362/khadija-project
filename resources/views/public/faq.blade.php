@@ -21,7 +21,7 @@
     .lp-container { max-width: min(calc(90.8% + 48px), 1620px); }
 
     /* ── Hero ─────────────────────────────────────────────────── */
-    .fq-hero { position: relative; overflow: hidden;
+    .fq-hero { position: relative;
         background: linear-gradient(103deg, #ecf3fe 0%, #eef4fe 46%, #f4f8fe 100%); }
     .fq-hero-in { position: relative; z-index: 2; padding: calc(28 * var(--u)) 0 calc(39 * var(--u));
         max-width: calc(580 * var(--u)); }
@@ -42,6 +42,16 @@
         background-position: right top; background-size: 100% 100%; z-index: 1;
         -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 9%);
         mask-image: linear-gradient(90deg, transparent 0, #000 9%); }
+
+    /* On the file the band does not end in one straight line: its right end
+       carries on about 26 of its pixels lower, so the last line of the
+       handwriting and the orange stroke under it run across the top corner
+       of the search card and past its right edge. That piece is its own
+       cut, laid over the card. */
+    .fq-script-tail { position: absolute; left: 85.84%; right: 0;
+        top: calc(277 * var(--u)); height: calc(46 * var(--u)); z-index: 4;
+        background-image: url('{{ asset('images/faq/script-tail.png') }}');
+        background-size: 100% 100%; }
 
     .fq-body { background: #f8fdfe; padding-bottom: calc(10 * var(--u)); }
 
@@ -204,7 +214,7 @@
     .fq-cbtn.blue { background: #0d6bf5; }
 
     @media (max-width: 980px) {
-        .fq-hero-art, .fq-search-art, .fq-cta-art, .fq-help .agent { display: none; }
+        .fq-hero-art, .fq-script-tail, .fq-search-art, .fq-cta-art, .fq-help .agent { display: none; }
         .fq-hero-in { max-width: none; }
         .fq-qa { grid-template-columns: minmax(0, 1fr); }
         .fq-side { flex-direction: row; overflow-x: auto; }
@@ -238,6 +248,7 @@
         'brief'   => '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M9 2h6a2.5 2.5 0 0 1 2.5 2.5V6h2A2.5 2.5 0 0 1 22 8.5v10A2.5 2.5 0 0 1 19.5 21h-15A2.5 2.5 0 0 1 2 18.5v-10A2.5 2.5 0 0 1 4.5 6h2V4.5A2.5 2.5 0 0 1 9 2zm.4 2.4a.6.6 0 0 0-.6.6V6h6.4V5a.6.6 0 0 0-.6-.6zM10.8 12a1.2 1.2 0 0 0 0 2.4h2.4a1.2 1.2 0 0 0 0-2.4z"/></svg>',
         'camera'  => '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M9.3 3h5.4a2 2 0 0 1 1.7.95l.75 1.25h2.35A2.5 2.5 0 0 1 22 7.7v10A2.5 2.5 0 0 1 19.5 20h-15A2.5 2.5 0 0 1 2 17.5v-10A2.5 2.5 0 0 1 4.5 5.2h2.35l.75-1.25A2 2 0 0 1 9.3 3zm2.7 4.6a4.9 4.9 0 1 0 0 9.8 4.9 4.9 0 0 0 0-9.8zm0 2.3a2.6 2.6 0 1 1 0 5.2 2.6 2.6 0 0 1 0-5.2z"/></svg>',
         'users'   => '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M8.3 3.4a3.6 3.6 0 1 1 0 7.2 3.6 3.6 0 0 1 0-7.2zm8 1a3 3 0 1 1 0 6 3 3 0 0 1 0-6zM8.3 12.3c3.6 0 6.5 2 6.5 4.6 0 1-.8 1.8-1.8 1.8H3.6c-1 0-1.8-.8-1.8-1.8 0-2.6 2.9-4.6 6.5-4.6zm8 .4c3.1 0 5.5 1.7 5.5 3.9 0 .9-.7 1.6-1.6 1.6h-3.9c.2-.4.3-.85.3-1.3 0-1.7-.85-3.2-2.2-4.1a9 9 0 0 1 1.9-.1z"/></svg>',
+        'mega'    => '<svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.6 3.3a1.3 1.3 0 0 1 2.2.95v15.5a1.3 1.3 0 0 1-2.2.95l-3.9-3.7H12v3.4a1.6 1.6 0 0 1-1.6 1.6H8.2a1.6 1.6 0 0 1-1.6-1.6V17H5A3 3 0 0 1 2 14v-4.1a3 3 0 0 1 3-3h8.7zM8.9 17v2.6h1.1V17z"/></svg>',
     ];
 
     /* One icon and one accent per category, so a category that is renamed in
@@ -275,13 +286,25 @@
         ->take(5)
         ->values();
 
-    /* The roles somebody can actually sign up as. The file draws a fourth,
-       Affiliate, which this platform does not have yet, so it is not drawn
-       here: a card leading nowhere is worse than three cards. */
+    /* The four the file draws, each to where that account is actually
+       started. Affiliate is a real account type here: it has its own AFF-
+       reference (OA-163), its own sign-in and its own self-serve signup.
+       The colours are not sampled off the file but read from the table Sir
+       Peter set in stone on 2026-09-23 (OA-164), which everything that
+       tints by role reads, so these four cannot drift from the avatars and
+       badges that use the same pairs. */
+    $tint = fn (string $role) => \App\Support\RoleColours::ROLES[$role][0];
+    $key  = fn (string $role) => \App\Support\RoleColours::ROLES[$role][1];
+
     $roles = [
-        ['Client', 'Plan and hire event services.', 'users', '#f4400a', '#fef3ee'],
-        ['Professional', 'Provide event services, submit bids, and grow your business.', 'brief', '#1565e8', '#edf5fd'],
-        ['Influencer', 'Create and share event experiences.', 'camera', '#9a1ae8', '#f3f1fd'],
+        ['Client', 'Plan and hire event services.', 'users', 'client',
+            route('register', ['role' => 'client'])],
+        ['Professional', 'Provide event services, submit bids, and grow your business.', 'brief', 'professional',
+            route('register', ['role' => 'professional'])],
+        ['Influencer', 'Create and share event experiences.', 'camera', 'influencer',
+            route('register', ['role' => 'influencer'])],
+        ['Affiliate', 'Refer new users and earn commissions.', 'mega', 'affiliate',
+            route('influencer.join')],
     ];
 
     $chev  = '<svg class="chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M5 8.5 12 15.5 19 8.5"/></svg>';
@@ -294,6 +317,7 @@
 {{-- ── Hero ─────────────────────────────────────────────────── --}}
 <section class="fq-hero">
     <div class="fq-hero-art" role="presentation"></div>
+    <span class="fq-script-tail" role="presentation"></span>
     <div class="lp-container">
         <div class="fq-hero-in">
             <span class="fq-eyebrow">FAQ</span>
@@ -333,9 +357,9 @@
         <h2>I am a&hellip;</h2>
         <p class="lede">Get answers tailored to your experience on GigResource.</p>
         <div class="fq-roles">
-            @foreach($roles as [$name, $blurb, $ic, $key, $tint])
-                <a class="fq-role" style="--k: {{ $key }}; --t: {{ $tint }};"
-                   href="{{ auth()->check() ? url('/dashboard') : route('register') }}">
+            @foreach($roles as [$name, $blurb, $ic, $role, $href])
+                <a class="fq-role" style="--k: {{ $key($role) }}; --t: {{ $tint($role) }};"
+                   href="{{ $href }}">
                     <span class="circ" aria-hidden="true">{!! $icon[$ic] !!}</span>
                     <span>
                         <b>{{ $name }}</b>
