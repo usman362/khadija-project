@@ -49,7 +49,10 @@
     .fq-search { position: relative; z-index: 3; margin-top: calc(-12 * var(--u));
         background: #fefdff; border: 1px solid #e4effc; border-radius: calc(14 * var(--u));
         padding: calc(18 * var(--u)) calc(22 * var(--u)) calc(20 * var(--u)); overflow: hidden; }
-    .fq-search-art { position: absolute; right: calc(16 * var(--u)); top: calc(10 * var(--u));
+    /* Where it sits on the file: 41 of its pixels below the card's top edge
+       and 64 in from its right, which puts it beside the pills rather than
+       against the top border. Its foot runs past the card there too. */
+    .fq-search-art { position: absolute; right: calc(87 * var(--u)); top: calc(56 * var(--u));
         width: calc(156 * var(--u)); height: calc(84 * var(--u));
         background-image: url('{{ asset('images/faq/search-art.png') }}');
         background-size: 100% 100%; background-repeat: no-repeat; }
