@@ -33,13 +33,10 @@
     .br-wrap { background: var(--bg-soft); }
 
     /* ── HERO ─────────────────────────────────────────── */
-    .br-hero { position: relative; padding: 46px 0 54px; overflow: hidden;
-        background:
-            linear-gradient(180deg, rgba(255,255,255,.0), rgba(247,249,252,.6)),
-            linear-gradient(110deg, rgba(37,99,235,.10), rgba(249,115,22,.08)); }
-    .br-hero::before { content:''; position:absolute; inset:0;
-        background-image: url('https://images.unsplash.com/photo-1519741497674-611481863552?w=1600&q=70&auto=format&fit=crop');
-        background-size: cover; background-position: center; opacity: .12; z-index: 0; }
+    /* Her band is a flat pale grey-blue, #e2e6eb, with no photograph behind
+       it. The stock wedding picture under here was a decision nobody made,
+       and it fought the heading. */
+    .br-hero { position: relative; padding: 34px 0 30px; overflow: hidden; background: #e2e6eb; }
     .br-hero > .lp-container { position: relative; z-index: 1; }
     /* Sits directly under the hero, so it needs the same 18px the content
        below uses (.br-main's top padding) — it had none and read as stuck
@@ -144,7 +141,9 @@
     .br-pro.is-list .br-pro-meta { margin: 0; flex: none; gap: 10px; }
     /* No rule above it and no push to the bottom: it is beside the name now,
        not underneath it. */
-    .br-pro.is-list .br-pro-foot { margin: 0; padding: 0; border-top: 0; flex: none; gap: 10px; }
+    .br-pro.is-list .br-pro-foot { margin: 0; padding: 0; border-top: 0; flex: none; gap: 10px;
+        flex-direction: row; align-items: center; }
+    .br-pro.is-list .br-pro-actions > * { flex: none; }
     .br-pro.is-list .br-price { font-size: 13px; }
     .br-pro.is-list .br-fav { width: 30px; height: 30px; }
 
@@ -181,12 +180,17 @@
     .br-chip.quick { background: #e9f9f1; color: #0f9d58; }
     .br-pro-meta { display: flex; flex-wrap: wrap; gap: 14px; font-size: 12.5px; color: var(--text); margin: 4px 0 12px; }
     .br-pro-meta .star { color: #f5a623; font-weight: 800; }
-    .br-pro-foot { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: auto; padding-top: 12px; border-top: 1px solid var(--line-soft); flex-wrap: wrap; }
-    .br-price { font-size: 13px; color: var(--muted); }
-    .br-price b { font-size: 18px; color: var(--ink); font-weight: 800; }
-    .br-pro-actions { display: flex; gap: 8px; }
-    .br-btn-ghost { border: 1px solid var(--line); background: #fff; border-radius: 10px; padding: 9px 14px; font-size: 12.5px; font-weight: 700; color: var(--ink-2); text-decoration: none; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
-    .br-btn-msg { border: none; border-radius: 10px; padding: 9px 16px; font-size: 12.5px; font-weight: 800; color: #fff; background: linear-gradient(135deg, var(--orange), var(--orange-dark)); text-decoration: none; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+    /* The price has its own line on her file and the two buttons share the
+       one under it, each half the body's width. Side by side, as they were,
+       the buttons were as small as the price and nothing led the eye. */
+    .br-pro-foot { display: flex; flex-direction: column; align-items: stretch; gap: 10px;
+        margin-top: auto; padding-top: 12px; border-top: 1px solid var(--line-soft); }
+    .br-price { font-size: 14px; color: var(--muted); }
+    .br-price b { font-size: 19px; color: var(--ink); font-weight: 800; }
+    .br-pro-actions { display: flex; gap: 10px; }
+    .br-pro-actions > * { flex: 1 1 0; justify-content: center; }
+    .br-btn-ghost { border: 1px solid var(--line); background: #fff; border-radius: 10px; padding: 11px 14px; font-size: 13.5px; font-weight: 700; color: var(--ink-2); text-decoration: none; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
+    .br-btn-msg { border: none; border-radius: 10px; padding: 11px 16px; font-size: 13.5px; font-weight: 800; color: #fff; background: linear-gradient(135deg, var(--orange), var(--orange-dark)); text-decoration: none; display: inline-flex; align-items: center; gap: 6px; cursor: pointer; }
 
     .br-empty { padding: 60px 20px; text-align: center; color: var(--muted); }
     .br-empty svg { width: 46px; height: 46px; color: var(--line); margin-bottom: 14px; }
@@ -299,7 +303,7 @@
     <section class="br-hero">
         <div class="lp-container">
             <h1 class="br-h1">Find Your <span class="b">Vibe</span>. Book the <span class="o">Pro</span>.</h1>
-            <p class="br-hero-sub">Every verified event professional, right at your fingertips.</p>
+            <p class="br-hero-sub">Find event professionals, right at your fingertips.</p>
 
             <form action="{{ route('public.browse') }}" method="GET" autocomplete="off" class="br-search">
                 <div class="br-sfield">
@@ -359,7 +363,6 @@
 
             {{-- Trust badges — compliance-safe (no "24/7", no reply-time metric) --}}
             <div class="br-trustrow">
-                <span class="br-tb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> License-Verified Pros</span>
                 <span class="br-tb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg> Secure Booking</span>
                 <span class="br-tb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg> Quick Reply Times</span>
                 {{-- A headset with a mic. Plain headphones are for listening; this line is
@@ -369,33 +372,11 @@
         </div>
     </section>
 
-    {{-- ══════════════ BUSIEST CATEGORIES ══════════════ --}}
-    {{-- Real categories that have professionals behind them, with their own
-         artwork and live counts. Each filters this page by the pro↔category
-         relation. This row used to be six hard-coded "vibes" pointing Unsplash
-         photos at keyword guesses. --}}
-    @if($trending->isNotEmpty())
-    <section class="br-vibes">
-        <div class="lp-container">
-            <p class="br-vibes-cap">Not sure where to start? Tap a category. These are the ones with the most professionals right now.</p>
-            <div class="br-vibe-scroll">
-                @foreach($trending as $tc)
-                    <a class="br-vibe {{ ($f['category'] ?? null) === $tc->slug ? 'is-active' : '' }}"
-                       href="{{ route('public.browse', ['category' => $tc->slug]) }}">
-                        <img src="{{ asset('storage/' . $tc->thumbnail) }}" alt="{{ $tc->name }}" loading="lazy">
-                        {{-- Count only. The artwork already carries the service name,
-                             so a description here just stacked three lines of text
-                             over the image. --}}
-                        <span class="br-vibe-ov">
-                            <h4>{{ Str::title($tc->name) }}</h4>
-                            <span>{{ $tc->pros_count }} {{ Str::plural('professional', $tc->pros_count) }}</span>
-                        </span>
-                    </a>
-                @endforeach
-            </div>
-        </div>
-    </section>
-    @endif
+    {{-- The "busiest categories" strip that stood here is not on her file,
+         so it is off the page. Nothing it reached is lost: every category is
+         in the All Services list in the band above, and /event-types is the
+         page for browsing them. Put it back by restoring this block from
+         git; $trending is still passed to the view. --}}
 
     {{-- ══════════════ MAIN ══════════════ --}}
     <div class="lp-container">
@@ -429,7 +410,7 @@
                         <label class="br-flabel">Hourly Rate <span class="br-frate" id="brRateOut">{{ $rateMaxF ? 'up to $' . number_format($rateMaxF) : 'Any' }}</span></label>
                         <input type="range" class="br-range" name="rate_max" id="brRate"
                                min="0" max="{{ $rateCeiling }}" step="25" value="{{ $rateMaxF ?: 0 }}">
-                        <div class="br-fscale"><span>Any</span><span>${{ number_format($rateCeiling) }}</span></div>
+                        <div class="br-fscale"><span>$0</span><span>${{ number_format($rateCeiling) }}+</span></div>
                     </div>
 
                     <div class="br-fgroup">
@@ -440,10 +421,14 @@
                     </div>
 
                     <div class="br-fgroup">
-                        <label class="br-flabel">Verification &amp; Availability</label>
-                        <label class="br-opt"><input type="checkbox" name="verified" value="1" @checked($verF)> Fully verified pro</label>
-                        <label class="br-opt"><input type="checkbox" name="insured" value="1" @checked($insF)> Liability insurance on file</label>
-                        <label class="br-opt"><input type="checkbox" name="available" value="1" @checked($availF)> Currently taking work</label>
+                        <label class="br-flabel">Availability</label>
+                        <label class="br-opt"><input type="checkbox" name="available" value="1" @checked($availF)> Currently accepting work</label>
+                    </div>
+
+                    <div class="br-fgroup">
+                        <label class="br-flabel">Credentials</label>
+                        <label class="br-opt"><input type="checkbox" name="verified" value="1" @checked($verF)> License information provided</label>
+                        <label class="br-opt"><input type="checkbox" name="insured" value="1" @checked($insF)> Insurance information provided</label>
                     </div>
 
                     <input type="hidden" name="sort" value="{{ $sortF }}">
@@ -765,7 +750,7 @@
         <section class="br-cta">
             <div>
                 <h3>Can't find what you're looking for?</h3>
-                <p>Post your event and let professionals come to you. Describe your needs and receive proposals from top-rated experts.</p>
+                <p>Post your event and join as a professional to connect with top-rated experts.</p>
                 <div class="br-cta-actions">
                     <a href="{{ route('register') }}" class="br-btn-msg" style="padding:11px 20px;">Post an Event</a>
                     <a href="{{ route('register') }}" class="br-btn-ghost" style="padding:11px 20px;">Join as Professional</a>
@@ -792,10 +777,6 @@
             <div class="br-strip-item">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15 9 22 9 17 14 19 21 12 17 5 21 7 14 2 9 9 9 12 2"/></svg>
                 <div><h4>Real Reviews</h4><p>Honest reviews from real, verified customers.</p></div>
-            </div>
-            <div class="br-strip-item">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 18v-6a9 9 0 0 1 18 0v6"/><path d="M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3z"/></svg>
-                <div><h4>Dedicated Support</h4><p>A real team, here to help when you need it.</p></div>
             </div>
         </section>
     </div>
