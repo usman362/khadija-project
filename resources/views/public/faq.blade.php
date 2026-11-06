@@ -155,11 +155,13 @@
     .fq-none { padding: calc(26 * var(--u)) calc(16 * var(--u)); font-size: calc(17 * var(--u)); color: #5a6679; }
 
     /* ── Still need help ──────────────────────────────────────── */
+    /* She stands past the card on the file, above its top edge and a little
+       past its right, so the card does not clip her. */
     .fq-help { position: relative; margin-top: calc(22 * var(--u)); background: #fafcfe;
-        border: 1px solid #e7eef8; border-radius: calc(13 * var(--u)); overflow: hidden;
-        display: grid; grid-template-columns: calc(120 * var(--u)) minmax(0, 1fr) auto calc(92 * var(--u));
-        align-items: center; gap: calc(14 * var(--u)); padding: calc(26 * var(--u)) calc(20 * var(--u));
-        }
+        border: 1px solid #e7eef8; border-radius: calc(13 * var(--u));
+        display: grid; grid-template-columns: calc(120 * var(--u)) minmax(0, 1fr) auto;
+        align-items: center; gap: calc(14 * var(--u));
+        padding: calc(26 * var(--u)) calc(198 * var(--u)) calc(26 * var(--u)) calc(20 * var(--u)); }
     .fq-help .head { display: flex; justify-content: center; color: #1565e8; }
     .fq-help .head svg { width: calc(66 * var(--u)); height: calc(66 * var(--u)); }
     .fq-help h3 { font-size: calc(25 * var(--u)); font-weight: 800; color: #0b1340; margin: 0 0 calc(4 * var(--u)); }
@@ -172,9 +174,10 @@
     .fq-hbtn svg { width: calc(19 * var(--u)); height: calc(19 * var(--u)); }
     .fq-hbtn.solid { background: #005afd; color: #fff; }
     .fq-hbtn.ghost { background: #fff; color: #1565e8; border-color: #bed5fa; }
-    .fq-help .agent { align-self: stretch; background-image: url('{{ asset('images/faq/agent.png') }}');
-        background-size: auto 100%; background-position: right bottom; background-repeat: no-repeat;
-        min-height: calc(100 * var(--u)); margin: calc(-26 * var(--u)) calc(-20 * var(--u)) calc(-26 * var(--u)) 0; }
+    .fq-help .agent { position: absolute; right: calc(-10 * var(--u)); top: 50%;
+        transform: translateY(-50%); width: calc(198 * var(--u)); height: calc(152 * var(--u));
+        background-image: url('{{ asset('images/faq/agent.png') }}');
+        background-size: contain; background-position: right center; background-repeat: no-repeat; }
 
     /* ── The band above the footer ────────────────────────────── */
     .fq-cta { position: relative; margin-top: calc(14 * var(--u)); background: #fef2ea; overflow: hidden; }
@@ -202,7 +205,8 @@
         .fq-hero-in { max-width: none; }
         .fq-qa { grid-template-columns: minmax(0, 1fr); }
         .fq-side { flex-direction: row; overflow-x: auto; }
-        .fq-help { grid-template-columns: minmax(0, 1fr); text-align: center; }
+        .fq-help { grid-template-columns: minmax(0, 1fr); text-align: center;
+            padding-right: calc(20 * var(--u)); }
         .fq-help .btns { justify-content: center; }
         .fq-cta-in { justify-content: center; text-align: center; flex-wrap: wrap; padding-left: 0; }
         .fq-cta-btns { justify-content: center; }
