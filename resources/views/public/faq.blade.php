@@ -48,12 +48,12 @@
        handwriting and the orange stroke under it run across the top corner
        of the search card and past its right edge. That piece is its own
        cut, laid over the card. */
-    .fq-script-tail { position: absolute; left: 88.75%; right: 0;
-        top: calc(269 * var(--u)); height: calc(50 * var(--u)); z-index: 4;
+    .fq-script-tail { position: absolute; right: calc(-70 * var(--u)); top: calc(-7 * var(--u));
+        width: calc(198 * var(--u)); height: calc(67 * var(--u)); z-index: 4;
         background-image: url('{{ asset('images/faq/script-tail.png') }}');
         background-size: 100% 100%; }
 
-    .fq-body { background: #f8fdfe; padding-bottom: calc(10 * var(--u)); }
+    .fq-body { background: #f8fdfe; padding-bottom: calc(10 * var(--u)); overflow-x: clip; }
 
     /* ── Search card ──────────────────────────────────────────── */
     /* The card is NOT white on the file. It is #f0f7fe, a light blue, and
@@ -67,14 +67,13 @@
        card leaves, which is how the file's proportions hold at any size. */
     .fq-search { position: relative; z-index: 3; margin-top: calc(-12 * var(--u));
         background: #f0f7fe; border: 1px solid #e2edfb; border-radius: calc(14 * var(--u));
-        padding: calc(16 * var(--u)) calc(273 * var(--u)) calc(14 * var(--u)) calc(30 * var(--u));
-        overflow: hidden; }
+        padding: calc(16 * var(--u)) calc(273 * var(--u)) calc(14 * var(--u)) calc(30 * var(--u)); }
     /* Decorative, and taller than the card it sits in, which is why it is
        laid over the card rather than placed in it: as a grid or flex item
        it would set the card's height and the card would grow 15 taller
        than the file's. Its lane is the padding above. */
     .fq-search-art { position: absolute; right: calc(98 * var(--u)); top: calc(12 * var(--u));
-        width: calc(159 * var(--u)); height: calc(128 * var(--u));
+        width: calc(159 * var(--u)); height: calc(124 * var(--u));
         background-image: url('{{ asset('images/faq/search-art.png') }}');
         background-size: 100% 100%; background-repeat: no-repeat; }
     .fq-searchrow { position: relative; z-index: 2; display: flex;
@@ -329,7 +328,6 @@
 {{-- ── Hero ─────────────────────────────────────────────────── --}}
 <section class="fq-hero">
     <div class="fq-hero-art" role="presentation"></div>
-    <span class="fq-script-tail" role="presentation"></span>
     <div class="lp-container">
         <div class="fq-hero-in">
             <span class="fq-eyebrow">FAQ</span>
@@ -345,6 +343,7 @@
     {{-- ── Search ───────────────────────────────────────────── --}}
     <div class="fq-search">
         <div class="fq-search-art" role="presentation"></div>
+        <span class="fq-script-tail" role="presentation"></span>
         <div class="fq-searchrow">
             <span class="ic" aria-hidden="true">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg>
