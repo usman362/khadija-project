@@ -279,7 +279,10 @@
     .br-cta p { color: var(--text); font-size: 14px; margin: 8px 0 16px; max-width: 460px; }
     .br-cta-actions { display: flex; gap: 10px; flex-wrap: wrap; }
     .br-cta-emoji { font-size: 78px; line-height: 1; }
-    .br-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; padding: 28px 0 0; }
+    /* Three columns, because there are three of them. It still said four
+       after the fourth was taken out, so the row stopped two thirds across
+       and the right of the page was empty. */
+    .br-strip { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; padding: 28px 0 0; }
     .br-strip-item { display: flex; align-items: flex-start; gap: 11px; }
     .br-strip-item svg { width: 26px; height: 26px; color: var(--blue); flex-shrink: 0; }
     .br-strip-item h4 { font-size: 13.5px; font-weight: 800; }
