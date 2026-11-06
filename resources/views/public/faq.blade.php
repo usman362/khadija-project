@@ -48,8 +48,8 @@
        handwriting and the orange stroke under it run across the top corner
        of the search card and past its right edge. That piece is its own
        cut, laid over the card. */
-    .fq-script-tail { position: absolute; left: 85.84%; right: 0;
-        top: calc(277 * var(--u)); height: calc(46 * var(--u)); z-index: 4;
+    .fq-script-tail { position: absolute; left: 88.75%; right: 0;
+        top: calc(269 * var(--u)); height: calc(50 * var(--u)); z-index: 4;
         background-image: url('{{ asset('images/faq/script-tail.png') }}');
         background-size: 100% 100%; }
 
