@@ -41,31 +41,37 @@
     /* Sits directly under the hero, so it needs the same 18px the content
        below uses (.br-main's top padding) — it had none and read as stuck
        to the hero. No bottom margin: .br-main's padding is the gap. */
-    .br-h1 { font-size: 40px; font-weight: 800; letter-spacing: -1.1px; text-align: center; }
+    /* Measured off her file at the width it was captured, as a share of the
+       window so the two can be compared at all: the heading runs 33.5% of
+       it, the field 60% from the 20% mark to the 80%, the orange button
+       9.5%, the pills 33%. Everything here was between a fifth and a third
+       short of that, which is the whole of the "smaller than the reference"
+       difference. */
+    .br-h1 { font-size: 51px; font-weight: 800; letter-spacing: -1.4px; text-align: center; }
     .br-h1 .b { color: var(--blue); }
     .br-h1 .o { color: var(--orange-dark); }
-    .br-hero-sub { text-align: center; color: var(--text); font-size: 16px; margin: 12px 0 26px; }
+    .br-hero-sub { text-align: center; color: var(--text); font-size: 20px; margin: 13px 0 26px; }
 
     /* search bar */
     .br-search { display: flex; align-items: stretch; gap: 0; background: #fff;
-        border: 1px solid var(--line); border-radius: 999px; padding: 7px 7px 7px 8px;
-        max-width: 940px; margin: 0 auto; box-shadow: 0 18px 40px -22px rgba(15,27,53,.35); flex-wrap: wrap; }
-    .br-sfield { display: flex; align-items: center; gap: 8px; padding: 8px 14px; flex: 1 1 0; min-width: 150px; position: relative; }
+        border: 1px solid var(--line); border-radius: 999px; padding: 8px 8px 8px 10px;
+        max-width: 1152px; margin: 0 auto; box-shadow: 0 18px 40px -22px rgba(15,27,53,.35); flex-wrap: wrap; }
+    .br-sfield { display: flex; align-items: center; gap: 10px; padding: 13px 18px; flex: 1 1 0; min-width: 170px; position: relative; }
     .br-sfield + .br-sfield { border-left: 1px solid var(--line-soft); }
-    .br-sfield svg { width: 16px; height: 16px; color: var(--blue); flex-shrink: 0; }
+    .br-sfield svg { width: 19px; height: 19px; color: var(--blue); flex-shrink: 0; }
     .br-sfield select, .br-sfield input { border: none; outline: none; background: transparent; width: 100%;
-        font-size: 14px; font-weight: 600; color: var(--ink-2); font-family: inherit; cursor: pointer; }
+        font-size: 16px; font-weight: 600; color: var(--ink-2); font-family: inherit; cursor: pointer; }
     .br-sfield input::placeholder { color: var(--muted); font-weight: 500; }
-    .br-find { border: none; border-radius: 999px; padding: 0 24px; margin-left: 4px;
+    .br-find { border: none; border-radius: 999px; padding: 0 30px; margin-left: 4px;
         background: linear-gradient(135deg, var(--orange), var(--orange-dark)); color: #fff;
-        font-weight: 800; font-size: 14.5px; display: inline-flex; align-items: center; gap: 8px; cursor: pointer; }
-    .br-find svg { width: 16px; height: 16px; }
+        font-weight: 800; font-size: 16.5px; display: inline-flex; align-items: center; gap: 9px; cursor: pointer; }
+    .br-find svg { width: 18px; height: 18px; flex: none; }
 
     /* trust badges row */
-    .br-trustrow { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin: 22px auto 0; }
-    .br-tb { display: inline-flex; align-items: center; gap: 7px; background: rgba(255,255,255,.7);
-        border: 1px solid var(--line); border-radius: 999px; padding: 7px 14px; font-size: 12.5px; font-weight: 700; color: var(--ink-2); }
-    .br-tb svg { width: 14px; height: 14px; color: var(--blue); }
+    .br-trustrow { display: flex; flex-wrap: wrap; gap: 13px; justify-content: center; margin: 24px auto 0; }
+    .br-tb { display: inline-flex; align-items: center; gap: 9px; background: rgba(255,255,255,.7);
+        border: 1px solid var(--line); border-radius: 999px; padding: 10px 19px; font-size: 15px; font-weight: 700; color: var(--ink-2); }
+    .br-tb svg { width: 17px; height: 17px; color: var(--blue); flex: none; }
 
     /* ── VIBES carousel ───────────────────────────────── */
     .br-vibes { padding: 30px 0 8px; }
