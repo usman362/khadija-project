@@ -162,9 +162,12 @@ class EveryFeeComesFromOneListTest extends TestCase
     /** It works signed out, because somebody deciding has not signed up yet. */
     public function test_the_pricing_page_is_public(): void
     {
+        // The heading is the designer's: "Rates" is set in blue beside it, so
+        // the two words are two elements and the capital R is hers.
         $this->get(route('pricing-and-rates'))
             ->assertSuccessful()
-            ->assertSee('Pricing and rates');
+            ->assertSee('Pricing and', false)
+            ->assertSee('Rates', false);
     }
 
     /**
