@@ -38,16 +38,21 @@
        to the part of the frame the panels never covered (everything left of
        x=1000 went, nothing was painted over), and the panels below are drawn
        in markup with the words the spec actually asks for. */
-    .ab-hero-art { position: absolute; top: 0; right: 0; bottom: 0; width: 54.1%;
+    /* A band along the foot of the hero, not a full-height panel.
+       What survived the cut is wide and short (1662 x 350), because the only
+       part of the frame the panels never touched is below them. Filling a
+       tall box with it would crop it back to its middle third and take the
+       laptop's two ends off, which is the one thing the picture is of. A band
+       whose shape is close to the strip's own shows the whole desk. */
+    .ab-hero-art { position: absolute; right: 0; bottom: 0; height: 62%; width: 54.1%;
         background-image: url('{{ asset('images/about/hero.jpg') }}');
-        /* The source is portrait now, so it fills the box rather than being
-           stretched to its corners the way the old landscape frame was. Held
-           low in the frame: that is where the desk, the laptop and the
-           notebook are, and the panels float over them the way the design
-           intends. Centred, the crop is nothing but bokeh. */
-        background-position: center 82%; background-size: cover;
+        background-position: 48% bottom; background-size: cover;
         -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 13%);
         mask-image: linear-gradient(90deg, transparent 0, #000 13%); }
+    /* Its top edge melts into the hero rather than ruling a line across it.
+       This tints, it does not cover: there is nothing underneath to hide. */
+    .ab-hero-art::before { content: ''; position: absolute; left: 0; right: 0; top: 0;
+        height: 34%; background: linear-gradient(180deg, #e9f1fd 0, rgba(233, 241, 253, 0) 100%); }
 
     /* The two panels, over the same area the art covers. */
     .ab-hero-cards { position: absolute; top: 0; right: 0; bottom: 0; width: 54.1%;
@@ -183,6 +188,12 @@
     @media (max-width: 1080px) {
         .ab-grid4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
         .ab-grid3 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    /* Under about 900px the hero's text column reaches past where the
+       picture begins, so the panels would be sitting on the paragraph. They
+       are decoration and the words are not, so the panels go. */
+    @media (max-width: 900px) {
+        .ab-hero-cards { display: none; }
     }
     @media (max-width: 760px) {
         .ab-hero-art, .ab-hero-cards { display: none; }
