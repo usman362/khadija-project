@@ -53,21 +53,29 @@
     .lc-pipehead b { display:block; font-size:15px; font-weight:800; color:var(--text-primary); }
     .lc-pipehead span { font-size:12px; color:var(--text-muted); }
 
-    .lc-stages { display:flex; gap:9px; align-items:stretch; }
-    .lc-arrow { display:flex; align-items:center; color:var(--text-muted); flex:none; }
-    .lc-arrow svg { width:15px; height:15px; }
-    .lc-stage { flex:1 1 0; min-width:0; display:flex; gap:10px; align-items:flex-start; text-decoration:none;
-        border:1px solid color-mix(in srgb, var(--c) 35%, transparent); border-radius:12px; padding:13px 14px;
-        background:color-mix(in srgb, var(--c) 9%, transparent); }
+    /* Five across, one row, with the arrows living in the gaps rather than
+       as flex children that can be wrapped onto a line of their own. */
+    .lc-stages { display:grid; grid-template-columns:repeat(5, minmax(0,1fr)); gap:22px; }
+    .lc-stage { position:relative; display:flex; gap:9px; align-items:center; text-decoration:none;
+        border:1px solid color-mix(in srgb, var(--c) 35%, transparent); border-radius:12px; padding:11px 12px;
+        background:color-mix(in srgb, var(--c) 9%, transparent); min-width:0; }
     .lc-stage.on { box-shadow:0 0 0 2px var(--c) inset; }
-    .lc-stage > .ic { width:32px; height:32px; border-radius:9px; flex:none; display:flex; align-items:center;
+    .lc-stage > .ic { width:30px; height:30px; border-radius:9px; flex:none; display:flex; align-items:center;
         justify-content:center; background:color-mix(in srgb, var(--c) 20%, transparent); color:var(--c); }
-    .lc-stage > .ic svg { width:16px; height:16px; }
+    .lc-stage > .ic svg { width:15px; height:15px; }
     .lc-stage .meta { min-width:0; }
-    .lc-stage .l { display:block; font-size:11.5px; font-weight:800; color:var(--c); }
-    .lc-stage .n { display:block; font-size:23px; font-weight:800; color:var(--text-primary); line-height:1.1; margin:2px 0; }
-    .lc-stage .v { font-size:12px; font-weight:700; color:var(--text-primary); }
-    .lc-stage .w { font-size:11px; color:var(--text-muted); margin-left:4px; }
+    .lc-stage .l { display:block; font-size:11px; font-weight:800; color:var(--c);
+        white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .lc-stage .n { display:block; font-size:20px; font-weight:800; color:var(--text-primary); line-height:1.15; }
+    .lc-stage .v { font-size:11.5px; font-weight:700; color:var(--text-primary); }
+    .lc-stage .w { font-size:10.5px; color:var(--text-muted); margin-left:3px; }
+
+    /* The arrow sits in the gap after every card but the last. */
+    .lc-arrow { display:none; }
+    .lc-stage::after { content:""; position:absolute; right:-15px; top:50%; width:7px; height:7px;
+        border-top:2px solid var(--text-muted); border-right:2px solid var(--text-muted);
+        transform:translateY(-50%) rotate(45deg); opacity:.55; }
+    .lc-stage:last-child::after { display:none; }
 
     /* ── Table details ── */
     .lc-who { display:flex; gap:10px; align-items:flex-start; }
@@ -93,7 +101,6 @@
     .lc-card { background:var(--bg-card); border:1px solid var(--border-color); border-radius:14px; padding:17px 18px; margin-bottom:17px; }
 
     /* ── The five stages ── */
-    .lc-stages { display:grid; grid-template-columns:repeat(5, minmax(0,1fr)); gap:11px; }
     .lc-stage { display:block; text-decoration:none; border:1px solid var(--border-color);
         border-top:3px solid var(--border-color); border-radius:11px; padding:13px 14px; background:var(--bg-page, var(--bg-card)); }
     .lc-stage.on { box-shadow:0 0 0 1px currentColor inset; }
@@ -156,9 +163,12 @@
     .lc-quick a { display:block; font-size:12.5px; font-weight:700; padding:10px 13px; border-radius:9px;
         text-decoration:none; border:1px solid var(--border-color); color:var(--text-primary); }
 
-    @media (max-width: 1250px) { .lc-stages { flex-wrap:wrap; } .lc-arrow { display:none; }
-        .lc-stage { flex:1 1 170px; }
-        .lc-filters { grid-template-columns:1fr; } .lc-bottom { grid-template-columns:1fr; } }
+    @media (max-width: 1250px) { .lc-filters { grid-template-columns:1fr; }
+        .lc-bottom { grid-template-columns:repeat(2, minmax(0,1fr)); } }
+    @media (max-width: 1000px) { .lc-stages { grid-template-columns:repeat(2, minmax(0,1fr)); gap:10px; }
+        .lc-stage::after { display:none; } }
+    @media (max-width: 700px) { .lc-stages { grid-template-columns:1fr; }
+        .lc-bottom { grid-template-columns:1fr; } }
     @media (max-width: 860px) { .lc-table thead { display:none; }
         .lc-table td { display:block; border:0; padding:3px 0; }
         .lc-table tr { display:block; border-bottom:1px solid var(--border-color); padding:11px 0; } }
