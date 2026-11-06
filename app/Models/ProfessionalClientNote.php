@@ -14,7 +14,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  */
 class ProfessionalClientNote extends Model
 {
-    protected $fillable = ['supplier_id', 'client_id', 'tags', 'note'];
+    protected $fillable = ['supplier_id', 'client_id', 'tags', 'note', 'requirements'];
 
     protected function casts(): array
     {

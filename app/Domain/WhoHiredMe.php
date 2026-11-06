@@ -196,7 +196,59 @@ final class WhoHiredMe
             // The professional's own words. Never shown to the client.
             'tags' => $notes->get($clientId)?->tags ?: [],
             'note' => $notes->get($clientId)?->note,
+            'requirements' => $notes->get($clientId)?->requirements,
+
+            /*
+             * Repeat, one-time or past, by the same rules the screen prints
+             * at the bottom of itself: two or more completed bookings ever is
+             * a repeat client; one completed and something within two years
+             * is one-time; nothing in two years is past.
+             */
+            'relationship' => match (true) {
+                $completed->count() >= 2 => 'repeat',
+                $theirs->contains(fn (Booking $b) => $b->event?->starts_at
+                    && $b->event->starts_at->gte(now()->subYears(2))) => 'one_time',
+                default => 'past',
+            },
+
+            // How long since either of them did anything. Null is not a long
+            // time; it means there has never been any contact at all.
+            'days_quiet' => self::lastContact($last, $conversations->get($clientId))
+                ?->diffInDays(now()),
+
+            /*
+             * Books at the same time every year.
+             *
+             * Khadijah's screen calls this "Next Likely Event" and offers
+             * Annual, Possible and Not Likely. Only the first is a fact: two
+             * bookings in the same calendar month in different years is a
+             * pattern this client has actually repeated. The other two would
+             * be guesses about somebody's intention, so they are not here.
+             */
+            'annual' => self::booksAnnually($completed),
+
+            'last_type' => $last?->event?->event_type,
         ];
+    }
+
+    /**
+     * Have they booked the same month in two different years?
+     *
+     * @param  Collection<int, Booking>  $completed
+     */
+    private static function booksAnnually(Collection $completed): bool
+    {
+        $byMonth = $completed
+            ->filter(fn (Booking $b) => $b->event?->starts_at)
+            ->groupBy(fn (Booking $b) => $b->event->starts_at->format('n'));
+
+        foreach ($byMonth as $inMonth) {
+            if ($inMonth->map(fn (Booking $b) => $b->event->starts_at->format('Y'))->unique()->count() >= 2) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     /**

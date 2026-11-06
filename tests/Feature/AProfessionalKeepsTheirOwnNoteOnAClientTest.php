@@ -137,7 +137,9 @@ class AProfessionalKeepsTheirOwnNoteOnAClientTest extends TestCase
 
         $this->actingAs($this->pro)->get(route('professional.clients.index'))
             ->assertOk()
-            ->assertSee('Last contact')
+            // The column was renamed with the table rebuild; what it must
+            // still do is say Never rather than show a date.
+            ->assertSee('Since contact')
             ->assertSee('Never');
     }
 }

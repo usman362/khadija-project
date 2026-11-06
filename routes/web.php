@@ -1223,6 +1223,7 @@ Route::middleware('auth')->group(function () {
          * Leads above is who MIGHT hire them. This is who already has.
          */
         Route::get('/clients', [\App\Http\Controllers\Professional\ProfessionalClientsController::class, 'index'])->name('professional.clients.index');
+        Route::get('/clients/export', [\App\Http\Controllers\Professional\ProfessionalClientsController::class, 'export'])->name('professional.clients.export');
         Route::post('/clients/{client}/note', [\App\Http\Controllers\Professional\ProfessionalClientsController::class, 'saveNote'])->name('professional.clients.note');
 
         // My Calendar (schedule home — agenda + month grid + availability)
