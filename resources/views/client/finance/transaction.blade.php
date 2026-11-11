@@ -37,6 +37,17 @@
     .tx-btn.primary { background: var(--brand-text, #f97316); color: #fff; }
     .tx-btn.ghost { border: 1px solid var(--border-color); color: var(--text-primary); }
     .tx-back { display: inline-block; font-size: 12.5px; font-weight: 700; color: var(--brand-text); text-decoration: none; margin-bottom: 14px; }
+    /* The breakdown. A row's dot says which of the two states its money is
+       in, because "received" and "still owed" can be the same figure and the
+       amount alone would not tell them apart. */
+    .tx-split .l { display: flex; align-items: center; gap: 8px; }
+    .tx-dot { width: 8px; height: 8px; border-radius: 50%; flex: none; }
+    .tx-dot.held { background: var(--ok-text, #10b981); }
+    .tx-dot.owed { background: var(--warn-text, #f59e0b); }
+    .tx-dot.fee  { background: #94a3b8; }
+    .tx-total { border-top: 2px solid var(--border-color); margin-top: 4px; padding-top: 12px; }
+    .tx-total .l, .tx-total .v { font-weight: 800; color: var(--text-primary); }
+    .tx-note { font-size: 11.5px; color: var(--text-muted); line-height: 1.55; margin: 12px 0 0; }
 </style>
 @endpush
 
@@ -65,6 +76,47 @@
                 <p class="tx-money-line">No amount was recorded on this booking, so there is nothing to show here yet.</p>
             @endif
         </div>
+
+        @if ($ledger['has'])
+            {{-- Read from the money record, not from the booking row. The
+                 booking carries one number; this is the account of it. --}}
+            <div class="tx-card tx-split">
+                <p class="tx-h">Where this money is</p>
+
+                @if ($ledger['received'] > 0)
+                    <div class="tx-line">
+                        <span class="l"><span class="tx-dot held"></span>Deposit received</span>
+                        <span class="v">${{ number_format($ledger['received'], 2) }}</span>
+                    </div>
+                @endif
+
+                @if ($ledger['owed'] > 0)
+                    <div class="tx-line">
+                        <span class="l"><span class="tx-dot owed"></span>Still to pay</span>
+                        <span class="v">${{ number_format($ledger['owed'], 2) }}</span>
+                    </div>
+                @endif
+
+                <div class="tx-line tx-total">
+                    <span class="l">Agreed with {{ $booking->supplier?->name ?? 'the professional' }}</span>
+                    <span class="v">${{ number_format($ledger['total'], 2) }}</span>
+                </div>
+
+                @if ($ledger['fee'] > 0)
+                    <div class="tx-line">
+                        <span class="l"><span class="tx-dot fee"></span>GigResource agreement fee</span>
+                        <span class="v">${{ number_format($ledger['fee'], 2) }}</span>
+                    </div>
+                    {{-- Said out loud because the fee sits under the total and
+                         would otherwise read as part of it. --}}
+                    <p class="tx-note">The agreement fee is ours and is not part of what you owe the professional.</p>
+                @endif
+
+                @if ($ledger['test'])
+                    <p class="tx-note"><b>Test mode.</b> This booking was funded with a test card, so no real money moved.</p>
+                @endif
+            </div>
+        @endif
 
         <div class="tx-card">
             <p class="tx-h">What it is for</p>
@@ -150,8 +202,12 @@
             </div>
 
             <p style="font-size:11.5px;color:var(--text-muted);line-height:1.55;margin:14px 0 0;padding-top:14px;border-top:1px solid var(--border-color)">
-                GigResource does not hold or transfer money for this booking. It records what was agreed
-                and who agreed it.
+                @if ($ledger['received'] > 0)
+                    GigResource took the deposit on this booking. The balance is settled directly with the professional.
+                @else
+                    GigResource does not hold or transfer money for this booking. It records what was agreed
+                    and who agreed it.
+                @endif
             </p>
         </div>
     </aside>

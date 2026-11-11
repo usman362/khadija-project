@@ -134,7 +134,7 @@ class MakeAffiliateAccount extends Command
             ['Password', $password],
             ['Name', $user->name],
             ['Reference', \App\Support\GigResourceId::display($user->public_id) ?? '(none)'],
-            ['Role', $user->getRoleNames()->implode(', ') ?: 'NONE — the portal will refuse them'],
+            ['Role', $user->getRoleNames()->implode(', ') ?: 'NONE, so the portal will refuse them'],
             ['Status', $influencer->status instanceof InfluencerStatus
                 ? $influencer->status->value
                 : (string) $influencer->status],

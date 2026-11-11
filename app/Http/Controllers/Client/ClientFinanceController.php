@@ -220,10 +220,17 @@ class ClientFinanceController extends Controller
      * happen next — so the client was looking at a figure with no account of
      * it, and "Transaction detail" stayed open in the audit.
      *
-     * Everything here is read from the booking and its own status history.
-     * Nothing is derived, split, or forecast: there is no payment provider
-     * wired to this app, so this page reports what was agreed and what state
-     * it is in, and says plainly when money has not moved.
+     * It was written when no payment provider was wired to this app, so every
+     * line on it said money had not moved. Stripe is wired now, a deposit is
+     * really taken at the end of the agreement wizard, and the ledger records
+     * both it and what is still owed. A page that goes on saying "it has not
+     * been collected" after taking somebody's deposit is worse than one that
+     * says nothing, so the ledger is read here and the booking's status is
+     * only the fallback for the bookings that have no entries.
+     *
+     * Test mode is carried through rather than hidden. A deposit paid with a
+     * test card is a real row in every table, and the one thing that makes it
+     * not a payment is the mode it was taken in.
      */
     public function transaction(Request $request, Booking $booking): View
     {
@@ -237,6 +244,36 @@ class ClientFinanceController extends Controller
             'supplier:id,name,avatar,public_id',
             'supplier.profile:id,user_id,headline,company_name,city,state',
         ]);
+
+        /*
+         * What the ledger actually holds for this booking.
+         *
+         * Two kinds of row, told apart by state rather than by amount, because
+         * the amounts can be equal: SECURED is money the gateway has, PENDING
+         * is money asked for. The platform fee is listed apart from both, since
+         * it is owed to GigResource and not to the professional, and adding it
+         * to either would overstate what the client owes.
+         */
+        $entries = \App\Domain\Money\Ledger::forBooking($booking);
+        $charges = $entries->where('entry_type', \App\Models\LedgerEntry::BOOKING_CHARGE);
+
+        $received = round((float) $charges->where('state', \App\Models\LedgerEntry::SECURED)->sum('amount'), 2);
+        $stillOwed = round((float) $charges->where('state', \App\Models\LedgerEntry::PENDING)->sum('amount'), 2);
+        $platformFee = round((float) $entries->where('entry_type', \App\Models\LedgerEntry::PLATFORM_FEE)->sum('amount'), 2);
+
+        // Was any of it taken with a test card? One row saying so is enough:
+        // a booking is funded in one mode, not a mixture.
+        $testMode = $entries->contains(fn ($e) => ($e->metadata['mode'] ?? null) === 'test');
+
+        $ledger = [
+            'has'      => $entries->isNotEmpty(),
+            'total'    => \App\Domain\Money\Ledger::bookingTotal($booking),
+            'received' => $received,
+            'owed'     => $stillOwed,
+            'fee'      => $platformFee,
+            'test'     => $testMode,
+            'entries'  => $entries,
+        ];
 
         // The status history IS the money timeline — every transition was
         // written by whoever made it, so nothing has to be reconstructed.
@@ -260,15 +297,19 @@ class ClientFinanceController extends Controller
                 'moved'  => false,
             ],
             'confirmed' => [
-                'label'  => 'Agreed, not yet paid',
+                'label'  => $received > 0 ? 'Deposit received' : 'Agreed, not yet paid',
                 'tone'   => 'indigo',
-                'line'   => 'Both sides have agreed this amount. It has not been collected through GigResource.',
-                'moved'  => false,
+                'line'   => $received > 0
+                    ? 'Both sides have agreed this amount. The deposit has been taken and the balance is still to come.'
+                    : 'Both sides have agreed this amount. Nothing has been collected on it yet.',
+                'moved'  => $received > 0,
             ],
             'completed' => [
                 'label'  => 'Settled',
                 'tone'   => 'green',
-                'line'   => 'The work is marked delivered and this amount was settled between you and the professional.',
+                'line'   => $received > 0
+                    ? 'The work is marked delivered. The deposit was taken here and the rest was settled between you and the professional.'
+                    : 'The work is marked delivered and this amount was settled between you and the professional.',
                 'moved'  => true,
             ],
             'cancelled' => [
@@ -285,7 +326,7 @@ class ClientFinanceController extends Controller
             ],
         };
 
-        return view('client.finance.transaction', compact('booking', 'history', 'money'));
+        return view('client.finance.transaction', compact('booking', 'history', 'money', 'ledger'));
     }
 
     public function spending(Request $request): View

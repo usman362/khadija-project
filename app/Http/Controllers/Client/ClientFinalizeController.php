@@ -628,6 +628,7 @@ class ClientFinalizeController extends Controller
              * Bookings page reads deposits by `kind` to work out what a client
              * still owes. Rolling them together would overstate every deposit.
              */
+            $feePayment = null;
             $fee = \App\Domain\Money\Pricing::agreementFee();
             $alreadyCharged = Payment::where('user_id', $f->client_id)
                 ->where('status', 'completed')
@@ -659,19 +660,6 @@ class ClientFinalizeController extends Controller
                 ]);
 
                 \App\Domain\Agreements\AgreementNotices::funded($f->fresh());
-
-                // And into the ledger, where every money event belongs.
-                \App\Domain\Money\Ledger::record(
-                    \App\Models\LedgerEntry::PLATFORM_FEE,
-                    $fee,
-                    '+',
-                    party: $f->client,
-                    event: $f->event,
-                    state: \App\Models\LedgerEntry::SECURED,
-                    payment: $feePayment,
-                    subject: $f,
-                    metadata: ['reason' => 'agreement', 'mode' => $mode],
-                );
             }
 
             // Only now is it a booking, and the proposal is won. The one
@@ -708,6 +696,30 @@ class ClientFinalizeController extends Controller
              * until then, and an entry with no booking_id is invisible to
              * forBooking().
              */
+            /*
+             * The agreement fee, recorded now rather than when it was charged.
+             *
+             * It used to go in a few lines above, before Award::book had made
+             * the booking, so every fee entry carried a null booking_id and was
+             * invisible to Ledger::forBooking — which is the one method a
+             * statement for this booking is built from. The money was in the
+             * ledger and absent from the only view of it that matters.
+             */
+            if ($feePayment) {
+                \App\Domain\Money\Ledger::record(
+                    \App\Models\LedgerEntry::PLATFORM_FEE,
+                    (float) $feePayment->amount,
+                    '+',
+                    party: $f->client,
+                    event: $f->event,
+                    booking: $booking,
+                    state: \App\Models\LedgerEntry::SECURED,
+                    payment: $feePayment,
+                    subject: $f,
+                    metadata: ['reason' => 'agreement', 'mode' => $mode],
+                );
+            }
+
             $agreed  = (float) $f->agreed_price;
             $deposit = min((float) $f->deposit_amount, $agreed);
             $balance = round($agreed - $deposit, 2);

@@ -150,6 +150,87 @@ class TheLedgerKnowsWhatTheBookingCostTest extends TestCase
         $this->assertEquals(LedgerEntry::PENDING, $charge->state);
     }
 
+    // ── what the client is then shown ────────────────────────
+
+    public function test_the_transaction_page_accounts_for_the_money_instead_of_denying_it(): void
+    {
+        [$client, $fin] = $this->readyToFund(agreed: 2000, deposit: 500);
+
+        $this->actingAs($client)
+            ->post(route('client.finalize.save', [$fin, 'payment']), ['confirm_payment' => 1]);
+
+        $booking = Booking::where('client_id', $client->id)->latest('id')->firstOrFail();
+
+        $page = $this->actingAs($client)
+            ->get(route('client.payments.show', $booking))
+            ->assertOk();
+
+        $page->assertSee('Deposit received');
+        $page->assertSee('$500.00');
+        $page->assertSee('Still to pay');
+        $page->assertSee('$1,500.00');
+
+        // The sentence this page used to print after taking the deposit.
+        $page->assertDontSee('It has not been collected through GigResource');
+        $page->assertDontSee('GigResource does not hold or transfer money for this booking');
+    }
+
+    public function test_a_test_card_booking_says_so(): void
+    {
+        [$client, $fin] = $this->readyToFund(agreed: 2000, deposit: 500);
+
+        $this->actingAs($client)
+            ->post(route('client.finalize.save', [$fin, 'payment']), ['confirm_payment' => 1]);
+
+        $booking = Booking::where('client_id', $client->id)->latest('id')->firstOrFail();
+
+        // Every row of a test funding is a real row. The mode is the only
+        // thing that makes it not a payment, so the page has to say it.
+        $this->actingAs($client)
+            ->get(route('client.payments.show', $booking))
+            ->assertSee('no real money moved');
+    }
+
+    public function test_the_agreement_fee_is_shown_apart_from_what_is_owed(): void
+    {
+        [$client, $fin] = $this->readyToFund(agreed: 2000, deposit: 500);
+
+        $this->actingAs($client)
+            ->post(route('client.finalize.save', [$fin, 'payment']), ['confirm_payment' => 1]);
+
+        $booking = Booking::where('client_id', $client->id)->latest('id')->firstOrFail();
+
+        $this->actingAs($client)
+            ->get(route('client.payments.show', $booking))
+            ->assertSee('is not part of what you owe the professional');
+    }
+
+    public function test_a_booking_with_no_entries_still_renders(): void
+    {
+        $client = $this->client();
+        $pro = $this->pro();
+
+        $event = Event::create([
+            'title' => 'Older booking', 'client_id' => $client->id,
+            'created_by' => $client->id, 'status' => 'published',
+            'starts_at' => now()->addDays(20),
+        ]);
+
+        // Everything booked before the ledger existed looks like this, and the
+        // page has to fall back to the booking's own status rather than break.
+        $booking = Booking::create([
+            'event_id' => $event->id, 'client_id' => $client->id,
+            'supplier_id' => $pro->id, 'created_by' => $client->id,
+            'category_id' => Category::create(['name' => 'DJ', 'slug' => 'dj-' . uniqid()])->id,
+            'status' => 'confirmed', 'price' => 1200, 'currency' => 'USD',
+        ]);
+
+        $this->actingAs($client)
+            ->get(route('client.payments.show', $booking))
+            ->assertOk()
+            ->assertSee('Nothing has been collected on it yet');
+    }
+
     // ── fixtures ─────────────────────────────────────────────
 
     private function client(): User

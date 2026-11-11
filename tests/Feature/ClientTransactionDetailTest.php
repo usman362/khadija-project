@@ -112,7 +112,10 @@ class ClientTransactionDetailTest extends TestCase
         $this->actingAs($client)
             ->get(route('client.payments.show', $booking))
             ->assertSee('Agreed, not yet paid')
-            ->assertSee('It has not been collected through GigResource.');
+            // The wording moved when this page started reading the ledger:
+            // it can now say a deposit WAS taken, so the no-money sentence
+            // had to stop being the only one it could print.
+            ->assertSee('Nothing has been collected on it yet.');
     }
 
     public function test_a_requested_booking_owes_nothing_yet(): void
