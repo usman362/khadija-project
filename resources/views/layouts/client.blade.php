@@ -905,7 +905,20 @@
         .cl-banner-text { flex: 1 1 auto; min-width: 0; overflow: hidden; }
         .cl-banner-text h1 { font-size: 17px; font-weight: 800; color: #fff; margin: 0; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .cl-banner-text p { font-size: 11.5px; color: #fff; margin: 2px 0 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 340px; }
-        .cl-banner-search { flex: 0 0 360px; min-width: 120px; position: relative; margin-left: 6px; }
+        /* 300px, and still a width of its own.
+           Sir Peter, 29 September: the search was a different size on every
+           page, because the title never shrank and the search took whatever
+           was left. The answer then was to fix the search and let the title
+           ellipsis, which TheBannerSearchIsOneWidthTest holds, and it is still
+           right: a box that changes width per page is a width nobody chose.
+
+           But at 360 the title had 156px on the dashboard and needed 263 for
+           a greeting carrying a full name, so the client was greeted by name
+           and the name was the part that got cut. Both are satisfied by
+           spending 60px of the search rather than changing who yields: the box
+           is one width everywhere, and the greeting fits inside what is left.
+           The greeting also uses the first name now, which is most of it. */
+        .cl-banner-search { flex: 0 0 300px; min-width: 120px; position: relative; margin-left: 6px; }
         .cl-banner-post { display: inline-flex; align-items: center; gap: 7px; flex: none; height: 42px; padding: 0 16px; margin-left: 10px;
             border-radius: 10px; background: #fff; color: var(--brand-strong, #ea580c); font-size: 13px; font-weight: 800;
             text-decoration: none; white-space: nowrap; box-shadow: 0 2px 8px -4px rgba(15,27,53,.35); }
@@ -1762,7 +1775,14 @@
             {{-- Orange welcome banner: greeting + search (matches reference) --}}
             <div class="cl-banner">
                 <div class="cl-banner-text">
-                    <h1>@yield('page-title', 'Welcome back, ' . (auth()->user()?->name ?? 'there') . '!')</h1>
+                    {{-- The first name, not the whole one. This line sits in a
+                         box that has to share a row with a search field, a
+                         button and the account controls, so a full name is a
+                         length nobody chose: "Welcome back, Dana Whitfield!"
+                         needed 263px of a 218px box and the client was greeted
+                         by a name that was the part cut off. The influencer
+                         dashboard has always done it this way. --}}
+                    <h1>@yield('page-title', 'Welcome back, ' . \Illuminate\Support\Str::before(auth()->user()?->name ?? 'there', ' ') . '!')</h1>
                     <p>@yield('page-subtitle', "Let's create amazing events together")</p>
                 </div>
                 {{-- Sir Peter, 2 Oct: "Can the post an event button be place in

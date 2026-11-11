@@ -12,6 +12,24 @@ code.
 
 ## 2026-11-12
 
+### The client was greeted by name, and the name was cut off
+The orange bar at the top of every client page said "Welcome back, ..." and
+stopped. The name, which is the only reason that sentence exists, was the part
+that did not fit.
+
+The bar shares one line with the search box, the Post an Event button and the
+account controls, and the search was holding a fixed width whatever else needed
+it, so the greeting absorbed the whole shortage. The greeting now uses the
+first name, and the search gave up sixty pixels.
+
+Worth saying because the first attempt was wrong: letting the search shrink
+instead looked like the obvious fix, and it was exactly the arrangement the
+owner complained about in September, when the search was a different size on
+every page. A test written at the time caught it. The search is still one width
+everywhere.
+
+Checked at five screen widths down to a phone.
+
 ### The dashboard disagreed with itself
 The dashboard page works out six of its own figures rather than being handed
 them, and those six did not follow the rule the rest of the page had just been
