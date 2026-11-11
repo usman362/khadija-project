@@ -150,6 +150,52 @@ class TheLedgerKnowsWhatTheBookingCostTest extends TestCase
         $this->assertEquals(LedgerEntry::PENDING, $charge->state);
     }
 
+    // ── the two sources of truth, pinned together ────────────
+
+    public function test_the_ledger_and_the_booking_agree_on_a_finalized_agreement(): void
+    {
+        [$client, $fin] = $this->readyToFund(agreed: 2000, deposit: 500);
+
+        $this->actingAs($client)
+            ->post(route('client.finalize.save', [$fin, 'payment']), ['confirm_payment' => 1]);
+
+        $booking = Booking::where('client_id', $client->id)->latest('id')->firstOrFail();
+
+        /*
+         * OA-146 is the reason this is asserted rather than assumed: four
+         * finance pages each worked out their own total and two of them were
+         * wrong, on the screen a client checks before paying. There are now two
+         * ways to ask what a booking costs, Booking::totalWithUpgrades() from
+         * the row and Ledger::bookingTotal() from the list, and the moment they
+         * can disagree one of them is lying to somebody.
+         */
+        $this->assertEquals(
+            $booking->totalWithUpgrades(),
+            \App\Domain\Money\Ledger::bookingTotal($booking),
+            'the booking row and the money list must answer the same question the same way',
+        );
+    }
+
+    public function test_the_ledger_and_the_booking_agree_on_a_package(): void
+    {
+        $pro = $this->pro();
+        $client = $this->client();
+        $package = $this->package($pro, 2400);
+
+        $this->actingAs($client)->post(route('client.packages.book.store', $package), [
+            'event_title' => 'Rooftop reception',
+            'date'        => now()->addDays(30)->toDateString(),
+            'agree'       => 1,
+        ]);
+
+        $booking = Booking::where('client_id', $client->id)->latest('id')->firstOrFail();
+
+        $this->assertEquals(
+            $booking->totalWithUpgrades(),
+            \App\Domain\Money\Ledger::bookingTotal($booking),
+        );
+    }
+
     // ── what the client is then shown ────────────────────────
 
     public function test_the_transaction_page_accounts_for_the_money_instead_of_denying_it(): void
