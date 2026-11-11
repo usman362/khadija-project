@@ -37,6 +37,7 @@ final class ClientReport
     public function spend(): array
     {
         $completed = Booking::where('client_id', $this->client->id)
+            ->notSelfSupplied()
             ->where('status', 'completed')
             ->whereBetween('created_at', [$this->from, $this->to]);
 
@@ -44,6 +45,7 @@ final class ClientReport
         $count = (clone $completed)->count();
 
         $committed = (float) Booking::where('client_id', $this->client->id)
+            ->notSelfSupplied()
             ->whereIn('status', ['requested', 'confirmed'])
             ->sum('price');
 

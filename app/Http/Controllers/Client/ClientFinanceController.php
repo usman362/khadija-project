@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use App\Models\Booking;
 use App\Models\Event;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Schema;
 use Illuminate\View\View;
 
 /**
@@ -93,15 +92,25 @@ class ClientFinanceController extends Controller
         ];
     }
 
-    private function priceColumn(): ?string
+    /**
+     * The column a booking's agreed figure lives in.
+     *
+     * This used to try `price`, then `total_amount`, then `agreed_price`, and
+     * return null if it found none — at which point every figure on both money
+     * pages quietly became 0.0. Neither of the other two has ever existed on
+     * bookings; they are the names that were guessed at while this was being
+     * written, and the guard is what made that guessing survivable.
+     *
+     * Kept as one place that names the column, because two pages and a trend
+     * read it, but it no longer answers for the database. If `price` is ever
+     * renamed, these pages should break loudly rather than tell a client they
+     * have spent nothing. ClientTotals says the same thing in its own words:
+     * reading a column that does not exist "is how every finance page once
+     * read $0".
+     */
+    private function priceColumn(): string
     {
-        foreach (['price', 'total_amount', 'agreed_price'] as $col) {
-            if (Schema::hasColumn('bookings', $col)) {
-                return $col;
-            }
-        }
-
-        return null;
+        return 'price';
     }
 
     /**
@@ -120,9 +129,9 @@ class ClientFinanceController extends Controller
             ->notSelfSupplied()
             ->when($eventId, fn ($q) => $q->where('event_id', $eventId));
 
-        $amount = fn ($status) => $col
-            ? (float) (clone $base)->when($status, fn ($q) => $q->where('status', $status))->sum($col)
-            : 0.0;
+        $amount = fn ($status) => (float) (clone $base)
+            ->when($status, fn ($q) => $q->where('status', $status))
+            ->sum($col);
 
         $total     = $amount(null);
         $settled   = $amount('completed');
@@ -461,13 +470,11 @@ class ClientFinanceController extends Controller
         $col = $s['col'];
         for ($i = 7; $i >= 0; $i--) {
             $weekEnd = now()->subWeeks($i)->endOfWeek();
-            $val = $col
-                ? (float) Booking::where('client_id', $user->id)
-                    ->notSelfSupplied()
-                    ->where('status', 'completed')
-                    ->where('updated_at', '<=', $weekEnd)
-                    ->sum($col)
-                : 0;
+            $val = (float) Booking::where('client_id', $user->id)
+                ->notSelfSupplied()
+                ->where('status', 'completed')
+                ->where('updated_at', '<=', $weekEnd)
+                ->sum($col);
             $trend[] = ['label' => $weekEnd->format('M d'), 'value' => $val];
         }
 

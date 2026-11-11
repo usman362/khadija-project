@@ -6,7 +6,6 @@ use App\Models\Booking;
 use App\Models\Event;
 use App\Models\User;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Schema;
 
 /**
  * What a client's planning actually looks like, read from their own records.
@@ -49,6 +48,10 @@ class ClientPlanningSnapshot
 
         $bookings = Booking::query()
             ->where('client_id', $client->id)
+            // Issue #117, the same rule the money pages use: a booking naming
+            // the client as their own professional is sample data, and it
+            // would appear here as a vendor they have hired.
+            ->notSelfSupplied()
             ->when($event, fn ($q) => $q->where('event_id', $event->id))
             ->whereIn('status', array_merge(self::COMMITTED, self::PENDING))
             ->with(['supplier:id,name', 'supplier.serviceCategories:id,name'])
@@ -60,7 +63,7 @@ class ClientPlanningSnapshot
             'name'     => $b->supplier?->name ?: 'Awaiting a professional',
             'service'  => $b->supplier?->serviceCategories->first()?->name ?: 'Service',
             'status'   => in_array($b->status, self::COMMITTED, true) ? 'Confirmed' : 'Pending',
-            'amount'   => $col ? (float) ($b->{$col} ?? 0) : 0.0,
+            'amount'   => (float) ($b->{$col} ?? 0),
             'is_firm'  => in_array($b->status, self::COMMITTED, true),
         ])->values()->all();
 
@@ -141,14 +144,20 @@ class ClientPlanningSnapshot
         return null;
     }
 
-    private static function priceColumn(): ?string
+    /**
+     * The column a booking's agreed figure lives in.
+     *
+     * It used to try `price`, then `total_amount`, then `agreed_price`, and
+     * hand back null if it found none, at which point every vendor in this
+     * snapshot was worth $0.00 and the AI tools reading it planned a budget
+     * around nothing. Neither of the other two has ever existed on bookings.
+     *
+     * Named in one place still, because this is the only file that reads it,
+     * but it no longer answers for the database: if `price` is renamed these
+     * tools should break rather than quietly plan an event for free.
+     */
+    private static function priceColumn(): string
     {
-        foreach (['price', 'total_amount', 'agreed_price'] as $col) {
-            if (Schema::hasColumn('bookings', $col)) {
-                return $col;
-            }
-        }
-
-        return null;
+        return 'price';
     }
 }

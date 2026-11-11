@@ -120,9 +120,14 @@ class ClientEventController extends Controller
         $events = $this->filteredQuery($request)->paginate(12)->withQueryString();
 
         $baseEvents  = Event::where('client_id', $user->id);
-        // Rows naming the client as their own professional are old bad data
-        // (new bookings refuse it); nothing on this page counts them.
-        $bookingBase = \App\Models\Booking::where('client_id', $user->id)->where('supplier_id', '!=', $user->id);
+        /*
+         * Rows naming the client as their own professional are old bad data;
+         * new bookings refuse it. The scope rather than the condition written
+         * out again: a plain `supplier_id != client_id` is never true against
+         * NULL, so it also dropped bookings that have no professional yet, and
+         * those are real bookings waiting for one that the Bookings page lists.
+         */
+        $bookingBase = \App\Models\Booking::where('client_id', $user->id)->notSelfSupplied();
 
         /*
          * Checklist rows 86, 101 and 125 — every tile counts EVENTS, and each

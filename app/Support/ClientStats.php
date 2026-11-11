@@ -55,7 +55,13 @@ final class ClientStats
      */
     public static function for(User $client): array
     {
-        $bookings  = Booking::where('client_id', $client->id);
+        /*
+         * Issue #117: a booking naming the client as their own professional is
+         * sample data, not a booking. The lists on Bookings, Spending and
+         * Payments leave it out, and these figures sit on the dashboard and on
+         * the client's public profile above those same lists.
+         */
+        $bookings  = Booking::where('client_id', $client->id)->notSelfSupplied();
         $completed = (clone $bookings)->whereIn('status', self::COMPLETED)->count();
         $cancelled = (clone $bookings)->where('status', 'cancelled')->count();
         $decided   = $completed + $cancelled;
@@ -99,6 +105,7 @@ final class ClientStats
     public static function repeatProfessionals(User $client): int
     {
         return Booking::where('client_id', $client->id)
+            ->notSelfSupplied()
             ->whereNotNull('supplier_id')
             ->whereIn('status', ['confirmed', 'completed'])
             ->selectRaw('supplier_id, count(*) as n')
@@ -138,7 +145,7 @@ final class ClientStats
         $candidates = collect([
             Message::where('sender_id', $client->id)->max('created_at'),
             Event::where('client_id', $client->id)->max('created_at'),
-            Booking::where('client_id', $client->id)->max('created_at'),
+            Booking::where('client_id', $client->id)->notSelfSupplied()->max('created_at'),
         ])->filter()->map(fn ($t) => \Illuminate\Support\Carbon::parse($t));
 
         return $candidates->max();

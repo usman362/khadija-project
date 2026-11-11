@@ -26,8 +26,8 @@ class ClientDashboardController extends Controller
             'total_events' => $public['total_events'],
             'open_events' => Event::where('client_id', $user->id)->whereIn('status', ['pending', 'published', 'confirmed'])->count(),
             'upcoming_events' => Event::where('client_id', $user->id)->where('starts_at', '>', now())->count(),
-            'total_bookings' => Booking::where('client_id', $user->id)->count(),
-            'active_bookings' => Booking::where('client_id', $user->id)->whereIn('status', ['requested', 'confirmed'])->count(),
+            'total_bookings' => Booking::where('client_id', $user->id)->notSelfSupplied()->count(),
+            'active_bookings' => Booking::where('client_id', $user->id)->notSelfSupplied()->whereIn('status', ['requested', 'confirmed'])->count(),
             'completed_bookings' => $public['completed_events'],
         ];
 
@@ -40,6 +40,7 @@ class ClientDashboardController extends Controller
 
         // Recent bookings
         $recentBookings = Booking::where('client_id', $user->id)
+            ->notSelfSupplied()
             ->with(['event:id,title', 'supplier:id,name'])
             ->latest()
             ->take(5)
@@ -114,6 +115,7 @@ class ClientDashboardController extends Controller
         // Finished work this client has not reviewed.
         $reviewed = \App\Models\Review::where('reviewer_id', $user->id)->pluck('booking_id');
         $toReview = Booking::where('client_id', $user->id)
+            ->notSelfSupplied()
             ->where('status', 'completed')
             ->whereNotIn('id', $reviewed)
             ->count();

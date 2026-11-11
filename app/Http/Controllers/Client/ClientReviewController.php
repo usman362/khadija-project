@@ -89,6 +89,8 @@ class ClientReviewController extends Controller
         // Bookings completed but not yet reviewed → "Pending Review Requests".
         $reviewedBookingIds = (clone $base)->pluck('booking_id')->filter()->all();
         $pendingReviews = Booking::where('client_id', $user->id)
+            // Nobody is asked to review themselves.
+            ->notSelfSupplied()
             ->where('status', 'completed')
             ->when(count($reviewedBookingIds), fn ($q) => $q->whereNotIn('id', $reviewedBookingIds))
             ->with(['event:id,title,starts_at', 'supplier:id,name,avatar'])

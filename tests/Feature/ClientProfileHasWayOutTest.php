@@ -81,6 +81,75 @@ class ClientProfileHasWayOutTest extends TestCase
     }
 
     /**
+     * A number beside a link is a promise about what is behind it.
+     *
+     * Bookings counted `created_by` while the page it opens lists `client_id`
+     * and leaves out a booking where the client is their own professional, and
+     * Payments counted completed Payment rows while that page lists one row
+     * per booking. Funding an agreement writes two payments, the deposit and
+     * the agreement fee, so the panel said two and the page showed one.
+     */
+    public function test_each_count_matches_the_page_it_opens(): void
+    {
+        $client = $this->client();
+        $pro = User::factory()->create(['primary_role' => 'professional']);
+        $pro->assignRole('professional');
+
+        $event = Event::create([
+            'title' => 'Rivera Wedding', 'client_id' => $client->id,
+            'created_by' => $client->id, 'status' => 'published',
+            'starts_at' => now()->addDays(30),
+        ]);
+
+        $category = \App\Models\Category::create(['name' => 'DJ', 'slug' => 'dj-' . uniqid()]);
+
+        Booking::create([
+            'event_id' => $event->id, 'client_id' => $client->id,
+            'supplier_id' => $pro->id, 'created_by' => $client->id,
+            'category_id' => $category->id,
+            'status' => 'confirmed', 'price' => 2000, 'currency' => 'USD',
+        ]);
+
+        /*
+         * A legacy row where the client is their own professional. Inserted
+         * past the model, because Booking now refuses to create one — the
+         * guard came after the rows did, which is exactly why notSelfSupplied
+         * still has to exist and still has to be matched by every count.
+         */
+        \Illuminate\Support\Facades\DB::table('bookings')->insert([
+            'event_id' => $event->id, 'client_id' => $client->id,
+            'supplier_id' => $client->id, 'created_by' => $client->id,
+            'category_id' => $category->id,
+            'status' => 'confirmed', 'price' => 400, 'currency' => 'USD',
+            'created_at' => now(), 'updated_at' => now(),
+        ]);
+
+        // Two payments against the one real booking, which is what funding an
+        // agreement leaves behind.
+        foreach ([['booking_deposit', 500], ['agreement_fee', 4.99]] as [$kind, $amount]) {
+            \App\Models\Payment::create([
+                'user_id' => $client->id, 'gateway' => 'test', 'status' => 'completed',
+                'amount' => $amount, 'currency' => 'USD', 'payment_method' => 'test_card',
+                'completed_at' => now(),
+                'metadata' => ['kind' => $kind, 'event_id' => $event->id, 'supplier_id' => $pro->id],
+            ]);
+        }
+
+        $byLabel = collect(
+            $this->actingAs($client)->get('/client/profile')->assertOk()->viewData('activity')
+        )->keyBy('label');
+
+        $onBookingsPage = $this->actingAs($client)->get(route('client.bookings.index'))
+            ->assertOk()->viewData('bookings')->total();
+        $onPaymentsPage = $this->actingAs($client)->get(route('client.payments.index'))
+            ->assertOk()->viewData('transactions')->total();
+
+        $this->assertSame($onBookingsPage, $byLabel['Bookings']['count']);
+        $this->assertSame($onPaymentsPage, $byLabel['Payments']['count']);
+        $this->assertSame(1, $byLabel['Bookings']['count'], 'the self-supplied row is not a booking');
+    }
+
+    /**
      * And they do not count anybody else's. A shared panel that quietly
      * included another client's bookings would be a privacy failure wearing
      * the clothes of a convenience.

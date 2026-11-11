@@ -12,6 +12,38 @@ code.
 
 ## 2026-11-12
 
+### Numbers that disagreed with the page they linked to
+On the profile panel, "Bookings" and "Payments" each showed a number beside a
+link, and neither matched what was behind the link. Bookings counted a
+different set of rows than the Bookings page lists. Payments counted payment
+records, while the Payments page shows one line per booking, and paying for an
+agreement creates two records, the deposit and our fee. So the panel said two
+where the page showed one.
+
+Both now ask exactly the question their own page answers.
+
+### Hiring yourself is not a booking
+A booking where the client is also the professional is leftover test data. The
+site already left those out of the Bookings, Spending and Payments lists, and
+new ones are refused outright. Four more places were still counting them: the
+dashboard tiles and its recent list, the figures shared between the dashboard
+and a client's public profile, the client report's money totals, and the prompt
+asking somebody to review a booking they supplied to themselves.
+
+All of them leave them out now. Two places had also written the rule out by
+hand instead of using the shared one, and the hand-written version quietly
+dropped bookings that have no professional assigned yet, which are real
+bookings waiting for one.
+
+### Every detail page checked
+There was a walk-through test that opens every client page and checks none of
+them break, but it skipped the pages that need a specific thing to open: an
+event, an agreement, a transaction, a conversation. Those are the heaviest
+pages on the site and the ones this month's money work touched.
+
+They are now opened and checked too, twelve of them, against one real set of
+records. All twelve open cleanly.
+
 ### Paying the deposit no longer shows as paying nothing
 On the Payments and Spending pages, a client who had just paid a deposit saw
 "Paid $0", with the whole price of the booking sitting under "agreed, not yet

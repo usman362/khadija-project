@@ -42,14 +42,33 @@ class ClientProfileController extends Controller
      */
     private function activityFor(\App\Models\User $user): array
     {
+        /*
+         * Each count asks the question its own page answers.
+         *
+         * Two of them did not, and a number beside a link is a promise about
+         * what is behind it:
+         *
+         * Bookings counted `created_by`, while the Bookings page lists
+         * `client_id` and leaves out a booking where the client is their own
+         * professional (Issue #117). Three differences, and they happen to
+         * agree on most accounts, which is the kind of disagreement that
+         * surfaces on one client's screen and nobody else's.
+         *
+         * Payments counted completed Payment ROWS, and the Payments page lists
+         * one row per booking. Funding an agreement writes two payments, the
+         * deposit and the agreement fee, so that count read two where the page
+         * showed one, and it also counted membership payments which never
+         * appear there at all.
+         */
+        $bookings = \App\Models\Booking::where('client_id', $user->id)->notSelfSupplied();
+
         $rows = [
             ['label' => 'My Events', 'count' => $user->clientEvents()->count(), 'route' => 'client.events.index'],
-            ['label' => 'Bookings', 'count' => $user->bookings()->count(), 'route' => 'client.bookings.index'],
+            ['label' => 'Bookings', 'count' => (clone $bookings)->count(), 'route' => 'client.bookings.index'],
             ['label' => 'Proposals', 'count' => \App\Models\Bid::whereIn(
                 'event_id', $user->clientEvents()->select('id')
             )->count(), 'route' => 'client.proposals.index'],
-            ['label' => 'Payments', 'count' => \App\Models\Payment::where('user_id', $user->id)
-                ->where('status', 'completed')->count(), 'route' => 'client.payments.index'],
+            ['label' => 'Payments', 'count' => (clone $bookings)->count(), 'route' => 'client.payments.index'],
         ];
 
         return array_values(array_map(

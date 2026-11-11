@@ -50,7 +50,7 @@ class PaymentTracker
             ->get();
 
         $bookings = Booking::where('client_id', $client->id)
-            ->where('supplier_id', '!=', $client->id)
+            ->notSelfSupplied()
             ->whereNotIn('id', Finalization::where('client_id', $client->id)->whereNotNull('booking_id')->pluck('booking_id'))
             ->when($since, fn ($q) => $q->where('created_at', '>=', $since))
             ->with(['event:id,title,starts_at', 'supplier:id,name,avatar,public_id,primary_role', 'category:id,name'])
