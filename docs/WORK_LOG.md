@@ -12,6 +12,21 @@ code.
 
 ## 2026-11-12
 
+### A card that printed one number and drew another
+The Spending Trend panel showed a large figure with a line under it. The figure
+was the total agreed across every booking; the line was money actually paid. So
+it read seven thousand six hundred dollars above a line sitting flat on zero,
+and nothing on the card said those were different questions.
+
+The card now shows what it draws: paid to date, counted the same way as the
+Paid tile at the top of the same page.
+
+### "Message Grand"
+A button on each booking said "Message" followed by the first word of the
+professional's name. That reads as a first name, and here a professional is as
+often a business, so a booking with Grand Oak Banquet Hall offered to "Message
+Grand". The button says Message; the card names them in full two lines above.
+
 ### The client was greeted by name, and the name was cut off
 The orange bar at the top of every client page said "Welcome back, ..." and
 stopped. The name, which is the only reason that sentence exists, was the part

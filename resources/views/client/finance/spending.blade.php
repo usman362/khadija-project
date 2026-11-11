@@ -319,8 +319,11 @@
     {{-- Earnings trend (sparkline) --}}
     <div class="ea-rail-card">
         <div class="ea-rail-head"><div class="ea-rail-title">Spending Trend</div><span class="ea-rail-sel">All time</span></div>
-        <div class="ea-trend-big">${{ number_format($stats['total_agreed'], 0) }}</div>
-        <div class="ea-trend-up">↑ Project total</div>
+        {{-- The figure the line is drawn from. It used to be the agreed
+             total over a line tracking what had been paid, so the card
+             printed $7,600 above a line flat on zero. --}}
+        <div class="ea-trend-big">${{ number_format($trendTotal, 0) }}</div>
+        <div class="ea-trend-up">Paid to date</div>
         @php
             $max = max(1, collect($trend)->max('value'));
             $pts = [];

@@ -527,9 +527,19 @@
                     </div>
 
                     <div class="bk-actions">
-                        <a href="{{ route('client.chat.index') }}" class="bk-btn">
+                        {{-- "Message" alone, with the name on the link for anyone
+                             reading it aloud. It used to print the first word of
+                             the professional's name, which reads as a first name
+                             and is one only half the time: a professional here is
+                             as often a business, so this button said "Message
+                             Grand" of Grand Oak Banquet Hall. The card names them
+                             in full two lines above, so the button does not have
+                             to. --}}
+                        <a href="{{ route('client.chat.index') }}" class="bk-btn"
+                           title="Message {{ $pro?->name ?? 'the professional' }}"
+                           aria-label="Message {{ $pro?->name ?? 'the professional' }}">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
-                            Message {{ \Illuminate\Support\Str::before($pro?->name ?? 'pro', ' ') }}
+                            Message
                         </a>
                         @if($event)
                             <a href="{{ route('client.events.show', $event) }}" class="bk-btn">

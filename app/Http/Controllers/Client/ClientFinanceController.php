@@ -465,21 +465,58 @@ class ClientFinanceController extends Controller
             'cancelled'     => \App\Domain\Finance\ClientTotals::cancelled($user, $activeEvent?->id),
         ];
 
-        // Earnings trend — last 8 weeks of cumulative completed-booking value.
+        /*
+         * Eight weeks of what this client has actually paid, cumulative.
+         *
+         * It used to count completed bookings only, while the big figure
+         * printed above the line was the agreed total. Two quantities in one
+         * card called "Spending Trend": the number said $7,600 and the line
+         * underneath it sat flat on zero, and a reader has no way to know
+         * those are different questions. The card now draws the figure it
+         * prints.
+         *
+         * Paid means the same thing here as it does in the tile at the top of
+         * the page: a completed booking's price, plus a deposit taken on one
+         * still running. Written out rather than shared with spend(), because
+         * that one answers "now" and this one has to answer "as of then".
+         */
         $trend = [];
         $col = $s['col'];
+        $void = \App\Domain\Finance\ClientTotals::VOID_STATUSES;
+
         for ($i = 7; $i >= 0; $i--) {
             $weekEnd = now()->subWeeks($i)->endOfWeek();
-            $val = (float) Booking::where('client_id', $user->id)
+
+            $completed = (float) Booking::where('client_id', $user->id)
                 ->notSelfSupplied()
+                ->when($activeEvent, fn ($q) => $q->where('event_id', $activeEvent->id))
                 ->where('status', 'completed')
                 ->where('updated_at', '<=', $weekEnd)
                 ->sum($col);
-            $trend[] = ['label' => $weekEnd->format('M d'), 'value' => $val];
+
+            $deposits = (float) \App\Models\LedgerEntry::query()
+                ->where('party_user_id', $user->id)
+                ->where('entry_type', \App\Models\LedgerEntry::BOOKING_CHARGE)
+                ->where('state', \App\Models\LedgerEntry::SECURED)
+                ->where('occurred_at', '<=', $weekEnd)
+                ->when($activeEvent, fn ($q) => $q->where('event_id', $activeEvent->id))
+                ->whereHas('booking', fn ($q) => $q
+                    ->where('status', '!=', 'completed')
+                    ->whereNotIn('status', $void)
+                    ->notSelfSupplied())
+                ->sum('amount');
+
+            $trend[] = [
+                'label' => $weekEnd->format('M d'),
+                'value' => round($completed + $deposits, 2),
+            ];
         }
 
+        // What the card prints above the line, so the two agree.
+        $trendTotal = (float) ($trend[count($trend) - 1]['value'] ?? 0);
+
         return view('client.finance.spending', compact(
-            'stats', 'vendors', 'pipeline', 'trend', 'activeEvent', 'filters', 'myEvents'
+            'stats', 'vendors', 'pipeline', 'trend', 'trendTotal', 'activeEvent', 'filters', 'myEvents'
         ) + ['statuses' => self::SPEND_STATUSES]);
     }
 }

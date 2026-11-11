@@ -397,6 +397,29 @@ class TheLedgerKnowsWhatTheBookingCostTest extends TestCase
         $this->assertEquals(2000.00, $financial['outstanding']);
     }
 
+    public function test_the_spending_trend_draws_the_figure_it_prints(): void
+    {
+        [$client, $fin] = $this->readyToFund(agreed: 2000, deposit: 500);
+
+        $this->actingAs($client)
+            ->post(route('client.finalize.save', [$fin, 'payment']), ['confirm_payment' => 1]);
+
+        /*
+         * The card printed the agreed total above a line tracking completed
+         * bookings, so it read $2,000 over a line flat on zero. Two questions,
+         * one card, and nothing on it to say which the line answered.
+         */
+        $page = $this->actingAs($client)->get(route('client.spending.index'))->assertOk();
+
+        $trend = $page->viewData('trend');
+        $last = end($trend);
+
+        $this->assertEquals(500.00, $page->viewData('trendTotal'));
+        $this->assertEquals(500.00, $last['value'], 'the line has to end where the figure says');
+        $this->assertEquals($page->viewData('stats')['paid'], $page->viewData('trendTotal'),
+            'paid to date and the Paid tile are the same question');
+    }
+
     // ── fixtures ─────────────────────────────────────────────
 
     private function client(): User
