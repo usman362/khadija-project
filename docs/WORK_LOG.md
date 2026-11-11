@@ -10,6 +10,54 @@ code.
 
 ---
 
+## 2026-11-12
+
+### Affiliate side: Resources removed
+The Resources section is gone from the affiliate portal: the sidebar group and
+its five pages (Getting Started, Resource Library, Academy, Tutorials, Featured
+Articles). The owner's call, nothing of value in it.
+
+Removed completely rather than hidden, including the table that stored the
+content. That part is on purpose. When Co-Op was retired in July the screens
+went and the storage was left behind as "harmless", and two weeks later the
+database still held eight rows of a product that no longer existed. Nothing
+here belonged to any one affiliate, only general guide text, so there was
+nothing to keep.
+
+Checked by tests and live on this machine.
+
+### The bidding, agreements and payments plan: reviewed
+Read the 14 page plan and checked every part of it against what the site
+actually does today. The short version is that most of it is already built, and
+the problem it opens with cannot happen here.
+
+That problem is a client thinking a $300 price and a $100 first payment are the
+same number. On this site they are four separate figures in four separate
+places: the client's budget estimate, the professional's offer, the agreed
+price, and the amount due today with the balance on a date. Also already
+working: a price change needs both signatures, editing a live request is free
+while reposting is paid, and every movement of money is written down and never
+overwritten.
+
+Genuinely missing, and worth a decision rather than a guess: paying in three or
+more stages (today it is a deposit and then the balance, which is what the plan
+itself recommends as the default), and the arrangement that would let the site
+hold money between the two.
+
+### Disputes: answered what is in place
+Disputes are built and in use on both sides. A client or professional can file
+one, attach evidence, and watch its stage; the admin side can classify, assign,
+decide and close. A case covers one service, not the whole event, so a problem
+with the caterer does not freeze the photographer's payment.
+
+Two things inside it are deliberately unfinished and both are waiting on a
+decision, not on work: there are no time limits yet (how long each side has to
+respond), and there are no dispute fees at all. The fee idea in the owner's
+message, where each side pays to escalate and the winner is refunded, does not
+exist yet anywhere.
+
+---
+
 ## 2026-11-10
 
 ### Affiliate test login
