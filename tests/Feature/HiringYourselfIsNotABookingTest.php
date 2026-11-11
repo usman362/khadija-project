@@ -130,6 +130,48 @@ class HiringYourselfIsNotABookingTest extends TestCase
         $this->assertSame(0, ClientStats::repeatProfessionals($this->client));
     }
 
+    public function test_the_dashboards_own_page_counts_the_same_set(): void
+    {
+        /*
+         * The dashboard VIEW runs six booking queries of its own, and they did
+         * not carry the rule its controller had just been given. Two of them
+         * sat two lines apart on the same card, one through ClientTotals and
+         * one not, counting different sets.
+         *
+         * Confirmed rather than completed, so this row would land in the
+         * "Hired" figure the page prints. That figure is the assertion: there
+         * is one real confirmed booking and one bad row, and the card has to
+         * say one.
+         */
+        $this->selfSupplied('confirmed', 400);
+
+        Booking::create([
+            'event_id' => $this->event->id, 'client_id' => $this->client->id,
+            'supplier_id' => $this->pro->id, 'created_by' => $this->client->id,
+            'category_id' => $this->category(), 'status' => 'confirmed',
+            'price' => 1500, 'currency' => 'USD',
+        ]);
+
+        $html = $this->actingAs($this->client)->get(route('client.dashboard'))
+            ->assertOk()->getContent();
+
+        $this->assertMatchesRegularExpression(
+            '/<div class="od-mini-value">1<\/div><div class="od-mini-label">Hired<\/div>/',
+            $html,
+            'the Hired card is counting a booking the client supplied to themselves',
+        );
+    }
+
+    public function test_an_event_type_needs_a_real_booking_to_count(): void
+    {
+        // The only completed booking on this event that is not self-supplied
+        // is the real one, so the event counts once, not twice, and an event
+        // with nothing but a self-supplied booking would not count at all.
+        $counts = ClientStats::eventTypeCounts($this->client);
+
+        $this->assertLessThanOrEqual(1, $counts->sum());
+    }
+
     public function test_the_report_does_not_count_it_as_money_spent(): void
     {
         $report = new ClientReport($this->client, now()->subMonth(), now()->addDay());

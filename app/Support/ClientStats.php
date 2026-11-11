@@ -125,7 +125,10 @@ final class ClientStats
     {
         return Event::query()
             ->where('events.client_id', $client->id)
-            ->whereHas('bookings', fn ($b) => $b->whereIn('status', self::COMPLETED))
+            // notSelfSupplied for the same reason as everything else here: an
+            // event whose only completed booking is one the client supplied to
+            // themselves is not an event type they have actually run.
+            ->whereHas('bookings', fn ($b) => $b->notSelfSupplied()->whereIn('status', self::COMPLETED))
             ->with('categories:id,name')
             ->get()
             ->flatMap(fn (Event $e) => $e->categories->pluck('name'))

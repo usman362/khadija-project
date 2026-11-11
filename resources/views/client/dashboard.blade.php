@@ -657,7 +657,10 @@
         ->whereBetween('updated_at', [$from, $to])
         ->sum('price'));
 
-    $completedSeries = $seriesFor(fn ($from, $to) => \App\Models\Booking::where('client_id', $user->id)
+    // Through ClientTotals::base, like the line above it: that carries the
+    // client scope AND leaves out a booking they supplied to themselves. The
+    // two series sit on the same card and were counting different sets.
+    $completedSeries = $seriesFor(fn ($from, $to) => \App\Domain\Finance\ClientTotals::base($user)
         ->where('status', 'completed')
         ->whereBetween('updated_at', [$from, $to])
         ->count());
@@ -795,9 +798,9 @@
        An empty calendar is the true answer, and the panel says so below. */
 
     // My Gigs Overview — split bookings by status (matches design columns).
-    $gigsRequested = \App\Models\Booking::where('client_id', $user->id)->where('status', 'requested')->count();
-    $gigsBidding   = \App\Models\Booking::where('client_id', $user->id)->where('status', 'pending')->count();
-    $gigsHired     = \App\Models\Booking::where('client_id', $user->id)->where('status', 'confirmed')->count();
+    $gigsRequested = \App\Domain\Finance\ClientTotals::base($user)->where('status', 'requested')->count();
+    $gigsBidding   = \App\Domain\Finance\ClientTotals::base($user)->where('status', 'pending')->count();
+    $gigsHired     = \App\Domain\Finance\ClientTotals::base($user)->where('status', 'confirmed')->count();
     $gigsDone      = $stats['completed_bookings'] ?? 0;
 
     /*
@@ -829,7 +832,7 @@
     $clientFigures = \App\Support\ClientStats::for($user);
 
     // Upcoming bookings — confirmed + future.
-    $upcomingBookings = \App\Models\Booking::where('client_id', $user->id)
+    $upcomingBookings = \App\Domain\Finance\ClientTotals::base($user)
         ->whereIn('status', ['confirmed', 'requested'])
         ->whereHas('event', fn ($q) => $q->where('starts_at', '>=', now()))
         ->with(['event:id,title,starts_at', 'supplier:id,name'])
@@ -888,7 +891,7 @@
 
     // What the card answers for, which does take the period.
     $completedInPeriod = $periodFrom
-        ? \App\Models\Booking::where('client_id', $user->id)->where('status', 'completed')
+        ? \App\Domain\Finance\ClientTotals::base($user)->where('status', 'completed')
             ->whereBetween('updated_at', [$periodFrom, $periodTo])->count()
         : $completedEvents;
     $tiers = [

@@ -12,6 +12,16 @@ code.
 
 ## 2026-11-12
 
+### The dashboard disagreed with itself
+The dashboard page works out six of its own figures rather than being handed
+them, and those six did not follow the rule the rest of the page had just been
+given. Two of them sat two lines apart on the same card, counting different
+sets of bookings.
+
+All six now count what everything else counts. Also corrected: the breakdown of
+what kinds of event a client has run was counting an event whose only finished
+booking was one they had supplied to themselves.
+
 ### Numbers that disagreed with the page they linked to
 On the profile panel, "Bookings" and "Payments" each showed a number beside a
 link, and neither matched what was behind the link. Bookings counted a
