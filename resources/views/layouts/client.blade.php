@@ -930,7 +930,17 @@
         .cl-banner-search input { width: 100%; height: 42px; border-radius: 10px; border: none; padding: 0 44px 0 40px; background: #fff; font-size: 13px; color: #1e293b; outline: none; }
         .cl-banner-search kbd { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); font-size: 10px; color: var(--text-muted); background: var(--bg-card-hover); border: 1px solid var(--border-color); border-radius: 5px; padding: 2px 6px; }
         .cl-topbar-right { display: flex; align-items: center; gap: 12px; flex-shrink: 0; }
-        @media (max-width: 1100px) { .cl-banner-text { display: none; } }
+        /* Under 1100 the greeting is gone, so the search can flex again.
+           The reason it is fixed above this width is that the page title was
+           pushing it to a different size on every page; with no title in the
+           banner there is nothing left to push it, and every page holds the
+           same two items. It had to change, because a 300px box that refuses
+           to shrink inside a banner that had come down to 202px simply hung
+           out of it and over the account controls on its right. */
+        @media (max-width: 1100px) {
+            .cl-banner-text { display: none; }
+            .cl-banner-search { flex: 1 1 auto; }
+        }
         @media (max-width: 768px) { .cl-topbar { flex-wrap: wrap; } .cl-topbar-right { width: 100%; justify-content: flex-end; } }
 
         /* Centre search bar — fixed width in the grid centre column. */

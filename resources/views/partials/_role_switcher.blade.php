@@ -41,7 +41,7 @@
             <input type="hidden" name="role" value="{{ $__target }}">
             <button type="submit" class="rs-btn" title="Switch to {{ $__targetLbl }} mode">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg>
-                Switch to {{ $__targetLbl }}
+                <span class="rs-label">Switch to {{ $__targetLbl }}</span>
             </button>
         </form>
     @else
@@ -54,7 +54,7 @@
                 data-role-enable="{{ $__target }}"
                 title="Enable {{ $__targetLbl }} mode">
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-            Become a {{ $__targetLbl }}
+            <span class="rs-label">Become a {{ $__targetLbl }}</span>
         </button>
     @endif
 </div>
@@ -104,5 +104,17 @@
 
     @media (max-width: 768px) {
         .rs-btn { padding: 6px 10px; font-size: 0.72rem; }
+    }
+
+    /* On a phone the words go and the icon stays.
+       The topbar wraps at 768 and this sits in a right-aligned group with the
+       theme, assistant, messages and bell icons and the avatar. With the label
+       in it that group is wider than a 375px screen, and being right-aligned
+       it overflowed to the LEFT: "Become a Professional" ran off the side of
+       the screen with its first letters cut away. The title attribute is
+       already on the button, so the action is not lost with the words. */
+    @media (max-width: 560px) {
+        .rs-label { display: none; }
+        .rs-btn { padding: 7px; }
     }
 </style>

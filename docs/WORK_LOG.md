@@ -12,6 +12,29 @@ code.
 
 ## 2026-11-12
 
+### The inbox on a laptop and on a phone
+Four faults on the Messages page, all of them about width.
+
+The page has three columns: the list of conversations, the conversation, and
+the panel about the person you are talking to. They were meant to become one
+column on a narrow screen and never did, because of how the rule was written.
+On a smaller laptop the middle column, which is the conversation itself, was
+about forty pixels wide with one word to a line and the right-hand panel drawn
+on top of it.
+
+The search box in the orange bar kept a fixed width even when the bar had
+shrunk around it, so on a tablet it hung out of the bar and over the icons
+beside it.
+
+On a phone the "Become a Professional" button ran off the left edge of the
+screen with its first letters cut away. It is now just its icon there, and
+still labelled for anyone using a screen reader.
+
+Also on a phone, "Awaiting your reply" was cut to "Awaiting your repl". It
+wraps to a second line now.
+
+Checked at five widths from a wide desktop down to a phone.
+
 ### A card that printed one number and drew another
 The Spending Trend panel showed a large figure with a line under it. The figure
 was the total agreed across every booking; the line was money actually paid. So

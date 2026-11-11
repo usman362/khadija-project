@@ -396,8 +396,29 @@
     .cm-send svg { width: 17px; height: 17px; }
     .cm-empty { flex: 1; display: flex; align-items: center; justify-content: center; color: var(--text-muted); padding: 60px; text-align: center; font-size: 13px; }
 
-    @media (max-width: 1100px) { .cm-stats { grid-template-columns: repeat(3, minmax(0,1fr)); } .cm-main { grid-template-columns: 1fr; } }
-    @media (max-width: 640px) { .cm-stats { grid-template-columns: repeat(2, minmax(0,1fr)); } }
+    /* The stacking rule has to name .has-side too.
+       `.cm-main { grid-template-columns: 1fr }` is one class and
+       `.cm-main.has-side` is two, so the three-column rule won inside this
+       media query however late it came: being in a media query adds no
+       specificity. The page kept all three columns down to any width, and the
+       middle one is the conversation — at 1024px it was about forty pixels
+       wide, wrapping one word to a line, with the profile rail sitting on top
+       of it. Below 1100 the columns stack, which is what this always said. */
+    @media (max-width: 1100px) {
+        .cm-stats { grid-template-columns: repeat(3, minmax(0,1fr)); }
+        .cm-main,
+        .cm-main.has-side,
+        .cm-main.has-side.panel-closed { grid-template-columns: minmax(0, 1fr); }
+    }
+    @media (max-width: 640px) {
+        .cm-stats { grid-template-columns: repeat(2, minmax(0,1fr)); }
+        /* Two cards to a row on a phone leaves these headings about 120px,
+           and nowrap then cut "Awaiting your reply" to "Awaiting your repl".
+           The heading is two or three words, so letting it take a second line
+           costs nothing; the card already has the height for it. */
+        .cm-stat-h { white-space: normal; min-height: 0; align-items: flex-start; }
+        .cm-stat-ico { margin-top: 1px; }
+    }
 </style>
 @endpush
 
