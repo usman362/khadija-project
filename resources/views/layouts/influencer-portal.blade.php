@@ -28,13 +28,6 @@
             ['Reports', 'influencer.analytics.reports'],
             ['Export Data', 'influencer.analytics.export'],
         ]],
-        ['Resources', 'book', null, [
-            ['Getting Started', 'influencer.resources.getting-started'],
-            ['Resource Library', 'influencer.resources.library'],
-            ['Academy', 'influencer.resources.academy'],
-            ['Tutorials', 'influencer.resources.tutorials'],
-            ['Featured Articles', 'influencer.resources.articles'],
-        ]],
         ['Badges & Tiers', 'badge', null, [
             ['Current Tier', 'influencer.badges.current'],
             ['Progress', 'influencer.badges.progress'],
@@ -53,7 +46,6 @@
         'percent'=> '<line x1="19" y1="5" x2="5" y2="19"/><circle cx="6.5" cy="6.5" r="2.5"/><circle cx="17.5" cy="17.5" r="2.5"/>',
         'wallet' => '<path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4z"/>',
         'chart'  => '<line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/>',
-        'book'   => '<path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>',
         'badge'  => '<polygon points="12 2 15 9 22 9.3 16.5 14 18.5 21 12 17 5.5 21 7.5 14 2 9.3 9 9"/>',
     ];
 

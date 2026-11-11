@@ -647,16 +647,6 @@ Route::middleware('auth')->group(function () {
             Route::get('/analytics/export', [$a, 'export'])->name('analytics.export');
         });
 
-        // Resources section
-        Route::middleware('permission:influencer.dashboard.view')->group(function () {
-            $r = \App\Http\Controllers\Influencer\InfluencerResourceController::class;
-            Route::get('/resources/library', [$r, 'library'])->name('resources.library');
-            Route::get('/resources/academy', [$r, 'academy'])->name('resources.academy');
-            Route::get('/resources/tutorials', [$r, 'tutorials'])->name('resources.tutorials');
-            Route::get('/resources/articles', [$r, 'articles'])->name('resources.articles');
-            Route::get('/resources/getting-started', [$r, 'gettingStarted'])->name('resources.getting-started');
-        });
-
         // Program sections: Referral Center, Marketing, Leaderboards, Commissions
         Route::middleware('permission:influencer.dashboard.view')->group(function () {
             $p = \App\Http\Controllers\Influencer\InfluencerProgramController::class;

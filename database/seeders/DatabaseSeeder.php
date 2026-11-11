@@ -76,7 +76,6 @@ class DatabaseSeeder extends Seeder
             DemoFormSubmissionsSeeder::class,
 
             // ── Influencer programme ──
-            InfluencerResourceSeeder::class,
             InfluencerReferralSeeder::class,
             InfluencerAnalyticsSeeder::class,
         ]);
