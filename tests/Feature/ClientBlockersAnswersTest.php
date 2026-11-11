@@ -111,7 +111,27 @@ class ClientBlockersAnswersTest extends TestCase
     public function test_the_faq_set_is_loaded(): void
     {
         $this->assertTrue(DB::table('faqs')->where('question', 'What happens if something goes wrong at my event?')->exists());
-        $this->assertSame(12, DB::table('faqs')->whereIn('category', ['Bookings & Payments', 'Trust & Safety', 'Account & Membership', 'For Professionals'])->count());
+
+        /*
+         * The topic names moved on 2026-11-06, when the FAQ was rebuilt to the
+         * PM's own file: "Bookings & Payments" became "Events & Bookings",
+         * "Account & Membership" became "Account & Settings", and "For
+         * Professionals" became "Requests & Proposals". The questions were not
+         * touched, only relabelled, so this test was pinning four names that no
+         * longer exist and counting three questions where it expected twelve.
+         *
+         * A floor rather than an exact number, because the number this was
+         * really guarding is "not zero": an exact count breaks every time a
+         * question is added, which is how it came to be asserting a figure
+         * nobody had looked at.
+         */
+        $topics = ['Getting Started', 'Events & Bookings', 'Payments & Payouts',
+                   'Account & Settings', 'Trust & Safety', 'Requests & Proposals'];
+
+        $this->assertGreaterThanOrEqual(12, DB::table('faqs')->whereIn('category', $topics)->count());
+        $this->assertSame(0, DB::table('faqs')->whereNotIn('category', $topics)->count(),
+            'every question belongs to one of the topics the help page offers');
+
         $this->assertStringNotContainsString(' — ', DB::table('faqs')->pluck('answer')->implode(' '));
     }
 

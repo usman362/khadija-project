@@ -85,14 +85,20 @@ class CategoryArtworkTest extends TestCase
         $html = $this->get('/event-types')->assertOk()->getContent();
 
         $this->assertStringContainsString('categories/thumbnails/wedding.png', $html);
-        $this->assertStringContainsString('et-all-init', $html, 'the occasion with no picture should draw its tile');
-        $this->assertSame(2, substr_count($html, 'class="et-all-card"'));
+        // The tinted initial, which is what an occasion with no picture draws.
+        $this->assertMatchesRegularExpression('/<span class="init">B<\/span>/', $html,
+            'the occasion with no picture should draw its tile');
+        $this->assertSame(2, substr_count($html, 'class="et-card"'));
     }
 
     /**
      * The page ran the full width of the window while the navbar and footer
-     * above and below it stayed centred, because .et-shell was written into the
-     * stylesheet and never put on any element.
+     * above and below it stayed centred.
+     *
+     * It used to carry its own `.et-shell`. The rebuild in d0cd157 put it on
+     * the landing layout's shared `.lp-container` instead, which is the point:
+     * one container for every public page rather than a width per screen. The
+     * assertion follows the markup; what it is checking has not changed.
      */
     public function test_the_page_content_sits_inside_the_shell(): void
     {
@@ -101,10 +107,10 @@ class CategoryArtworkTest extends TestCase
 
         $html = $this->get('/event-types')->assertOk()->getContent();
 
-        $this->assertStringContainsString('class="et-shell"', $html,
+        $this->assertStringContainsString('lp-container', $html,
             'the page is not inside its own container and will stretch edge to edge');
 
-        // And the container is the same width the chrome uses.
-        $this->assertMatchesRegularExpression('/\.et-shell \{[^}]*max-width: 1320px/', $html);
+        // And the container is given a width, rather than inheriting none.
+        $this->assertMatchesRegularExpression('/\.lp-container \{[^}]*max-width:/', $html);
     }
 }
