@@ -550,17 +550,23 @@
         .od-row-3 { grid-template-columns: 1fr 1fr; }
         .od-row-3 > .od-a-activity { grid-column: 1 / -1; }
     }
+    /* minmax(0, 1fr), not 1fr.
+       A 1fr track is minmax(AUTO, 1fr), and an auto minimum is the content's
+       own min-content width, so a card wider than the screen pushes its track
+       wider than the screen rather than being made to fit. On a 375px phone
+       the Gigs Overview card ran to 402: twenty-seven pixels of it off the
+       right edge, with no page scrollbar to reveal them. */
     @media (max-width: 1100px) {
-        .od-stats { grid-template-columns: repeat(2, 1fr); }
-        .od-top { grid-template-columns: 1fr; }
-        .od-row-a { grid-template-columns: 1fr; }
-        .od-row-b { grid-template-columns: 1fr; }
-        .od-row-3 { grid-template-columns: 1fr; }
+        .od-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .od-top { grid-template-columns: minmax(0, 1fr); }
+        .od-row-a { grid-template-columns: minmax(0, 1fr); }
+        .od-row-b { grid-template-columns: minmax(0, 1fr); }
+        .od-row-3 { grid-template-columns: minmax(0, 1fr); }
     }
     @media (max-width: 600px) {
-        .od-stats { grid-template-columns: 1fr; }
-        .od-badges { grid-template-columns: repeat(2, 1fr); }
-        .od-mini-grid { grid-template-columns: repeat(2, 1fr); }
+        .od-stats { grid-template-columns: minmax(0, 1fr); }
+        .od-badges { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+        .od-mini-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
 </style>
 @endpush

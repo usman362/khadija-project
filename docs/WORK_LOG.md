@@ -12,6 +12,19 @@ code.
 
 ## 2026-11-12
 
+### Pages running off the side of a phone
+Two pages had content wider than the screen with no sign that anything was
+missing: the Dashboard by about a centimetre, Hired Talent by rather more. Both
+were the same mistake in the layout, where a column is told to take the space
+available but its minimum is still "as wide as the contents need", so the
+contents set the width and push the rest off the edge.
+
+On Hired Talent the four tabs across the top also became four blank pills on a
+phone: the rule meant to hide the small line under each label was hiding the
+label and the icon too, so nothing told them apart. And the card header put the
+photograph, the name and the buttons on one line whatever the width, leaving
+the name about sixty pixels and the buttons off the screen.
+
 ### The inbox on a laptop and on a phone
 Four faults on the Messages page, all of them about width.
 

@@ -86,6 +86,21 @@
 
     /* ── Right ──────────────────────────────────────────────── */
     .ht-detail-h { display: flex; align-items: flex-start; gap: 18px; padding: 22px 22px 18px; }
+    /* The name block, which had no width of its own.
+       This row is an 84px avatar, the name, a flex:1 spacer and the action
+       buttons, and the buttons are flex:none. On a phone that left the name
+       about sixty pixels: a business name broke one word to a line and the
+       buttons were pushed off the right of the screen. */
+    .ht-detail-h > div { flex: 1 1 auto; min-width: 0; }
+    @media (max-width: 640px) {
+        .ht-detail-h { flex-wrap: wrap; gap: 12px; padding: 18px 16px 14px; }
+        .ht-detail-av { width: 56px; height: 56px; }
+        .ht-detail-n { font-size: 18px; }
+        /* The spacer exists to push the buttons right on a wide row. On a
+           wrapped one it only forces a line break in the wrong place. */
+        .ht-detail-sp { display: none; }
+        .ht-actions { width: 100%; }
+    }
     .ht-avwrap { position: relative; flex: none; }
     .ht-detail-av { width: 84px; height: 84px; border-radius: 50%; object-fit: cover; display: block; }
     .ht-avtick { position: absolute; right: 0; bottom: 0; width: 26px; height: 26px; border-radius: 50%;
@@ -158,10 +173,14 @@
     .ht-detail { display: none; }
     .ht-detail.is-on { display: block; }
 
+    /* minmax(0, 1fr) and not 1fr: a 1fr track's minimum is auto, which is the
+       content's min-content width, so the card sets the track rather than the
+       track setting the card. On a 375px phone this page ran 67px off the
+       right edge. */
     @media (max-width: 1100px) {
-        .ht { grid-template-columns: 1fr; }
+        .ht { grid-template-columns: minmax(0, 1fr); }
         .ht-list { max-height: none; }
-        .ht-facts, .ht-two { grid-template-columns: 1fr; }
+        .ht-facts, .ht-two { grid-template-columns: minmax(0, 1fr); }
         .ht-fact { border-right: 0; border-bottom: 1px solid var(--border-color); }
     }
     /* Sir Peter, 12 October: "Hired Talent will be the webpage with tabs for
@@ -177,7 +196,12 @@
     .ht-tab-ico { width: 30px; height: 30px; border-radius: 9px; flex: none; display: flex; align-items: center; justify-content: center;
         background: rgba(249,115,22,.12); color: #ea580c; }
     .ht-tab-ico svg { width: 16px; height: 16px; }
-    @media (max-width: 560px) { .ht-tab span { display: none; } }
+    /* Only the small line under the label.
+       `.ht-tab span` matched every span in the pill, and the icon is a span
+       and so is the wrapper around the label, so on a phone all four tabs
+       became identical empty pills: no icon, no word, nothing to tell them
+       apart or say what they did. The blurb is the one nested two deep. */
+    @media (max-width: 560px) { .ht-tab > span > span { display: none; } }
 </style>
 @endpush
 
