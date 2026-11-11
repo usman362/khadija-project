@@ -12,6 +12,32 @@ code.
 
 ## 2026-11-12
 
+### Paying the deposit no longer shows as paying nothing
+On the Payments and Spending pages, a client who had just paid a deposit saw
+"Paid $0", with the whole price of the booking sitting under "agreed, not yet
+paid". On the page somebody checks before paying again.
+
+Both pages sorted a booking's whole price by the state of the booking, which
+was correct while the site took no money at all. It takes a deposit now, at the
+end of the agreement, so the deposit is counted as paid and the remainder as
+still owed. The price that was agreed is unchanged, as it should be: only what
+is left to pay moves.
+
+A booking already finished keeps counting once. Its full price is already
+counted as paid, and adding the deposit again would have reported two thousand
+five hundred dollars paid on two thousand dollars of work.
+
+### Three tests that were failing before any of this
+All three had been failing on the main copy of the site and none of them had
+found a real fault. Each was checking the spelling of something rather than the
+thing itself: two were looking for names on the Event Types page that were
+renamed when that page was rebuilt, and one was counting twelve help questions
+under four topic names that were relabelled on 6 November, so it found three.
+
+Corrected to match, and the counting one now checks that no question is hidden
+outside the topics the help page offers, which is the fault it was meant to
+catch.
+
 ### The money record was keeping our fee and not the client's money
 Every booking writes a running record of what was charged, so that a total is
 always the list added up and never a single number somebody can overwrite. It

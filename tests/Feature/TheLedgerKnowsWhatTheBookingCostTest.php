@@ -277,6 +277,54 @@ class TheLedgerKnowsWhatTheBookingCostTest extends TestCase
             ->assertSee('Nothing has been collected on it yet');
     }
 
+    // ── and on the two money pages ───────────────────────────
+
+    public function test_the_money_pages_count_the_deposit_as_paid(): void
+    {
+        [$client, $fin] = $this->readyToFund(agreed: 2000, deposit: 500);
+
+        $this->actingAs($client)
+            ->post(route('client.finalize.save', [$fin, 'payment']), ['confirm_payment' => 1]);
+
+        /*
+         * Both pages bucketed a booking's whole price by the booking's status,
+         * which was right while GigResource took no money. It takes a deposit
+         * now, so this read "Paid $0" with the entire $2,000 under "agreed,
+         * not yet paid" on the page a client checks before paying again.
+         *
+         * Asserted on the figures the pages are given rather than on the
+         * rendered numbers: $2,000 appears on both pages quite correctly, as
+         * the total agreed, so scraping for it proves nothing either way.
+         */
+        foreach ([route('client.payments.index'), route('client.spending.index')] as $url) {
+            $stats = $this->actingAs($client)->get($url)->assertOk()->viewData('stats');
+
+            $this->assertEquals(500.00, $stats['paid'], "the deposit is missing from {$url}");
+            $this->assertEquals(1500.00, $stats['agreed_unpaid'],
+                "the full price is still shown as unpaid on {$url}");
+            // The agreement itself has not changed, only what is left to pay.
+            $this->assertEquals(2000.00, $stats['total_agreed']);
+        }
+    }
+
+    public function test_a_completed_booking_does_not_count_its_deposit_twice(): void
+    {
+        [$client, $fin] = $this->readyToFund(agreed: 2000, deposit: 500);
+
+        $this->actingAs($client)
+            ->post(route('client.finalize.save', [$fin, 'payment']), ['confirm_payment' => 1]);
+
+        $booking = Booking::where('client_id', $client->id)->latest('id')->firstOrFail();
+        $booking->update(['status' => 'completed']);
+
+        // A completed booking's whole price is already counted as settled, so
+        // adding its deposit on top would report $2,500 paid on $2,000 of work.
+        $stats = $this->actingAs($client)->get(route('client.payments.index'))
+            ->assertOk()->viewData('stats');
+
+        $this->assertEquals(2000.00, $stats['paid']);
+    }
+
     // ── fixtures ─────────────────────────────────────────────
 
     private function client(): User

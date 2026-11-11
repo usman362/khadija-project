@@ -129,6 +129,36 @@ class ClientFinanceController extends Controller
         $inEscrow  = $amount('confirmed');   // confirmed but not released
         $pending   = $amount('requested');   // awaiting confirmation
 
+        /*
+         * The deposit, which these four figures could not see.
+         *
+         * Each of them buckets a booking's WHOLE price by the booking's
+         * status, and that was right while GigResource took no money: a
+         * confirmed booking meant a price agreed and nothing paid. It takes a
+         * deposit at the end of the agreement wizard now, so a client could
+         * pay $500 and read "Paid $0" with the entire $2,000 sitting under
+         * "Agreed, not yet paid" on the page they check before paying again.
+         *
+         * Read from the ledger rather than from Payments, because the ledger
+         * is where the money is now recorded and it already distinguishes
+         * money the gateway has (SECURED) from money merely asked for.
+         *
+         * Only on bookings that are not completed. A completed booking's full
+         * price is already inside `settled`, so adding its deposit would count
+         * the same money twice.
+         */
+        $depositsOnOpenBookings = (float) \App\Models\LedgerEntry::query()
+            ->where('party_user_id', $userId)
+            ->where('entry_type', \App\Models\LedgerEntry::BOOKING_CHARGE)
+            ->where('state', \App\Models\LedgerEntry::SECURED)
+            ->when($eventId, fn ($q) => $q->where('event_id', $eventId))
+            ->whereHas('booking', fn ($q) => $q->where('status', '!=', 'completed')->notSelfSupplied())
+            ->sum('amount');
+
+        $settled  = round($settled + $depositsOnOpenBookings, 2);
+        // What is still owed on those bookings, and no longer their whole price.
+        $inEscrow = round(max(0, $inEscrow - $depositsOnOpenBookings), 2);
+
         return compact('total', 'settled', 'inEscrow', 'pending', 'col');
     }
 
