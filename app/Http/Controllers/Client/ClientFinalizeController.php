@@ -686,6 +686,60 @@ class ClientFinalizeController extends Controller
                 'booking_id'   => $booking->id,
                 'status'       => 'booked',
             ]);
+
+            /*
+             * And the booking itself into the ledger.
+             *
+             * The agreement fee above was going in and the deposit was not,
+             * which left the ledger holding GigResource's $4.99 and no trace
+             * of the client's several hundred. Ledger::bookingTotal() sums
+             * BOOKING_CHARGE and UPGRADE, so with no booking charge ever
+             * written it answered 0.00 for every booking on the site, and
+             * margin() computed a gross of nothing but fees. Nothing reads
+             * either yet, which is the only reason this has not been seen.
+             *
+             * Two rows, not one, because an entry carries a single state and
+             * this money is in two: the deposit is SECURED, the gateway has
+             * it, and the balance is PENDING, asked for and not received. They
+             * sum to the agreed price, so bookingTotal() is right and
+             * standing() can tell held from owed without a second rule.
+             *
+             * Written after Award::book because the booking does not exist
+             * until then, and an entry with no booking_id is invisible to
+             * forBooking().
+             */
+            $agreed  = (float) $f->agreed_price;
+            $deposit = min((float) $f->deposit_amount, $agreed);
+            $balance = round($agreed - $deposit, 2);
+
+            if ($deposit > 0) {
+                \App\Domain\Money\Ledger::record(
+                    \App\Models\LedgerEntry::BOOKING_CHARGE,
+                    $deposit,
+                    '+',
+                    party: $f->client,
+                    event: $f->event,
+                    booking: $booking,
+                    state: \App\Models\LedgerEntry::SECURED,
+                    payment: $payment,
+                    subject: $f,
+                    metadata: ['reason' => 'deposit', 'mode' => $mode],
+                );
+            }
+
+            if ($balance > 0) {
+                \App\Domain\Money\Ledger::record(
+                    \App\Models\LedgerEntry::BOOKING_CHARGE,
+                    $balance,
+                    '+',
+                    party: $f->client,
+                    event: $f->event,
+                    booking: $booking,
+                    state: \App\Models\LedgerEntry::PENDING,
+                    subject: $f,
+                    metadata: ['reason' => 'balance', 'mode' => $mode],
+                );
+            }
         });
     }
 

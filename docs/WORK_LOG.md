@@ -12,6 +12,26 @@ code.
 
 ## 2026-11-12
 
+### The money record was keeping our fee and not the client's money
+Every booking writes a running record of what was charged, so that a total is
+always the list added up and never a single number somebody can overwrite. It
+was recording the $4.99 we charge for the agreement, and nothing else.
+
+So a two thousand dollar booking had four dollars and ninety nine cents written
+against it, and the question "what did this booking come to" answered zero.
+Both ways of making a booking had the same hole: finalising an agreement, and
+buying a package.
+
+Now a funded agreement writes two lines, the deposit as money received and the
+remainder as money still owed, and they add up to the price both sides signed.
+Buying a package writes its price as owed, because nothing is charged at that
+moment. Our own fee stays separate, which is correct: it is ours, not the
+professional's.
+
+Nothing on screen reads this record yet, which is exactly why it was never
+noticed, and why it was worth fixing before anything does. Checked by six tests
+and by the 411 existing ones.
+
 ### Affiliate side: Resources removed
 The Resources section is gone from the affiliate portal: the sidebar group and
 its five pages (Getting Started, Resource Library, Academy, Tutorials, Featured

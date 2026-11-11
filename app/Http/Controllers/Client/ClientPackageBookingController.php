@@ -194,6 +194,31 @@ class ClientPackageBookingController extends Controller
                 metadata: ['reason' => 'agreement', 'via' => 'package'],
             );
 
+            /*
+             * And the package price itself, on the same terms.
+             *
+             * The fee was going into the ledger and the thing the client
+             * actually bought was not, so Ledger::bookingTotal() answered 0.00
+             * for a package booking while the booking row said $2,400.
+             *
+             * PENDING, like the fee above and for the same reason: buying a
+             * package opens the booking as 'requested' and charges nothing, so
+             * this is money owed rather than money held. One row, because
+             * unlike a finalized agreement there is no deposit splitting it in
+             * two.
+             */
+            \App\Domain\Money\Ledger::record(
+                \App\Models\LedgerEntry::BOOKING_CHARGE,
+                (float) $package->price,
+                '+',
+                party: $client,
+                event: $event,
+                booking: $booking,
+                state: \App\Models\LedgerEntry::PENDING,
+                subject: $package,
+                metadata: ['reason' => 'package_price', 'via' => 'package'],
+            );
+
             return $booking;
         });
 
