@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>GigResource: Developer Interview Sheet</title>
+<style>
+  @page { size: A4; margin: 16mm 14mm 14mm; }
+  * { box-sizing: border-box; }
+  body { font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+         color: #1e293b; font-size: 10.5pt; line-height: 1.5; margin: 0; }
+  h1 { font-size: 20pt; margin: 0 0 2mm; color: #ea580c; letter-spacing: -0.3px; }
+  .sub { color: #64748b; font-size: 10pt; margin: 0 0 6mm; }
+  h2 { font-size: 12pt; margin: 8mm 0 3mm; padding-bottom: 1.5mm;
+       border-bottom: 2px solid #ea580c; color: #0f172a; }
+  .note { background: #fff7ed; border: 1px solid #fed7aa; border-radius: 3mm;
+          padding: 4mm 5mm; margin: 0 0 6mm; font-size: 10pt; }
+  .note b { color: #9a3412; }
+  .q { border: 1px solid #e2e8f0; border-radius: 3mm; padding: 4mm 5mm;
+       margin: 0 0 4mm; page-break-inside: avoid; }
+  .q .ask { font-weight: 700; color: #0f172a; margin: 0 0 3mm; }
+  .q .ask span { color: #ea580c; }
+  .good, .bad, .why { margin: 0 0 2mm; padding-left: 7mm; position: relative; font-size: 10pt; }
+  .good::before { content: "YES"; position: absolute; left: 0; top: 0;
+                  font-size: 7.5pt; font-weight: 800; color: #047857; }
+  .bad::before  { content: "NO";  position: absolute; left: 0; top: 0;
+                  font-size: 7.5pt; font-weight: 800; color: #b91c1c; }
+  .why { padding-left: 0; margin-top: 3mm; padding-top: 2.5mm;
+         border-top: 1px dashed #e2e8f0; color: #64748b; font-size: 9.5pt; font-style: italic; }
+  .score { float: right; border: 1px solid #cbd5e1; border-radius: 2mm;
+           font-size: 8.5pt; color: #64748b; padding: 1mm 3mm; margin-left: 4mm; }
+  table { width: 100%; border-collapse: collapse; font-size: 10pt; margin-top: 3mm; }
+  th, td { border: 1px solid #e2e8f0; padding: 2.5mm 3mm; text-align: left; }
+  th { background: #f8fafc; font-size: 9.5pt; }
+  .flag { background: #fef2f2; border: 1px solid #fecaca; border-radius: 3mm;
+          padding: 4mm 5mm; font-size: 10pt; }
+  .flag ul { margin: 2mm 0 0; padding-left: 5mm; }
+  .foot { margin-top: 8mm; font-size: 9pt; color: #94a3b8; text-align: center; }
+</style>
+</head>
+<body>
+
+<h1>Developer Interview Sheet</h1>
+<p class="sub">GigResource &middot; second developer lead &middot; prepared 12 November 2026</p>
+
+<div class="note">
+  <b>How to use this.</b> Every question below is about work this candidate would
+  actually do on GigResource. You do not need to be technical to score it: under
+  each question is what a good answer contains and what should worry you. Read the
+  question as written, let them answer, then tick.
+  <br><br>
+  <b>If you only have ten minutes</b>, ask questions 3, 5, 7 and 8. The first
+  three are the ones where a wrong answer costs us data, money or a client's
+  trust, and the fourth shows how they behave when something is already broken.
+</div>
+
+<h2>About the work itself</h2>
+
+<div class="q">
+  <span class="score">1 of 12</span>
+  <p class="ask"><span>1.</span> GigResource is built with Laravel and Blade templates, with MySQL behind it. There is no React or Vue anywhere. Have you built a complete site this way, and are you happy to keep working in it?</p>
+  <p class="good">Names a specific project they built in Blade. Says plainly that they are comfortable.</p>
+  <p class="bad">Wants to rebuild the front end in React, Vue or Inertia. Says they only build APIs and someone else does the screens.</p>
+  <p class="why">The site is over three hundred Blade files and three thousand tests. Nobody is rewriting the front end, so a candidate who only wants to work the other way will be unhappy within a week.</p>
+</div>
+
+<div class="q">
+  <span class="score">2 of 12</span>
+  <p class="ask"><span>2.</span> A page lists fifty events, and each one shows the client's name. The page runs fifty-one database queries. What is happening, and how would you fix it?</p>
+  <p class="good">Calls it an N+1 problem. Says to load the related records together, usually with "eager loading" or the word <i>with()</i>.</p>
+  <p class="bad">Suggests adding caching, or a bigger server. Does not know the term. Goes quiet.</p>
+  <p class="why">This is the single most common performance mistake in Laravel and it is on every list page we have. Anyone who has maintained a real Laravel site has met it.</p>
+</div>
+
+<div class="q">
+  <span class="score">3 of 12</span>
+  <p class="ask"><span>3.</span> What is the difference between <i>php artisan migrate</i> and <i>php artisan migrate:fresh</i>, and when would you use each?</p>
+  <p class="good">Says plainly that <i>fresh</i> deletes everything and rebuilds, so it is for a local machine only, never on the live site. <i>migrate</i> applies what is new.</p>
+  <p class="bad">Treats them as interchangeable. Says they would run <i>fresh</i> to tidy things up.</p>
+  <p class="why">One wrong command here deletes every client, booking and payment on the live site. The answer has a single correct shape, which makes it easy to score.</p>
+</div>
+
+<div class="q">
+  <span class="score">4 of 12</span>
+  <p class="ask"><span>4.</span> A column in the live database has the wrong name and we want to rename it. The table already holds real client data. How do you do it safely?</p>
+  <p class="good">Writes a new migration. Keeps the old data, copies it across, then removes the old column. Says you never edit a migration that has already run.</p>
+  <p class="bad">Says to edit the original migration file, or to rebuild the database.</p>
+  <p class="why">We have nearly two hundred of these change files and a live database behind them.</p>
+</div>
+
+<h2>Money, which is the part that must not be wrong</h2>
+
+<div class="q">
+  <span class="score">5 of 12</span>
+  <p class="ask"><span>5.</span> How do you store a price in the database, and why would you not use a decimal number that floats?</p>
+  <p class="good">Either a fixed decimal column, or whole numbers of cents. Must say that a floating-point number is wrong for money because it loses fractions of a cent.</p>
+  <p class="bad">Says float or double. Says it does not matter at our size.</p>
+  <p class="why">Every agreement, deposit, fee and commission on this site is money. A rounding error here is an argument with a client.</p>
+</div>
+
+<div class="q">
+  <span class="score">6 of 12</span>
+  <p class="ask"><span>6.</span> The same booking total appears on four different pages of a client's account. How would you make sure all four always agree?</p>
+  <p class="good">Works the figure out in one place and has all four pages use it. Mentions writing a test so it cannot drift apart again.</p>
+  <p class="bad">Says they would check each page, or copy the same query into each one. Has not thought about it.</p>
+  <p class="why">This exact fault has already happened here: two pages said eighty dollars while two said five thousand and eighty. It is the difference between a developer who thinks in systems and one who thinks in screens.</p>
+</div>
+
+<div class="q">
+  <span class="score">7 of 12</span>
+  <p class="ask"><span>7.</span> A payment provider tells our site that a card charge succeeded. The same message arrives twice by mistake. What stops the client being charged twice?</p>
+  <p class="good">Recognises this as a webhook. Says each message carries an identity that we record, and we ignore one we have already seen. May use the word idempotent.</p>
+  <p class="bad">Does not know what a webhook is. Says it would not happen.</p>
+  <p class="why">Payment providers deliver the same message twice on purpose when they are unsure it arrived. Not handling it means double charges.</p>
+</div>
+
+<h2>Working alone, and under pressure</h2>
+
+<div class="q">
+  <span class="score">8 of 12</span>
+  <p class="ask"><span>8.</span> A page works on your own machine and shows an error on the live site. Talk me through your first five minutes.</p>
+  <p class="good">Reads the error log first. Reproduces the problem. Only then changes anything. Looks at what differs between the two machines.</p>
+  <p class="bad">Starts changing code straight away to see what helps. Says they would ask someone else to look.</p>
+  <p class="why">On this project there is nobody else to ask at two in the morning. Someone who guesses instead of reading the log turns an hour into a day.</p>
+</div>
+
+<div class="q">
+  <span class="score">9 of 12</span>
+  <p class="ask"><span>9.</span> Have you ever been the only developer on a project, responsible for putting it live yourself? Tell me about that one.</p>
+  <p class="good">A real example, named. Describes deploying it themselves and what went wrong at least once.</p>
+  <p class="bad">Has always had a team lead who handled releases. Cannot name a project.</p>
+  <p class="why">This is the job. There is no senior developer above them to catch a mistake before it reaches the live site.</p>
+</div>
+
+<div class="q">
+  <span class="score">10 of 12</span>
+  <p class="ask"><span>10.</span> This project has about three thousand automated tests, and they are run before anything goes live. How do you feel about that?</p>
+  <p class="good">Treats it as normal and useful. Says they run them before pushing. Understands that for one developer the tests are the only second pair of eyes.</p>
+  <p class="bad">Says tests slow you down, or that testing is somebody else's job.</p>
+  <p class="why">A candidate who resents the tests will stop running them, and then we will find out from a client.</p>
+</div>
+
+<h2>Judgement</h2>
+
+<div class="q">
+  <span class="score">11 of 12</span>
+  <p class="ask"><span>11.</span> We only operate in seven states, and a professional must be in the same state as the client. Where in the system would you put a rule like that so it cannot be got around?</p>
+  <p class="good">On the server, in one place, checked every time. Says that hiding a button is not a rule.</p>
+  <p class="bad">Says they would hide the option on screen, or check it in the browser only.</p>
+  <p class="why">Our geography rules are a legal position, not a convenience. A rule that only exists on screen is not a rule.</p>
+</div>
+
+<div class="q">
+  <span class="score">12 of 12</span>
+  <p class="ask"><span>12.</span> The owner asks for a feature you think is a mistake. What do you do? And if you notice a completely unrelated bug while you are in there?</p>
+  <p class="good">Says the concern once, with reasons, then builds what the owner decides. Writes the unrelated bug down and raises it, rather than quietly fixing it inside unrelated work.</p>
+  <p class="bad">"Whatever they ask, I build." Or refuses outright. Or fixes everything they notice without telling anyone.</p>
+  <p class="why">Both halves matter. The first is whether they will warn us. The second is whether a small change can be trusted to stay small.</p>
+</div>
+
+<h2>Scoring</h2>
+
+<table>
+  <tr><th style="width:28%">Count of good answers</th><th>What it means</th></tr>
+  <tr><td><b>10 or more</b></td><td>Strong. Can be trusted with the live site fairly quickly.</td></tr>
+  <tr><td><b>7 to 9</b></td><td>Worth a second conversation. Check which ones they missed: 3, 5 and 7 matter more than the rest.</td></tr>
+  <tr><td><b>Under 7</b></td><td>Not for this project. They would be learning on a site that already has clients on it.</td></tr>
+</table>
+
+<p style="margin-top:4mm; font-size:10pt;"><b>Three that are not negotiable.</b> If they get question 3, 5 or 7 wrong, the count does not matter. Those three are the ones where a wrong answer destroys data, money or trust.</p>
+
+<h2>Red flags, whatever the score</h2>
+
+<div class="flag">
+  <ul>
+    <li>Every answer is "yes, I can do that", with no detail and no example.</li>
+    <li>Cannot name a single project they worked on, or what it did.</li>
+    <li>Cannot say which version of Laravel they last used.</li>
+    <li>Blames previous clients or employers for everything that went wrong.</li>
+    <li>Will not say "I don't know" about anything.</li>
+  </ul>
+</div>
+
+<p class="foot">GigResource &middot; Developer Interview Sheet &middot; 12 November 2026</p>
+
+</body>
+</html>
