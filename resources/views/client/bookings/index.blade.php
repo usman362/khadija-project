@@ -278,14 +278,14 @@
                     $event   = $booking->event;
                     $pro     = $booking->supplier;
                     $profile = $pro?->profile;
-                    $deposit = $deposits->get(($booking->event_id ?? '') . ':' . ($booking->supplier_id ?? ''));
+                    $deposit = $deposits->get($booking->id);
                     $moves   = $booking->allowedTransitionsFor(auth()->user());
                     $review  = $myReviews->get($booking->id);
                     $log     = $history->get($booking->id) ?? collect();
                     $agreement = $booking->latestAgreement;
 
                     $price      = (float) ($booking->price ?? 0);
-                    $paid       = (float) ($deposit->amount ?? 0);
+                    $paid       = (float) ($deposit['amount'] ?? 0);
                     $cancelled  = $booking->status === 'cancelled';
 
                     // When each state was reached. The log records transitions, so
@@ -421,7 +421,7 @@
                                         ${{ number_format($paid) }}
                                         {{-- Test-mode deposits let the flow be walked through before live
                                              payments are on; label it so a screenshot can't imply otherwise. --}}
-                                        <span class="bk-tag {{ ($deposit->metadata['mode'] ?? null) === 'test' ? 'test' : 'paid' }}">{{ ($deposit->metadata['mode'] ?? null) === 'test' ? 'Test' : 'Paid' }}</span>
+                                        <span class="bk-tag {{ ($deposit['mode'] ?? null) === 'test' ? 'test' : 'paid' }}">{{ ($deposit['mode'] ?? null) === 'test' ? 'Test' : 'Paid' }}</span>
                                     @else
                                         None taken
                                     @endif

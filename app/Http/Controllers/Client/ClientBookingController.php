@@ -91,14 +91,28 @@ class ClientBookingController extends Controller
             ->get()
             ->groupBy('subject_id');
 
-        // Deposits are Payments tagged `booking_deposit`, carrying the event and
-        // supplier they were taken for — that pair is what identifies a booking.
-        // Anything not matched simply has no deposit shown; nothing is guessed.
-        $deposits = Payment::where('user_id', $user->id)
-            ->where('status', 'completed')
+        /*
+         * What has actually been paid on each of these bookings, from the
+         * ledger, keyed by the booking itself.
+         *
+         * It used to key Payment rows by the event and supplier their metadata
+         * named. One event can carry two services from the same professional,
+         * which is two bookings with one key, and keyBy keeps the last: both
+         * cards would then show one of the two deposits. The ledger entry
+         * names its booking, so there is nothing to match on.
+         */
+        $deposits = \App\Models\LedgerEntry::whereIn('booking_id', $ids)
+            ->where('entry_type', \App\Models\LedgerEntry::BOOKING_CHARGE)
+            ->where('state', \App\Models\LedgerEntry::SECURED)
             ->get()
-            ->filter(fn ($p) => ($p->metadata['kind'] ?? null) === 'booking_deposit')
-            ->keyBy(fn ($p) => ($p->metadata['event_id'] ?? '') . ':' . ($p->metadata['supplier_id'] ?? ''));
+            ->groupBy('booking_id')
+            ->map(fn ($rows) => [
+                'amount' => round((float) $rows->sum('amount'), 2),
+                // Test mode travels with the figure, so a card cannot show a
+                // test deposit as a real one. One booking is funded in one
+                // mode, so the first row speaks for all of them.
+                'mode'   => $rows->first()->metadata['mode'] ?? null,
+            ]);
 
         /*
          * OA-146: the same calculation Spending and Payments use, so the four

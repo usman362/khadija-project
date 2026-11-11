@@ -134,17 +134,28 @@ class ClientTotals
      */
     public static function depositsPaid(User $client, ?int $eventId = null): float
     {
+        /*
+         * From the ledger, which is where money is recorded.
+         *
+         * This used to match Payment rows by the event and supplier named in
+         * their metadata. That worked, but it answered the same question the
+         * Payments and Spending pages answer, by a different route, from a
+         * different table — and OA-146 is what two routes to one figure cost
+         * the last time. It also keyed on event and supplier, and one event can
+         * carry two services from the same professional, which is two bookings
+         * and two deposits wearing one key.
+         *
+         * Everything made before 2026-11-12 was given its entries by the
+         * backfill migration, read from exactly those Payment rows, so no
+         * history is lost in the move.
+         */
         $standing = self::base($client, $eventId)
             ->whereNotIn('status', self::VOID_STATUSES)
-            ->get(['event_id', 'supplier_id'])
-            ->map(fn ($b) => $b->event_id . ':' . $b->supplier_id)
-            ->flip();
+            ->pluck('id');
 
-        return (float) \App\Models\Payment::where('user_id', $client->id)
-            ->where('status', 'completed')
-            ->get()
-            ->filter(fn ($p) => ($p->metadata['kind'] ?? null) === 'booking_deposit'
-                && $standing->has(($p->metadata['event_id'] ?? '') . ':' . ($p->metadata['supplier_id'] ?? '')))
+        return (float) \App\Models\LedgerEntry::whereIn('booking_id', $standing)
+            ->where('entry_type', \App\Models\LedgerEntry::BOOKING_CHARGE)
+            ->where('state', \App\Models\LedgerEntry::SECURED)
             ->sum('amount');
     }
 

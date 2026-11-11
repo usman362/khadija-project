@@ -325,6 +325,78 @@ class TheLedgerKnowsWhatTheBookingCostTest extends TestCase
         $this->assertEquals(2000.00, $stats['paid']);
     }
 
+    public function test_a_cancelled_bookings_deposit_is_not_counted_as_money_spent(): void
+    {
+        [$client, $fin] = $this->readyToFund(agreed: 2000, deposit: 500);
+
+        $this->actingAs($client)
+            ->post(route('client.finalize.save', [$fin, 'payment']), ['confirm_payment' => 1]);
+
+        $booking = Booking::where('client_id', $client->id)->latest('id')->firstOrFail();
+        $booking->update(['status' => 'cancelled']);
+
+        /*
+         * A cancelled booking's price is deliberately outside every total on
+         * these pages, so that it is not shown as money still to spend. Its
+         * deposit has to come out with it, or Paid would be $500 against a
+         * total agreed of $0.
+         */
+        $stats = $this->actingAs($client)->get(route('client.payments.index'))
+            ->assertOk()->viewData('stats');
+
+        $this->assertEquals(0.00, $stats['paid']);
+        $this->assertEquals(0.00, $stats['total_agreed']);
+    }
+
+    public function test_one_professional_twice_on_one_event_keeps_two_deposits(): void
+    {
+        $client = $this->client();
+        $pro = $this->pro();
+
+        $event = Event::create([
+            'title' => 'Rivera Wedding', 'client_id' => $client->id,
+            'created_by' => $client->id, 'status' => 'published',
+            'starts_at' => now()->addDays(30),
+        ]);
+
+        /*
+         * A photographer who is also doing the videography is two bookings on
+         * one event with one professional. The deposits used to be keyed by
+         * the event and supplier their payment metadata named, so both of
+         * these wore the same key and keyBy kept one: the two cards showed one
+         * deposit and the total counted it once.
+         */
+        foreach ([[600.0, 2000.0], [300.0, 900.0]] as [$deposit, $price]) {
+            $booking = Booking::create([
+                'event_id' => $event->id, 'client_id' => $client->id,
+                'supplier_id' => $pro->id, 'created_by' => $client->id,
+                'category_id' => Category::create(['name' => 'DJ', 'slug' => 'dj-' . uniqid()])->id,
+                'status' => 'confirmed', 'price' => $price, 'currency' => 'USD',
+            ]);
+
+            \App\Domain\Money\Ledger::record(
+                LedgerEntry::BOOKING_CHARGE, $deposit, '+',
+                party: $client, event: $event, booking: $booking,
+                state: LedgerEntry::SECURED, subject: $booking,
+            );
+            \App\Domain\Money\Ledger::record(
+                LedgerEntry::BOOKING_CHARGE, $price - $deposit, '+',
+                party: $client, event: $event, booking: $booking,
+                state: LedgerEntry::PENDING, subject: $booking,
+            );
+        }
+
+        $this->assertEquals(900.00, \App\Domain\Finance\ClientTotals::depositsPaid($client->fresh()),
+            'both deposits are real money and both were paid');
+
+        $financial = $this->actingAs($client)->get(route('client.bookings.index'))
+            ->assertOk()->viewData('financial');
+
+        $this->assertEquals(2900.00, $financial['agreed_total']);
+        $this->assertEquals(900.00, $financial['deposits_paid']);
+        $this->assertEquals(2000.00, $financial['outstanding']);
+    }
+
     // ── fixtures ─────────────────────────────────────────────
 
     private function client(): User

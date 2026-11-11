@@ -146,13 +146,24 @@ class ClientFinanceController extends Controller
          * Only on bookings that are not completed. A completed booking's full
          * price is already inside `settled`, so adding its deposit would count
          * the same money twice.
+         *
+         * And not on cancelled or declined ones. Their price is deliberately
+         * outside every total here — ClientTotals::VOID_STATUSES, so that a
+         * cancelled booking is not presented as money still to spend — and
+         * counting the deposit from one would put money into "paid" against an
+         * agreement nobody is holding, so Paid could exceed the total agreed.
+         * What happened to a deposit on a cancelled booking is a refund
+         * question, and it has its own place to be answered.
          */
         $depositsOnOpenBookings = (float) \App\Models\LedgerEntry::query()
             ->where('party_user_id', $userId)
             ->where('entry_type', \App\Models\LedgerEntry::BOOKING_CHARGE)
             ->where('state', \App\Models\LedgerEntry::SECURED)
             ->when($eventId, fn ($q) => $q->where('event_id', $eventId))
-            ->whereHas('booking', fn ($q) => $q->where('status', '!=', 'completed')->notSelfSupplied())
+            ->whereHas('booking', fn ($q) => $q
+                ->where('status', '!=', 'completed')
+                ->whereNotIn('status', \App\Domain\Finance\ClientTotals::VOID_STATUSES)
+                ->notSelfSupplied())
             ->sum('amount');
 
         $settled  = round($settled + $depositsOnOpenBookings, 2);
