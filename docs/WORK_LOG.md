@@ -87,6 +87,21 @@ so the whole desk is in frame.
 
 ---
 
+## On hold: professional and affiliate side
+
+The agreed order of work is the client side first. These are reviewed, written
+down and understood, and none of them is started.
+
+- **Bidding, agreements and payments.** The whole of the November plan. What is
+  genuinely missing from it is paying in three or more stages, and the
+  arrangement that would let the site hold money between them. Everything else
+  in the plan already exists.
+- **Disputes.** Built on both sides already. What is unfinished inside it is
+  the time limits for each side to respond and the dispute fee, and both are
+  waiting on a decision rather than on work.
+- **Influencer hiring.** Influencers still cannot be hired at all. The rules
+  for it are settled; the screens are not built.
+
 ## Still waiting on the client
 
 - **Duplicate services.** 360 Photo Booths and 360 Video Booths are the same
