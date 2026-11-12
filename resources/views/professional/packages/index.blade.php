@@ -375,8 +375,14 @@
                                 @if($pkg->coverage || $pkg->duration)
                                     <span class="mp-chip">{!! $ico('clock') !!} {{ $pkg->coverage ?: $pkg->duration }}</span>
                                 @endif
-                                @if($pkg->team)
-                                    <span class="mp-chip">{!! $ico('team') !!} {{ $pkg->team }} {{ \Illuminate\Support\Str::plural('Professional', $pkg->team) }}</span>
+                                {{-- The COUNT, not the list. `team` is an array of
+                                     roles, and echoing it raw is what made this
+                                     page return a 500 to any professional whose
+                                     package had a crew on it. The roles
+                                     themselves are on the booking page, which
+                                     has the width for them. --}}
+                                @if($pkg->teamSize())
+                                    <span class="mp-chip">{!! $ico('team') !!} {{ $pkg->teamSize() }} {{ \Illuminate\Support\Str::plural('Professional', $pkg->teamSize()) }}</span>
                                 @endif
                                 @if($pkg->guests)<span class="mp-chip">{!! $ico('team') !!} {{ $pkg->guests }}</span>@endif
                                 {{-- One state, not a list. R38: a package is bookable

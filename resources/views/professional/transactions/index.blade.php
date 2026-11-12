@@ -12,7 +12,18 @@
         gap: 20px;
         margin-top: 20px;
     }
-    @media (max-width: 1100px) { .tx-layout { grid-template-columns: 1fr; } }
+    @media (max-width: 1100px) { .tx-layout { grid-template-columns: minmax(0, 1fr); } }
+    /* And the columns themselves, whose auto minimum is their content: the
+       panel inside ran to 533px on a 375px screen. */
+    .tx-layout > * { min-width: 0; }
+    /* Both tables scroll sideways rather than spilling out of their cards.
+       The wrapper needs its own zero minimum or the table's width travels
+       back up into the column. */
+    .tx-tablewrap { overflow-x: auto; min-width: 0; }
+    .tx-tablewrap .cl-table { min-width: 620px; }
+    @media (max-width: 620px) {
+        .tx-panel-header { flex-wrap: wrap; }
+    }
 
     .tx-panel-header {
         display: flex;
@@ -39,9 +50,20 @@
         flex-wrap: wrap;
         margin-bottom: 0;
     }
-    .tx-filter-bar .cl-search-box { flex: 1; min-width: 200px; }
+    /* A basis and a ceiling, where it had `flex: 1` and nothing else. The
+       search took every spare pixel of a 1090px row, so the two dates, the
+       status and the button were pushed onto lines of their own and the bar
+       read as five stacked filters rather than one row. */
+    .tx-filter-bar .cl-search-box { flex: 1 1 240px; min-width: 200px; max-width: 420px; }
+    /* These carry .cl-form-input / .cl-form-select, which are width:100% for
+       stacked forms, so in this flex row each one claimed the whole line and
+       the bar became five rows. A basis of its own and width:auto puts them
+       back beside each other. */
     .tx-filter-bar input[type="date"],
+    .tx-filter-bar input[type="text"],
     .tx-filter-bar select {
+        flex: 0 1 170px;
+        width: auto;
         min-width: 130px;
     }
     .tx-content-filter {
@@ -230,6 +252,7 @@
         @error('amount')<div style="color:var(--bad-text);font-size:12.5px;margin-bottom:10px;">{{ $message }}</div>@enderror
 
         @if($payouts->isNotEmpty())
+            <div class="tx-tablewrap">
             <table class="cl-table">
                 <thead><tr><th>Date</th><th>Amount</th><th>Method</th><th>Status</th></tr></thead>
                 <tbody>
@@ -243,6 +266,7 @@
                     @endforeach
                 </tbody>
             </table>
+            </div>
         @else
             <div style="font-size:12.5px;color:var(--text-muted);">No payouts yet. Request one above once you have available earnings.</div>
         @endif
@@ -322,6 +346,7 @@
                     <div class="cl-empty-text">All your financial transactions will be recorded here.</div>
                 </div>
             @else
+                <div class="tx-tablewrap">
                 <table class="cl-table">
                     <thead><tr><th>Date</th><th>Description</th><th>Type</th><th>Status</th><th class="text-end">Amount</th></tr></thead>
                     <tbody>
@@ -336,6 +361,7 @@
                         @endforeach
                     </tbody>
                 </table>
+                </div>
             @endif
 
             {{-- Pagination strip — visible even when empty so the UI scaffold matches the design --}}

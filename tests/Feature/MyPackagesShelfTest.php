@@ -61,6 +61,38 @@ class MyPackagesShelfTest extends TestCase
 
     // ── The bug that made drafts impossible ──────────────────────
 
+    /**
+     * The shelf used to return a 500 to any professional whose package listed
+     * a crew.
+     *
+     * `team` is cast to array and the chip echoed it straight out, so
+     * htmlspecialchars() threw. The booking form had already hit this and
+     * fixed it inline with a comment; this page went on doing it, which is
+     * why the reading of the column now lives on the model where a third view
+     * cannot repeat it.
+     */
+    public function test_a_package_with_a_crew_on_it_still_opens(): void
+    {
+        $pro = $this->pro();
+        $this->package($pro, [
+            'team' => ['1 Lead Photographer', '1 Videographer', '1 Floral Designer'],
+        ]);
+
+        $this->actingAs($pro)
+            ->get(route('professional.packages.index'))
+            ->assertOk()
+            ->assertSee('3 Professionals');
+    }
+
+    public function test_a_crew_saved_as_a_plain_string_is_read_the_same_way(): void
+    {
+        // Older rows were written this way, and the column still accepts it.
+        $package = $this->package($this->pro());
+        $package->forceFill(['team' => '1 Lead Photographer, 1 Videographer'])->save();
+
+        $this->assertSame(2, $package->fresh()->teamSize());
+    }
+
     public function test_save_as_draft_does_not_publish_the_package(): void
     {
         $pro = $this->pro();

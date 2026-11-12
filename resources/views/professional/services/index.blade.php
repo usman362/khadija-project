@@ -24,6 +24,9 @@
     .sp-head .sp-btn { flex:none; }
 
     .sp-layout { display:grid; grid-template-columns:minmax(0,1fr) 240px; gap:18px; align-items:start; }
+    /* A grid item's own minimum is its content, so the widest card in a
+       column still sets that column's width however the track is declared. */
+    .sp-layout > * { min-width: 0; }
 
     .sp-btn { display:inline-flex; align-items:center; gap:7px; font-size:13px; font-weight:700;
         padding:9px 15px; border-radius:9px; text-decoration:none; background:var(--accent-blue, #2563eb);
@@ -148,11 +151,14 @@
         color:var(--accent-blue, #2563eb); text-decoration:none; }
     .sp-link svg { width:13px; height:13px; }
 
-    @media (max-width: 1250px) { .sp-layout { grid-template-columns:1fr; } .sp-rail { position:static; } }
+    @media (max-width: 1250px) { .sp-layout { grid-template-columns:minmax(0,1fr); } .sp-rail { position:static; } }
     @media (max-width: 1100px) { .sp-cards { grid-template-columns:repeat(2, minmax(0,1fr)); } }
     @media (max-width: 1000px) { .sp-stats { grid-template-columns:repeat(2, minmax(0,1fr)); }
         .sp-tools { flex-wrap:wrap; } }
-    @media (max-width: 720px) { .sp-cards { grid-template-columns:1fr; } }
+    @media (max-width: 720px) { .sp-cards { grid-template-columns:minmax(0,1fr); } }
+    /* Two of these side by side still need about 430px between them, so on a
+       phone they went on over the right edge. */
+
 
     .sp-card { background:var(--bg-card); border:1px solid var(--border-color); border-radius:14px; padding:18px; margin-bottom:18px; }
     .sp-card > h2 { font-size:15px; font-weight:800; margin:0 0 4px; color:var(--text-primary); }
@@ -217,6 +223,26 @@
     textarea.sp-in { font-family: inherit; resize: vertical; }
     @media (max-width: 860px) { .sp-three, .sp-inline { grid-template-columns: 1fr; } }
     @media (max-width: 1000px) { .sp-row { grid-template-columns:1fr 1fr 1fr; } .sp-tools, .sp-add { grid-template-columns:1fr; } }
+
+    /* Last in the sheet on purpose.
+       `.sp-tools` declares flex-wrap:nowrap at line 169, AFTER the 1000px
+       media query that tries to set it to wrap, and at equal specificity the
+       later rule wins however narrow the screen gets. So the filter row never
+       wrapped and ran off the side of a phone, and a rule written anywhere
+       above this one would have lost the same argument. */
+    @media (max-width: 620px) {
+        .sp-stats { grid-template-columns:minmax(0,1fr); }
+
+        .sp-tools { flex-wrap:wrap; }
+        .sp-tools > * { flex:1 1 100%; min-width:0; }
+
+        .sp-cardhead { flex-wrap:wrap; }
+        .sp-cardhead .acts { flex:1 1 100%; }
+
+        /* Two columns, the field and its button, on a screen with room for
+           one. */
+        .sp-add { grid-template-columns:minmax(0,1fr); }
+    }
 </style>
 @endpush
 

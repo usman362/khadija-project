@@ -12,6 +12,26 @@ code.
 
 ## 2026-11-12 (professional side)
 
+### The professional side, checked page by page
+Every page of the professional portal opened and measured at phone width, the
+same check that found the faults on the client side.
+
+One page was broken outright: My Packages returned an error to any
+professional whose package listed a crew. The booking page had already hit the
+same fault months ago and worked around it in place, so this one went on
+failing. Both now read that information the same way, through one shared
+piece of code, so a third page cannot repeat it. While fixing it, it turned
+out the same field has been saved three different ways over the life of the
+site, which is now handled in that one place rather than guessed at by each
+page.
+
+Three more pages ran off the side of a phone: My Services & Pricing, Proposals
+& Bids, and Transactions. The Gig Operations Hub did too, and its wide table
+now scrolls instead of spilling.
+
+And one desktop fault found on the way: the filter row on Transactions put
+every control on its own line, so a row of five filters was five rows.
+
 ### Checking in on the day
 The Gig Operations Hub now opens with what is happening today, and the one
 action that belongs to the day itself: the professional marks that they are on

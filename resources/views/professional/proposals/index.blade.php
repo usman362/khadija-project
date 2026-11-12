@@ -87,7 +87,12 @@
     /* Her column widths. Fixed, because the client column has to stay wide
        enough for the name and the place to sit side by side: left to itself
        the browser squeezes it and every fact wraps onto a line of its own. */
-    .pp-table { table-layout:fixed; }
+    .pp-table { table-layout:fixed; min-width: 760px; }
+    /* Scrolls sideways rather than spilling. The column widths are fixed and
+       measured for a desktop card, so on a phone the table simply ran off the
+       page: 1231px of it on a 375px screen. The wrapper and its column need a
+       zero minimum or the table's own drags them both wide again. */
+    .pp-tablewrap { overflow-x: auto; min-width: 0; }
     .pp-table col.c-who  { width:300px; }
     .pp-table col.c-sm   { width:100px; }
     .pp-table col.c-md   { width:118px; }
@@ -400,6 +405,7 @@
             <button type="button" class="pp-clear" id="pp-none">Clear Selection</button>
         </div>
 
+        <div class="pp-tablewrap">
         <table class="pp-table">
             <colgroup>
                 <col style="width:22px;">
@@ -671,6 +677,7 @@
             @endforeach
             </tbody>
         </table>
+        </div>
     </form>
 
     <div class="pp-foot">

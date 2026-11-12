@@ -92,6 +92,87 @@ class Package extends Model
         return $tiers;
     }
 
+    /**
+     * The crew this package brings.
+     *
+     * `team` has been written three different ways over the life of this
+     * column, and all three are in the database:
+     *
+     *   an INTEGER, a bare count, which is what the My Packages design asks
+     *   for and what its test writes;
+     *   an ARRAY of role names, which the demo seeder writes and the booking
+     *   page prints;
+     *   a comma-separated STRING, from older rows.
+     *
+     * Every view that touched it worked out its own answer, and two of them
+     * got it wrong in opposite directions: the booking form fixed the array
+     * case inline and My Packages returned a 500 on it. Three readings of one
+     * column, so the reading lives here and a view asks for what it wants.
+     *
+     * The named roles, which a bare count does not have.
+     *
+     * @return array<int, string>
+     */
+    public function teamList(): array
+    {
+        $team = $this->team;
+
+        // A number is a count, not a name. It has no roles to list.
+        if (is_int($team) || (is_string($team) && is_numeric(trim($team)))) {
+            return [];
+        }
+
+        if (is_string($team)) {
+            $team = explode(',', $team);
+        }
+
+        return array_values(array_filter(array_map(
+            fn ($m) => trim((string) $m),
+            (array) $team,
+        )));
+    }
+
+    /** How many of them, whichever way the column was written. */
+    public function teamSize(): int
+    {
+        $team = $this->team;
+
+        if (is_int($team) || (is_string($team) && is_numeric(trim($team)))) {
+            return max(0, (int) $team);
+        }
+
+        // An array holding one number is a count that has been through a
+        // json cast, not a crew of one.
+        $list = $this->teamList();
+
+        if (count($list) === 1 && is_numeric($list[0])) {
+            return max(0, (int) $list[0]);
+        }
+
+        return count($list);
+    }
+
+    /**
+     * The line to print, for a page with room for one.
+     *
+     * Roles where we have them, and the count where we only have a number,
+     * rather than printing a bare "2" under a heading that says Team.
+     */
+    public function teamLine(): ?string
+    {
+        $list = $this->teamList();
+
+        if ($list !== []) {
+            return implode(', ', $list);
+        }
+
+        $size = $this->teamSize();
+
+        return $size > 0
+            ? $size . ' ' . \Illuminate\Support\Str::plural('Professional', $size)
+            : null;
+    }
+
     /** Does this package offer a choice, or one price? */
     public function hasTiers(): bool
     {

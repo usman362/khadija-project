@@ -66,6 +66,16 @@
         padding: 9px 15px; border-radius: 9px; background: var(--brand-text, #ea580c); color: #fff; }
     .goh-live-undo { flex: none; background: none; border: 0; cursor: pointer;
         font-size: 11.5px; font-weight: 700; color: var(--text-muted); text-decoration: underline; }
+
+    /* On a phone the three tabs and the Create New button do not fit on one
+       line, and the row does not wrap, so the button and its menu hung past
+       the right edge of the screen. */
+    @media (max-width: 620px) {
+        .goh-tabs { flex-wrap: wrap; row-gap: 6px; }
+        .goh-new { margin-left: 0; width: 100%; }
+        .goh-new > summary { width: 100%; justify-content: center; }
+        .goh-new ul { left: 0; right: 0; min-width: 0; }
+    }
 </style>
 @endpush
 

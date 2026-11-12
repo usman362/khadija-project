@@ -63,6 +63,12 @@
     .gh-tile .go svg { width:17px; height:17px; }
 
     .gh-layout { display:grid; grid-template-columns:minmax(0,1fr) 322px; gap:18px; align-items:start; }
+    /* The tracks are minmax(0,1fr), but the COLUMNS inside them are grid items
+       of their own with an auto minimum, so the widest thing in a column still
+       sets that column's width. The table scroller below is 560px wide by
+       design, and without this it dragged the whole left column to 598 on a
+       375px screen, taking every tile and card in it over the edge. */
+    .gh-layout > * { min-width: 0; }
     .gh-card { background:var(--bg-card); border:1px solid var(--border-color); border-radius:14px;
         padding:16px 18px; margin-bottom:16px; }
     .gh-card h3 { display:flex; align-items:center; justify-content:space-between; gap:12px;
@@ -77,7 +83,16 @@
 
     /* Fixed, or the browser re-sizes the columns to fit its own idea of the
        content and the colgroup above is ignored. Her widths then do not hold. */
-    .gh-table { width:100%; border-collapse:collapse; font-size:12.5px; table-layout:fixed; }
+    /* min-width: 0 on the scroller AND on the card holding it. Without it the
+       table's own min-width travels up through them: a grid item's minimum is
+       its content, so the card grew to 600px on a 375px screen and took every
+       tile beside it over the edge. The scroller has to be allowed to be
+       narrower than what it scrolls. */
+    .gh-tablewrap { overflow-x: auto; min-width: 0; }
+    .gh-card { min-width: 0; }
+    /* A minimum, so the fixed column widths have something real to divide up
+       on a narrow screen instead of crushing the last two to nothing. */
+    .gh-table { width:100%; min-width: 560px; border-collapse:collapse; font-size:12.5px; table-layout:fixed; }
     .gh-table th { text-align:left; font-size:11px; font-weight:700; color:var(--text-muted);
         padding:0 8px 9px; border-bottom:1px solid var(--border-color); white-space:nowrap; }
     .gh-table td { padding:9px 8px; border-bottom:1px solid var(--border-color);
@@ -216,6 +231,13 @@
                 {{-- Her column widths, measured off the 28 October file:
                      the card is 906px wide there and the headings sit at
                      +0 / +241 / +332 / +488 / +720 / +819. --}}
+                {{-- Scrolls sideways rather than spilling. The column widths
+                     below are measured off a 906px card, and table-layout
+                     fixed holds them, so on a phone the last two columns and
+                     their buttons simply hung outside the card. Every other
+                     wide table on this site is in a scroller; this one was
+                     not. --}}
+                <div class="gh-tablewrap">
                 <table class="gh-table">
                     <colgroup>
                         <col style="width:28.4%;"><col style="width:10.0%;"><col style="width:17.3%;">
@@ -330,6 +352,7 @@
                     @endforeach
                     </tbody>
                 </table>
+                </div>
             @else
                 <p class="gh-none">No gigs yet. One appears here as soon as a client books you.</p>
             @endif

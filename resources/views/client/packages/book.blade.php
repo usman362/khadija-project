@@ -166,8 +166,10 @@
                 <div class="pb-line"><span class="l">Duration</span><span class="v">{{ $package->duration }}</span></div>
             @endif
             @php
-                // `team` is cast to array on the model — printing it raw threw.
-                $team = is_array($package->team) ? implode(', ', $package->team) : $package->team;
+                // Through the model, so this page and My Packages read the
+                // column the same way. It was fixed here alone once, and the
+                // other page went on throwing on it.
+                $team = $package->teamLine();
             @endphp
             @if ($team)
                 <div class="pb-line"><span class="l">Team</span><span class="v">{{ $team }}</span></div>
