@@ -10,6 +10,24 @@ code.
 
 ---
 
+## 2026-11-12 (professional side)
+
+### A package can now be sold at more than one level
+From the sprint checklist. A professional building a package could set one
+price and say how to read it, hourly or flat or starting-at. They can now offer
+two or three levels instead, like Silver and Gold, each with its own price and
+a line saying what makes it different.
+
+The client sees the levels on the package page, each with its own button, and
+the booking form opens on whichever one they clicked with the total matching.
+Changing their mind on the form changes the total as they do it.
+
+One decision worth recording: once a package has levels, the price shown on
+the cards and in search is taken from the cheapest level rather than typed
+separately. Otherwise a professional could advertise a figure the package
+cannot actually be bought at, which is the sort of thing a client notices at
+exactly the wrong moment.
+
 ## 2026-11-12
 
 ### Pages running off the side of a phone

@@ -27,10 +27,11 @@ use Illuminate\View\View;
  *
  * This is the purchase path. What it deliberately does NOT do:
  *
- *  - It does not invent tiers or priced add-ons. The Owner has not decided
- *    those, so the client is charged the package's own listed price and
- *    nothing else. When tiers land, they add lines here; they do not change
- *    the shape of the flow.
+ *  - It does not invent a price. A package with levels is sold at the level
+ *    the client chose and one without at its own listed figure, both read
+ *    from the package itself. Levels landed on 2026-11-12 and did exactly
+ *    what the note here said they would: they added lines, and left the shape
+ *    of the flow alone.
  *  - It does not take payment. There is no payment provider wired to this app,
  *    so the confirmation screen says what is owed and how it will be
  *    collected, and never implies money has moved.
@@ -83,7 +84,13 @@ class ClientPackageBookingController extends Controller
         $chosen = $request->query('date');
         $chosenBusy = $chosen && in_array($chosen, $busy, true);
 
-        return view('client.packages.book', compact('package', 'pro', 'busy', 'chosen', 'chosenBusy'));
+        // The level they clicked on the package page, if it offers any. Looked
+        // up by name rather than trusted: the query string is the client's to
+        // edit, and the price has to come from the package either way.
+        $tiers = $package->tierList();
+        $tier  = $package->tierNamed($request->query('tier')) ?? ($tiers[0] ?? null);
+
+        return view('client.packages.book', compact('package', 'pro', 'busy', 'chosen', 'chosenBusy', 'tiers', 'tier'));
     }
 
     public function store(Request $request, Package $package): RedirectResponse
@@ -97,6 +104,7 @@ class ClientPackageBookingController extends Controller
             'location'    => ['nullable', 'string', 'max:255', new \App\Rules\PlaceNotALink, new \App\Rules\PlausibleAddress(requireNumber: false)],
             'guests'      => ['nullable', 'integer', 'min:1', 'max:100000'],
             'notes'       => ['nullable', 'string', 'max:1000'],
+            'tier'        => ['nullable', 'string', 'max:40'],
             'agree'       => ['accepted'],
         ], [
             'agree.accepted' => 'Please confirm you have read what is included before booking.',
@@ -119,7 +127,24 @@ class ClientPackageBookingController extends Controller
                 ->withErrors(['date' => 'You already have a request with this professional on that date.']);
         }
 
-        $booking = DB::transaction(function () use ($client, $package, $validated, $date) {
+        /*
+         * What this costs, decided here and not in the form.
+         *
+         * A package with levels is sold at the level the client picked; one
+         * without is sold at its own price. Resolved from the package by name,
+         * so a client editing the hidden field buys a level that exists or the
+         * cheapest one, never a price of their own choosing.
+         */
+        $tier  = $package->tierNamed($validated['tier'] ?? null);
+        $tiers = $package->tierList();
+
+        if ($tier === null && $tiers !== []) {
+            $tier = $tiers[0];
+        }
+
+        $price = $tier['price'] ?? $package->price;
+
+        $booking = DB::transaction(function () use ($client, $package, $validated, $date, $tier, $price) {
             /*
              * A booking needs an event. For a package purchase the client never
              * wrote a brief, so the event is built from what they did give us
@@ -147,12 +172,13 @@ class ClientPackageBookingController extends Controller
                 'supplier_id' => $package->user_id,
                 'created_by'  => $client->id,
                 'status'      => 'requested',
-                'price'       => $package->price,
+                'price'       => $price,
                 'currency'    => 'USD',
                 'booked_at'   => $date,
                 'source'      => 'package',
                 'notes'       => trim(
                     'Package: '.$package->title
+                    .($tier ? ' ('.$tier['name'].')' : '')
                     .(($validated['notes'] ?? null) ? "\n\n".$validated['notes'] : '')
                 ),
             ]);
@@ -209,7 +235,7 @@ class ClientPackageBookingController extends Controller
              */
             \App\Domain\Money\Ledger::record(
                 \App\Models\LedgerEntry::BOOKING_CHARGE,
-                (float) $package->price,
+                (float) $price,
                 '+',
                 party: $client,
                 event: $event,

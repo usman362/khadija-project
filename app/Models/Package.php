@@ -10,7 +10,7 @@ class Package extends Model
 {
     protected $fillable = [
         'user_id', 'category_id', 'services', 'event_types',
-        'title', 'purpose', 'slug', 'type', 'description', 'price', 'price_unit', 'duration',
+        'title', 'purpose', 'slug', 'type', 'description', 'price', 'price_unit', 'tiers', 'duration',
         'coverage', 'team', 'guests', 'guests_max', 'serves_regions', 'availability', 'savings_pct',
         'includes', 'images', 'is_active', 'status', 'sort_order',
         // Rule R38, Option B — a package is bookable only in its owner's own
@@ -59,12 +59,66 @@ class Package extends Model
         'team'       => 'array',
         'includes'   => 'array',
         'images'     => 'array',
+        'tiers'      => 'array',
         'is_active'  => 'boolean',
         'price'      => 'integer',
         'guests_max' => 'integer',
         'savings_pct' => 'integer',
         'sort_order' => 'integer',
     ];
+
+    /**
+     * The tiers a client chooses between, cheapest first.
+     *
+     * Always sorted here rather than trusting the order they were typed in:
+     * a list of levels that does not climb reads as a mistake, and the first
+     * one is the figure the card shows.
+     *
+     * @return array<int, array{name: string, price: int, blurb: ?string}>
+     */
+    public function tierList(): array
+    {
+        $tiers = collect($this->tiers ?: [])
+            ->filter(fn ($t) => is_array($t) && trim((string) ($t['name'] ?? '')) !== '' && (int) ($t['price'] ?? 0) > 0)
+            ->map(fn ($t) => [
+                'name'  => trim((string) $t['name']),
+                'price' => (int) $t['price'],
+                'blurb' => trim((string) ($t['blurb'] ?? '')) ?: null,
+            ])
+            ->sortBy('price')
+            ->values()
+            ->all();
+
+        return $tiers;
+    }
+
+    /** Does this package offer a choice, or one price? */
+    public function hasTiers(): bool
+    {
+        return count($this->tierList()) > 1;
+    }
+
+    /**
+     * One tier by name, for a client who has picked one.
+     *
+     * By name and not by position, because a professional can reorder or
+     * reprice their tiers between a client opening the page and submitting
+     * the form, and a position would then buy them something else.
+     */
+    public function tierNamed(?string $name): ?array
+    {
+        if ($name === null || $name === '') {
+            return null;
+        }
+
+        foreach ($this->tierList() as $tier) {
+            if (mb_strtolower($tier['name']) === mb_strtolower(trim($name))) {
+                return $tier;
+            }
+        }
+
+        return null;
+    }
 
     public function user(): BelongsTo
     {

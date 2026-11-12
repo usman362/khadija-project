@@ -16,6 +16,11 @@
     $pServices   = old('services', $p?->services ?? []);
     $pEventTypes = old('event_types', $p?->event_types ?? []);
     $pIncludes   = old('includes', $p?->includes ?? []);
+    /* Always three rows. A professional offering two levels leaves the last
+       one empty and the controller drops it; an empty repeater with an "add"
+       button hides the feature behind a click. */
+    $pTiers = old('tiers', $p?->tierList() ?? []);
+    $pTiers = array_pad(array_values((array) $pTiers), 3, ['name' => '', 'price' => '', 'blurb' => '']);
     $gMin = old('guest_min'); $gMax = old('guest_max');
 
     /*
@@ -53,6 +58,13 @@
 
     /* Her stepper: the number sits above its label, and the line runs
        between the circles rather than between the whole blocks. */
+    .pc-tiers { margin-top: 18px; padding-top: 16px; border-top: 1px solid var(--border-color); }
+    .pc-tiers-h b { display: block; font-size: 13px; font-weight: 800; color: var(--text-primary); }
+    .pc-tiers-h span { display: block; font-size: 11.5px; color: var(--text-muted); margin: 2px 0 12px; }
+    .pc-tier-row { display: grid; grid-template-columns: minmax(0,1fr) minmax(0,110px) minmax(0,1.4fr);
+        gap: 10px; margin-bottom: 9px; }
+    @media (max-width: 760px) { .pc-tier-row { grid-template-columns: minmax(0, 1fr); } }
+
     .pc-stepper { display: flex; align-items: flex-start; background: var(--bg-card);
         border: 1px solid var(--border-color); border-radius: 14px; padding: 18px 20px 16px; margin-bottom: 20px; }
     .pc-own { margin-top: 10px; padding: 10px 12px; border: 1px solid var(--border-color); border-radius: 10px; background: var(--bg-card-hover, transparent); }
@@ -670,6 +682,33 @@
                         <div class="pc-field">
                             <label>Duration</label>
                             <input type="text" name="duration" class="pc-input" maxlength="60" value="{{ old('duration', $p?->duration) }}" placeholder="Full day">
+                        </div>
+                    </div>
+
+                    {{-- Levels. Optional, and the whole block says so, because a
+                         professional with one price should not feel they have
+                         left something blank. --}}
+                    <div class="pc-tiers">
+                        <div class="pc-tiers-h">
+                            <b>Offer more than one level</b>
+                            <span>Optional. Give a client a choice of two or three, like Silver and Gold. Leave it empty to sell one price.</span>
+                        </div>
+                        @foreach($pTiers as $i => $t)
+                            <div class="pc-tier-row">
+                                <input type="text" name="tiers[{{ $i }}][name]" class="pc-input" maxlength="40"
+                                       value="{{ $t['name'] ?? '' }}" placeholder="{{ ['Silver','Gold','Platinum'][$i] ?? 'Level name' }}"
+                                       aria-label="Level {{ $i + 1 }} name">
+                                <input type="number" name="tiers[{{ $i }}][price]" class="pc-input" min="1" max="10000000"
+                                       value="{{ $t['price'] ?? '' }}" placeholder="Price" aria-label="Level {{ $i + 1 }} price">
+                                <input type="text" name="tiers[{{ $i }}][blurb]" class="pc-input" maxlength="120"
+                                       value="{{ $t['blurb'] ?? '' }}" placeholder="What makes this one different"
+                                       aria-label="Level {{ $i + 1 }} description">
+                            </div>
+                        @endforeach
+                        <div class="hint">
+                            A level needs a name and a price to count. Once you add levels, the price above
+                            becomes the cheapest of them and the card reads "Starting at", so clients are
+                            never shown a figure they cannot buy at.
                         </div>
                     </div>
                 </div>

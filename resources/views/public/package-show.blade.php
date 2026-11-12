@@ -91,6 +91,18 @@
     .pk-f input, .pk-f select { width: 100%; border: 1px solid var(--line); border-radius: 10px; padding: 10px 12px; font-size: 13.5px; font-family: inherit; color: var(--ink); background: #fff; }
     .pk-cta { display: block; width: 100%; text-align: center; padding: 12px; border-radius: 11px; font-weight: 800; font-size: 14.5px; border: none; cursor: pointer; font-family: inherit; }
     .pk-cta-primary { background: var(--orange); color: #fff; }
+
+    /* The levels. Each is its own card with its own button, because the
+       choice and the action have to be the same click. */
+    .pk-tiers { display: grid; gap: 9px; margin-top: 4px; }
+    .pk-tier { border: 1px solid var(--line, #e2e8f0); border-radius: 12px; padding: 12px 13px; }
+    .pk-tier-top { display: flex; align-items: baseline; justify-content: space-between; gap: 10px; }
+    .pk-tier-top b { font-size: 13.5px; font-weight: 800; }
+    .pk-tier-top span { font-size: 15px; font-weight: 800; color: var(--orange); white-space: nowrap; }
+    .pk-tier p { font-size: 11.5px; color: var(--muted); margin: 5px 0 0; line-height: 1.5; }
+    .pk-tier-go { display: block; text-align: center; margin-top: 10px; padding: 8px 10px;
+        border-radius: 9px; background: var(--orange); color: #fff; font-size: 12.5px;
+        font-weight: 800; text-decoration: none; }
     .pk-cta-primary:hover { background: var(--orange-dark); }
     .pk-cta-ghost { border: 1px solid var(--line); color: var(--ink); background: #fff; margin-top: 9px; }
     .pk-mini { display: flex; gap: 8px; margin-top: 10px; }
@@ -336,8 +348,43 @@
                                 : route('login');
                         @endphp
 
+                        {{-- The levels, when there are any. Shown here rather than
+                             further down the page because this is the decision:
+                             a client choosing between Silver and Gold is choosing
+                             before they click, not after. --}}
+                        @if ($package->hasTiers())
+                            <div class="pk-tiers">
+                                @foreach ($package->tierList() as $__t)
+                                    <div class="pk-tier">
+                                        <div class="pk-tier-top">
+                                            <b>{{ $__t['name'] }}</b>
+                                            <span>${{ number_format($__t['price'], 0) }}</span>
+                                        </div>
+                                        @if ($__t['blurb'])
+                                            <p>{{ $__t['blurb'] }}</p>
+                                        @endif
+                                        @unless ($isOwner)
+                                            <a class="pk-tier-go"
+                                               href="{{ route('client.packages.book', array_filter([
+                                                   'package' => $package->id,
+                                                   'date'    => $checkDate ?: null,
+                                                   'tier'    => $__t['name'],
+                                               ])) }}">Choose {{ $__t['name'] }}</a>
+                                        @endunless
+                                    </div>
+                                @endforeach
+                            </div>
+                        @endif
+
                         @if ($isOwner)
                             <a class="pk-cta pk-cta-ghost" href="{{ route('professional.packages.index') }}">This is your package · manage it</a>
+                        @elseif ($package->hasTiers())
+                            {{-- No second Book button under the levels: two ways to
+                                 buy, one of which quietly picks for them, is the
+                                 fault this whole feature exists to avoid. --}}
+                            <div style="font-size:11.5px;color:var(--muted);margin-top:7px;text-align:center;line-height:1.5;">
+                                You are not charged when you send it: {{ $pro?->name ?? 'the professional' }} confirms the date first.
+                            </div>
                         @else
                             <a class="pk-cta pk-cta-primary" href="{{ $bookUrl }}">Book this package · ${{ number_format((float) $package->price, 0) }}</a>
                             <div style="font-size:11.5px;color:var(--muted);margin-top:7px;text-align:center;line-height:1.5;">

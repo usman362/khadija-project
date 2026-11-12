@@ -20,6 +20,15 @@
     .pb-err { font-size: 11.5px; color: var(--bad-text); font-weight: 600; margin-top: 4px; }
     .pb-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
     @media (max-width: 620px) { .pb-row { grid-template-columns: 1fr; } }
+    .pb-tier { display: flex; align-items: center; gap: 11px; padding: 11px 13px; margin-bottom: 8px;
+        border: 1px solid var(--border-color); border-radius: 11px; cursor: pointer; }
+    .pb-tier:has(input:checked) { border-color: var(--brand-text, #ea580c); background: rgba(249,115,22,.06); }
+    .pb-tier input { margin: 0; flex: none; }
+    .pb-tier-body { flex: 1 1 auto; min-width: 0; }
+    .pb-tier-body b { display: block; font-size: 13px; font-weight: 800; color: var(--text-primary); }
+    .pb-tier-body span { display: block; font-size: 11.5px; color: var(--text-muted); margin-top: 2px; line-height: 1.45; }
+    .pb-tier-price { font-size: 14.5px; font-weight: 800; color: var(--text-primary); white-space: nowrap; }
+
     .pb-check { display: flex; gap: 9px; align-items: flex-start; font-size: 12.5px; color: var(--text-primary); }
     .pb-check input { margin-top: 2px; }
     .pb-submit { width: 100%; padding: 12px 16px; border: 0; border-radius: 10px; background: var(--brand-text, #f97316);
@@ -92,6 +101,27 @@
             </div>
         </div>
 
+        @if (count($tiers ?? []) > 1)
+            <div class="pb-card">
+                <h2 class="pb-h">Which level</h2>
+                <p style="font-size:12.5px;color:var(--text-muted);margin:0 0 12px;line-height:1.5;">
+                    {{ $pro?->name }} offers this package at more than one level. The total updates to match.
+                </p>
+                @foreach ($tiers as $__t)
+                    <label class="pb-tier {{ ($tier['name'] ?? null) === $__t['name'] ? 'on' : '' }}">
+                        <input type="radio" name="tier" value="{{ $__t['name'] }}"
+                               @checked(old('tier', $tier['name'] ?? null) === $__t['name'])>
+                        <span class="pb-tier-body">
+                            <b>{{ $__t['name'] }}</b>
+                            @if ($__t['blurb'])<span>{{ $__t['blurb'] }}</span>@endif
+                        </span>
+                        <span class="pb-tier-price">${{ number_format($__t['price'], 0) }}</span>
+                    </label>
+                @endforeach
+                @error('tier')<div class="pb-err">{{ $message }}</div>@enderror
+            </div>
+        @endif
+
         <div class="pb-card">
             <h2 class="pb-h">Before you send</h2>
 
@@ -146,17 +176,18 @@
                 <div class="pb-line"><span class="l">Coverage</span><span class="v">{{ $package->coverage }}</span></div>
             @endif
 
+            {{-- The figure follows the level chosen above, and says which one,
+                 because a total with no label is the thing a client disputes. --}}
             <div class="pb-total">
-                <span class="l">Package price</span>
-                <span class="v">${{ number_format((float) $package->price, 2) }}</span>
+                <span class="l">{{ ($tier['name'] ?? null) ? $tier['name'].' price' : 'Package price' }}</span>
+                <span class="v" data-pb-total>${{ number_format((float) ($tier['price'] ?? $package->price), 2) }}</span>
             </div>
-            @if ($package->price_unit)
+            @if (! count($tiers ?? []) && $package->price_unit)
                 <div style="font-size:11.5px;color:var(--text-muted);text-align:right;margin-top:2px">{{ $package->price_unit }}</div>
             @endif
 
-            {{-- No tiers, no add-ons, no fee line. None of those has been
-                 decided, and a number on this screen is a number the client
-                 will hold us to. --}}
+            {{-- No add-ons and no fee line. Neither has been decided, and a
+                 number on this screen is a number the client will hold us to. --}}
             <div style="font-size:11.5px;color:var(--text-muted);margin-top:10px;line-height:1.5">
                 This is the professional's own listed price for everything below. Nothing is added at this step.
             </div>
@@ -180,4 +211,28 @@
         </div>
     </aside>
 </div>
+@push('scripts')
+<script>
+    /* The total above is rendered by the server for the level the page opened
+       on. Changing the radio without this would leave the figure describing a
+       level they are no longer buying, and the server would then charge the
+       one they picked: two different numbers for one booking. */
+    (function () {
+        var out = document.querySelector('[data-pb-total]');
+        if (!out) return;
+        var label = out.previousElementSibling;
+        document.querySelectorAll('input[name="tier"]').forEach(function (r) {
+            r.addEventListener('change', function () {
+                var row = r.closest('.pb-tier');
+                var price = row.querySelector('.pb-tier-price');
+                var name = row.querySelector('.pb-tier-body b');
+                if (price) out.textContent = price.textContent.trim() + '.00';
+                if (label && name) label.textContent = name.textContent.trim() + ' price';
+                document.querySelectorAll('.pb-tier').forEach(function (t) { t.classList.remove('on'); });
+                row.classList.add('on');
+            });
+        });
+    })();
+</script>
+@endpush
 @endsection

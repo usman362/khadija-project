@@ -406,6 +406,13 @@ class ProfessionalPackageController extends Controller
             'event_types.*'   => ['string', 'max:60'],
             'price'           => ['nullable', 'integer', 'min:0', 'max:10000000'],
             'price_unit'      => ['nullable', 'in:flat,from,hourly'],
+            // Tiers are optional and capped at three. More than three is a
+            // price list, and a client comparing five levels on a phone picks
+            // none of them.
+            'tiers'           => ['nullable', 'array', 'max:3'],
+            'tiers.*.name'    => ['nullable', 'string', 'max:40'],
+            'tiers.*.price'   => ['nullable', 'integer', 'min:1', 'max:10000000'],
+            'tiers.*.blurb'   => ['nullable', 'string', 'max:120'],
             'duration'        => ['nullable', 'string', 'max:60'],
             'coverage'        => ['nullable', 'string', 'max:80'],
             'guest_min'       => ['nullable', 'integer', 'min:0', 'max:1000000'],
@@ -489,9 +496,28 @@ class ProfessionalPackageController extends Controller
             ->map(fn ($s) => trim((string) $s))->filter()
             ->intersect(self::EVENT_TYPES)->values()->all();
 
-        return [
+        $tiers = $this->cleanTiers($request->input('tiers'));
+
+        /*
+         * With tiers, the headline price is the cheapest of them.
+         *
+         * `price` is the column every listing, filter, sort and search card
+         * reads, and it is the one a client sees before they open anything.
+         * If a professional typed 3250 there and then priced their levels at
+         * 1800, 2600 and 3900, the package would be advertised at a figure it
+         * cannot be bought for. Derived rather than asked for, so the two can
+         * never disagree, and the basis goes with it: a package with levels is
+         * a "starting at" package by definition.
+         */
+        $derivedPrice = $tiers === [] ? [] : [
+            'price'      => $tiers[0]['price'],
+            'price_unit' => 'from',
+        ];
+
+        return $derivedPrice + [
             'services'        => $services,
             'event_types'     => $eventTypes,
+            'tiers'           => $tiers ?: null,
             // Packages are solo-only (Team/Co-Op combined-force removed platform-wide).
             // coop_partner_id used to be forced to null here; the column is gone.
             'type'            => 'solo',
@@ -499,6 +525,31 @@ class ProfessionalPackageController extends Controller
             'includes'        => $this->cleanList($request->input('includes')),
             'guests'          => $this->guestLabel($request->integer('guest_min'), $request->integer('guest_max')),
         ];
+    }
+
+    /**
+     * The tiers worth keeping: a name and a price, cheapest first.
+     *
+     * A half-filled row is dropped rather than refused. The repeater always
+     * renders three, so a professional who wants two leaves the last one
+     * empty, and failing validation on a row they deliberately left blank
+     * would be the form arguing with them.
+     *
+     * @return array<int, array{name: string, price: int, blurb: ?string}>
+     */
+    private function cleanTiers($raw): array
+    {
+        return collect((array) $raw)
+            ->map(fn ($t) => [
+                'name'  => trim((string) ($t['name'] ?? '')),
+                'price' => (int) ($t['price'] ?? 0),
+                'blurb' => trim((string) ($t['blurb'] ?? '')) ?: null,
+            ])
+            ->filter(fn ($t) => $t['name'] !== '' && $t['price'] > 0)
+            ->unique('name')
+            ->sortBy('price')
+            ->values()
+            ->all();
     }
 
     /** Turn min/max guest inputs into a display label, e.g. "50–150" / "Up to 150". */
