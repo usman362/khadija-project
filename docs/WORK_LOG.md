@@ -12,6 +12,30 @@ code.
 
 ## 2026-11-12 (professional side)
 
+### Four screens that were built, working, and empty
+Agreements, Messages, Disputes and Availability all opened correctly and said
+there was nothing to show, because for the demonstration accounts there
+genuinely was nothing. In a demonstration that is indistinguishable from
+unfinished.
+
+Each now has something real behind it, on every demonstration professional
+rather than a chosen few:
+
+- Three agreements at the three stages the page exists to tell apart: one
+  waiting on the professional, one on the client, one signed by both.
+- A message thread with a real client about a real booking, with the client
+  speaking last, so the "awaiting your reply" count means something.
+- One dispute, filed and responded to, at the first of the four stages.
+- A working calendar: days marked available, days marked unavailable, days
+  already booked, and days not answered yet, which an empty calendar cannot
+  tell apart.
+
+Two mistakes of my own on the way, both caught before they mattered. The
+Agreements page reads a different record than the one I first filled, so three
+agreements existed and the page still said none. And the calendar entries were
+being created afresh on every run, which an existing test for exactly that
+caught.
+
 ### The service card, the way the owner drew it
 On My Services & Pricing, the service name now sits inside the coloured band
 with the status beside it, and the category line underneath is gone.

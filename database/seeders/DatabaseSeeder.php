@@ -73,6 +73,10 @@ class DatabaseSeeder extends Seeder
 
             // ── Things that hang off a booking, so they come after the gigs ──
             DemoDisputesSeeder::class,
+            // Agreements, message threads, a dispute and a working calendar:
+            // the four professional screens that were built and empty, which
+            // in a demonstration looks the same as unfinished.
+            DemoProfessionalActivitySeeder::class,
             DemoFormSubmissionsSeeder::class,
 
             // ── Influencer programme ──
