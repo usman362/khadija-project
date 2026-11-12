@@ -701,6 +701,19 @@ Route::middleware('auth')->group(function () {
         Route::post('/{case}/escalate', [$d, 'requestOutsideEscalation'])->name('escalate');
     });
 
+    /*
+     * Check-in on the day, both directions.
+     *
+     * One pair of routes rather than one per portal, for the same reason
+     * disputes and cancellations have one: the professional saying they are
+     * on site and the client agreeing are the same action from two sides, and
+     * the rule about WHEN it may happen has to live in one place.
+     */
+    Route::post('/bookings/{booking}/check-in', [\App\Http\Controllers\Bookings\CheckInController::class, 'store'])
+        ->name('bookings.check-in');
+    Route::delete('/bookings/{booking}/check-in', [\App\Http\Controllers\Bookings\CheckInController::class, 'destroy'])
+        ->name('bookings.check-in.undo');
+
     // ── Cancellations, both directions (checklist row 155) ────────
     //
     // One set of routes for both parties, like disputes: a client cancelling

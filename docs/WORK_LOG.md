@@ -12,6 +12,20 @@ code.
 
 ## 2026-11-12 (professional side)
 
+### Checking in on the day
+The Gig Operations Hub now opens with what is happening today, and the one
+action that belongs to the day itself: the professional marks that they are on
+site. The client sees it on their booking and can confirm it.
+
+Recorded as two separate facts rather than one. The professional saying they
+have arrived is a claim and the client agreeing is a confirmation, and if
+there is ever an argument about a morning, the difference between those two is
+the whole of it.
+
+It can only be done on the day of the event, only by the two people involved,
+and only once. A mistaken tap can be undone the same day; after that it is a
+record of what happened rather than something to tidy up.
+
 ### A package can now be sold at more than one level
 From the sprint checklist. A professional building a package could set one
 price and say how to read it, hourly or flat or starting-at. They can now offer

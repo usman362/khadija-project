@@ -47,10 +47,67 @@
     .goh-new li a { display: block; padding: 9px 11px; border-radius: 8px; font-size: 12.5px;
         font-weight: 600; color: var(--text-primary); text-decoration: none; }
     .goh-new li a:hover { background: var(--bg-card-hover, rgba(128,128,128,.1)); }
+
+    /* Today. Above the tabs because it belongs to the whole page, and
+       because at nine in the morning it is the only part that matters. */
+    .goh-today { background: var(--bg-card); border: 1px solid var(--border-color);
+        border-radius: 14px; padding: 16px 18px; margin-bottom: 14px; }
+    .goh-today-h { display: flex; align-items: baseline; gap: 9px; margin: 0 0 12px; }
+    .goh-today-h b { font-size: 14px; font-weight: 800; color: var(--text-primary); }
+    .goh-today-h span { font-size: 12px; color: var(--text-muted); }
+    .goh-live { display: flex; align-items: center; gap: 14px; flex-wrap: wrap;
+        padding: 12px 0; border-top: 1px solid var(--border-color); }
+    .goh-live:first-of-type { border-top: 0; padding-top: 0; }
+    .goh-live-main { flex: 1 1 240px; min-width: 0; }
+    .goh-live-main b { display: block; font-size: 13.5px; font-weight: 800; color: var(--text-primary); }
+    .goh-live-main span { display: block; font-size: 11.5px; color: var(--text-muted); margin-top: 2px; }
+    .goh-live-state { font-size: 11.5px; color: var(--text-muted); flex: none; }
+    .goh-live-btn { flex: none; border: 0; cursor: pointer; font-size: 12.5px; font-weight: 800;
+        padding: 9px 15px; border-radius: 9px; background: var(--brand-text, #ea580c); color: #fff; }
+    .goh-live-undo { flex: none; background: none; border: 0; cursor: pointer;
+        font-size: 11.5px; font-weight: 700; color: var(--text-muted); text-decoration: underline; }
 </style>
 @endpush
 
 @section('content')
+
+    {{-- Today's gigs, and the one action that belongs to the day itself. --}}
+    @if(($liveToday ?? collect())->isNotEmpty())
+        <div class="goh-today">
+            <p class="goh-today-h">
+                <b>Happening today</b>
+                <span>{{ $liveToday->count() }} {{ \Illuminate\Support\Str::plural('gig', $liveToday->count()) }}</span>
+            </p>
+
+            @foreach($liveToday as $live)
+                <div class="goh-live">
+                    <span class="goh-live-main">
+                        <b>{{ $live->event?->title ?? 'Untitled event' }}</b>
+                        <span>
+                            {{ $live->client?->name ?? 'Client' }}
+                            @if($live->event?->starts_at) · {{ $live->event->starts_at->format('g:i A') }} @endif
+                            @if($live->event?->location) · {{ $live->event->location }} @endif
+                        </span>
+                    </span>
+
+                    {{-- Says only what was recorded, and who recorded it. --}}
+                    <span class="goh-live-state">{{ $live->checkInLine() }}</span>
+
+                    @if($live->hasCheckedIn(auth()->user()))
+                        <form method="POST" action="{{ route('bookings.check-in.undo', $live) }}">
+                            @csrf @method('DELETE')
+                            <button type="submit" class="goh-live-undo">Undo check-in</button>
+                        </form>
+                    @elseif($live->canCheckIn(auth()->user()))
+                        <form method="POST" action="{{ route('bookings.check-in', $live) }}">
+                            @csrf
+                            <button type="submit" class="goh-live-btn">I am on site</button>
+                        </form>
+                    @endif
+                </div>
+            @endforeach
+        </div>
+    @endif
 
     <div class="goh-tabs">
         @foreach($tabs as $key => [$label, $hint])

@@ -209,6 +209,8 @@ class Booking extends Model
             'archived_at' => 'datetime',
             'point_of_contact_set_at' => 'datetime',
             'attendance_confirmed_at' => 'datetime',
+            'supplier_checked_in_at' => 'datetime',
+            'client_checked_in_at' => 'datetime',
             'price' => 'decimal:2',
         ];
     }
@@ -297,6 +299,73 @@ class Booking extends Model
     public function upgrades(): HasMany
     {
         return $this->hasMany(BookingUpgrade::class);
+    }
+
+    // ── Check-in on the day ──────────────────────────────────
+
+    /**
+     * Whether a check-in can be recorded on this booking right now, and by
+     * this person.
+     *
+     * Three conditions, and each is the honest one:
+     *
+     *   The booking is live. A requested gig nobody has accepted and a
+     *   cancelled one are not events anybody turns up to.
+     *
+     *   It is the day of the event. A check-in a week early records nothing
+     *   that happened, and this column is only worth having if it is true.
+     *
+     *   They are one of the two parties. The professional marks that they are
+     *   on site; the client confirms it. Nobody else has anything to say.
+     */
+    public function canCheckIn(?User $user): bool
+    {
+        if (! $user || ! in_array($this->status, ['confirmed', 'in_progress'], true)) {
+            return false;
+        }
+
+        if (! in_array($user->id, [$this->supplier_id, $this->client_id], true)) {
+            return false;
+        }
+
+        $day = $this->event?->starts_at ?? $this->booked_at;
+
+        // No date on the booking means nothing can say today is the day.
+        return $day !== null && $day->isSameDay(now());
+    }
+
+    /** The column this person's check-in is written to, if they have one. */
+    public function checkInColumnFor(?User $user): ?string
+    {
+        return match (true) {
+            $user && $user->id === $this->supplier_id => 'supplier_checked_in_at',
+            $user && $user->id === $this->client_id   => 'client_checked_in_at',
+            default => null,
+        };
+    }
+
+    /** Has this person checked in already? */
+    public function hasCheckedIn(?User $user): bool
+    {
+        $column = $this->checkInColumnFor($user);
+
+        return $column !== null && $this->{$column} !== null;
+    }
+
+    /**
+     * Who is on site, as a short line for either party to read.
+     *
+     * Says only what was recorded. "Nobody has checked in" is an answer, and
+     * a truer one than an empty space.
+     */
+    public function checkInLine(): string
+    {
+        return match (true) {
+            $this->supplier_checked_in_at && $this->client_checked_in_at => 'On site, confirmed by both',
+            (bool) $this->supplier_checked_in_at => 'The professional has checked in',
+            (bool) $this->client_checked_in_at   => 'The client has marked them as arrived',
+            default => 'Nobody has checked in yet',
+        };
     }
 
     /** Price plus confirmed upgrades. Computed, never stored. */

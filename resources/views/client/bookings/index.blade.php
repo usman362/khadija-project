@@ -526,6 +526,27 @@
                         </div>
                     </div>
 
+                    {{-- On the day, and only on the day. The client confirms
+                         the professional turned up; the line above the button
+                         says what has actually been recorded so far and by
+                         whom, rather than implying anything. --}}
+                    @if($booking->canCheckIn(auth()->user()) || $booking->supplier_checked_in_at)
+                        <div class="bk-checkin">
+                            <span>{{ $booking->checkInLine() }}</span>
+                            @if($booking->hasCheckedIn(auth()->user()))
+                                <form method="POST" action="{{ route('bookings.check-in.undo', $booking) }}">
+                                    @csrf @method('DELETE')
+                                    <button type="submit" class="bk-checkin-undo">Undo</button>
+                                </form>
+                            @elseif($booking->canCheckIn(auth()->user()))
+                                <form method="POST" action="{{ route('bookings.check-in', $booking) }}">
+                                    @csrf
+                                    <button type="submit" class="bk-checkin-go">They have arrived</button>
+                                </form>
+                            @endif
+                        </div>
+                    @endif
+
                     <div class="bk-actions">
                         {{-- "Message" alone, with the name on the link for anyone
                              reading it aloud. It used to print the first word of

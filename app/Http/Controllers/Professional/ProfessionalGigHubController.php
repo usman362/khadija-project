@@ -163,6 +163,25 @@ class ProfessionalGigHubController extends Controller
         $today = $now;
 
         /*
+         * The gigs happening today, which is what "live event management"
+         * means on this page: the one thing a professional opens it for at
+         * nine in the morning.
+         *
+         * Read off the event's own start date rather than the booking's
+         * status, because a gig does not become today's by being marked
+         * in_progress; it becomes today's by being today. A booking with no
+         * date on it cannot be here, and that is correct: nothing can say
+         * today is the day.
+         */
+        $liveToday = Booking::where('supplier_id', $user->id)
+            ->whereIn('status', ['confirmed', 'in_progress'])
+            ->whereHas('event', fn ($q) => $q->whereDate('starts_at', $now->toDateString()))
+            ->with(['event:id,title,starts_at,location', 'client:id,name'])
+            ->get()
+            ->sortBy(fn (Booking $b) => $b->event?->starts_at)
+            ->values();
+
+        /*
          * Khadijah's 28 October screen carries two more columns beside the
          * gigs: what is due, and what has just happened. Both are read off
          * records that already exist rather than a new activity log.
@@ -175,7 +194,7 @@ class ProfessionalGigHubController extends Controller
         $activity = $this->activity($user);
 
         return view('professional.gig-hub.index', array_merge(
-            compact('tab', 'stats', 'gigs', 'crew', 'msg', 'money', 'today', 'deadlines', 'activity'),
+            compact('tab', 'stats', 'gigs', 'crew', 'msg', 'money', 'today', 'liveToday', 'deadlines', 'activity'),
             $tab === 'gigs'      ? $this->gigsTab($request) : [],
             $tab === 'contracts' ? $this->contractsTab($request, $money) : [],
         ));
