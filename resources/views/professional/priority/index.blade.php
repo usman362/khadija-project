@@ -96,7 +96,7 @@
     /* A row: tick, icon and badge, what it is, when it is due, the button. */
     /* Her row: tick, a tile, the badge, what it is, when, the button, the
        menu. Tight, so nine of them fit on one screen the way hers do. */
-    .pa-item { display: grid; grid-template-columns: 16px 38px auto minmax(0,1fr) auto auto 22px;
+    .pa-item { display: grid; grid-template-columns: 16px 38px auto minmax(0,1fr) auto auto;
         gap: 10px; align-items: center;
         background: var(--bg-card); border: 1px solid var(--border-color);
         border-radius: 11px; padding: 12px 14px; margin-bottom: 10px; }
@@ -114,9 +114,6 @@
     .pa-when .due { display: block; color: var(--bad-text, #dc2626); font-weight: 700; }
     .pa-go { font-size: 12px; font-weight: 700; padding: 8px 14px; border-radius: 8px; text-decoration: none;
         background: var(--accent-blue, #2563eb); color: #fff; white-space: nowrap; }
-    .pa-kebab { width: 24px; height: 26px; border-radius: 6px; border: 0;
-        background: none; color: var(--text-muted); cursor: pointer; font-size: 15px; line-height: 1; padding: 0; }
-    .pa-kebab:hover { background: var(--bg-card-hover, rgba(128,128,128,.1)); }
 
     .pa-empty { background: var(--bg-card); border: 1px solid var(--border-color); border-radius: 12px;
         padding: 30px 20px; text-align: center; }
@@ -176,7 +173,7 @@
     @media (max-width: 1150px) { .pa-layout { grid-template-columns: 1fr; } .pa-rail { position: static; } }
     @media (max-width: 980px) {
         .pa-item { grid-template-columns: 18px 40px minmax(0,1fr); row-gap: 9px; }
-        .pa-badge, .pa-when, .pa-go, .pa-kebab { grid-column: 3; justify-self: start; text-align: left; }
+        .pa-badge, .pa-when, .pa-go { grid-column: 3; justify-self: start; text-align: left; }
     }
 </style>
 @endpush
@@ -312,8 +309,12 @@
 
                 <a class="pa-go" href="{{ $item['url'] }}">{{ $item['cta'] }}</a>
 
-                <a class="pa-kebab" href="{{ $item['url'] }}" style="display:flex;align-items:center;justify-content:center;text-decoration:none;"
-                   aria-label="Open {{ $item['title'] }}">&#8942;</a>
+                {{-- Ali, 13 November. There was a three-dot button here as well,
+                     and it was an <a> pointing at the same URL as the button
+                     beside it: it looked like a menu and behaved as a redirect.
+                     A priority action carries one destination and nothing else
+                     to offer, so there is no menu to open. The duplicate is
+                     gone rather than made into a menu of one item. --}}
             </div>
         @empty
             <div class="pa-empty">

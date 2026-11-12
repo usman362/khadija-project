@@ -62,7 +62,11 @@
     .mc-tab.on { background:var(--text-primary); color:var(--bg-card); border-color:var(--text-primary); }
     .mc-tab .n { opacity:.65; margin-left:4px; }
 
-    .mc-table { width:100%; border-collapse:collapse; font-size:12.5px; }
+    /* Nine columns that would not fit a 1024px window: the table reached
+       1179px and carried the page into a sideways scroll. It scrolls inside
+       the card now, and below 900 the rows stack so the floor comes off. */
+    .mc-tablewrap { overflow-x:auto; -webkit-overflow-scrolling:touch; margin:0 -4px; padding:0 4px; }
+    .mc-table { width:100%; min-width:900px; border-collapse:collapse; font-size:12.5px; }
     .mc-table th { text-align:left; font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:.4px;
         color:var(--text-muted); padding:0 9px 8px; border-bottom:1px solid var(--border-color); }
     .mc-table td { padding:11px 9px; border-bottom:1px solid var(--border-color); vertical-align:top; color:var(--text-primary); }
@@ -112,7 +116,9 @@
         .mc-tools { grid-template-columns:1fr; } .mc-noteform { grid-template-columns:1fr; } }
     @media (max-width: 900px) { .mc-table thead { display:none; }
         .mc-table td { display:block; border:0; padding:3px 0; }
-        .mc-table tr { display:block; border-bottom:1px solid var(--border-color); padding:11px 0; } }
+        .mc-table tr { display:block; border-bottom:1px solid var(--border-color); padding:11px 0; }
+        .mc-table { min-width:0; }
+        .mc-tablewrap { overflow-x:visible; margin:0; padding:0; } }
 </style>
 @endpush
 
@@ -200,6 +206,7 @@
         <button type="button" class="mc-clear" id="mcClearSel">Clear selection</button>
     </div>
 
+    <div class="mc-tablewrap">
     <table class="mc-table">
         <thead>
             <tr>
@@ -365,6 +372,7 @@
         @endforeach
         </tbody>
     </table>
+    </div>
     <div class="mc-foot">
         <span class="mc-muted">
             Showing {{ $rows->count() }} of {{ $summary['clients'] }}

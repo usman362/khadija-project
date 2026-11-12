@@ -176,7 +176,11 @@
     .sp-cardhead h2 { font-size:17px; font-weight:800; margin:0 0 2px; color:var(--text-primary); }
     .sp-cardhead .sub { font-size:12.5px; color:var(--text-muted); margin:0; line-height:1.5; }
 
-    .sp-tools { display:flex; gap:9px; align-items:center; flex-wrap:nowrap; margin-bottom:16px; }
+    /* It was flex-wrap:nowrap, and the search box had a 130px floor, so from
+       about 1150px down the filter row simply grew past the card: at 1024 it
+       ended 77px off the right of the screen. Wrapping only happens when the
+       row cannot fit, so a wide screen still shows one line. */
+    .sp-tools { display:flex; gap:9px; align-items:center; flex-wrap:wrap; margin-bottom:16px; }
     .sp-search { flex:1 1 170px; min-width:130px; }
     /* A select sizes itself to its longest option unless it is told not to,
        which is how "All Pricing Types" pushed the view toggle off the row. */

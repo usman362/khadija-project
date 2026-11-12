@@ -78,6 +78,28 @@ final class LeadPipeline
             ->with(['client:id,name', 'categories:id,name'])
             ->get();
 
+        /*
+         * The same rule, applied to the second half of it.
+         *
+         * The paragraph above leaves out an open request in another state,
+         * because R38 means this professional can never take it and a lead
+         * they are not allowed to take is not a lead. R61 says exactly the
+         * same thing about a service they have not listed, and that half was
+         * never applied: on 13 November this account's funnel counted seven
+         * open requests for work it does not offer, and every one of them
+         * answered 403 when you clicked it. Asked of BidAccess, which is
+         * also what the wizard asks, so the list and the wizard cannot
+         * disagree about what is takeable.
+         *
+         * A request they have already bid on or been booked for stays
+         * whatever became of it: that work happened.
+         */
+        $listed = FitScore::servicesOf($me);
+
+        $events = $events->filter(
+            fn (Event $event) => $touched->contains($event->id) || BidAccess::allows($me, $event, $listed)
+        )->values();
+
         $talking = Conversation::whereIn('event_id', $events->pluck('id'))
             ->whereHas('participants', fn ($q) => $q->where('users.id', $me->id))
             ->has('messages')
@@ -100,6 +122,8 @@ final class LeadPipeline
                 $notes->get($event->id),
                 $now,
                 $repeatClients,
+                $me,
+                $listed,
             ))
             ->sortByDesc(fn (array $r) => $r['activity_at']?->timestamp ?? 0)
             ->values();
@@ -114,6 +138,8 @@ final class LeadPipeline
         ?LeadNote $note,
         ?\Illuminate\Support\Carbon $now = null,
         ?Collection $repeatClients = null,
+        ?User $me = null,
+        ?Collection $listed = null,
     ): array {
         $now ??= now();
         $stage = match (true) {
@@ -169,6 +195,18 @@ final class LeadPipeline
             'stage'     => $stage,
             'stage_label' => self::STAGES[$stage][0],
             'stage_color' => self::STAGES[$stage][1],
+
+            /*
+             * Whether the bid wizard will actually open for this one.
+             *
+             * The page offered "Open the request" on every row and linked it
+             * at the wizard. On 13 November all seven of those links answered
+             * 403 or 410: requests outside this professional's listed
+             * services, or already closed to proposals. The wizard was right
+             * to refuse; the page was wrong to offer. It asks first now, and
+             * the answer comes from the same place the wizard's does.
+             */
+            'can_bid'   => $me !== null && \App\Support\BidAccess::allows($me, $event, $listed),
 
             // How the request reached them, in the request's own words.
             'source'    => match ($event->source) {

@@ -43,7 +43,11 @@
     .pc-card-link svg { width: 12px; height: 12px; }
 
     /* Tabs */
-    .pc-tabs { display: flex; gap: 20px; border-bottom: 1px solid var(--border-color); margin-bottom: 4px; }
+    /* Four nowrap tabs in a flex row came to 402px on a 390px phone and the
+       last one hung off the card. They scroll now rather than overflow. */
+    .pc-tabs { display: flex; gap: 20px; border-bottom: 1px solid var(--border-color); margin-bottom: 4px;
+        overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
+    .pc-tabs::-webkit-scrollbar { display: none; }
     .pc-tab { font-size: 12.5px; font-weight: 600; color: var(--text-muted); padding-bottom: 10px; border-bottom: 2px solid transparent; cursor: pointer; white-space: nowrap; }
     .pc-tab.active { color: var(--pc-blue); border-bottom-color: var(--pc-blue); }
 

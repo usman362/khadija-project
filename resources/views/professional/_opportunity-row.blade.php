@@ -34,8 +34,19 @@
         <div class="of-fit">{{ $row['fit'] }}%</div>
         <div class="of-fit-k">Fit</div>
 
-        @if($actionable)
+        {{-- "Actionable" meant the service matched. It did not mean the wizard
+             would open: the dashboard offered Bid on a request that was not
+             taking proposals and the button answered 410. Asked properly now,
+             of the same place the wizard asks. 13 November. --}}
+        @php
+            $__canBid = $actionable
+                && auth()->check()
+                && \App\Support\BidAccess::allows(auth()->user(), $event->loadMissing('categories'));
+        @endphp
+        @if($__canBid)
             <a class="of-bid" href="{{ route('professional.bid.step', ['event' => $event->id]) }}">Bid</a>
+        @elseif($actionable)
+            <span class="of-locked">Closed to bids</span>
         @else
             <span class="of-locked">Not your service</span>
         @endif

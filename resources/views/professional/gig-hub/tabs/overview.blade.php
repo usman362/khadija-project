@@ -127,10 +127,6 @@
     .gh-acts { display:inline-flex; gap:6px; align-items:center; }
     .gh-btn { font-size:11.5px; font-weight:700; padding:6px 13px; border-radius:8px; text-decoration:none;
         border:1px solid var(--border-color); color:var(--text-primary); background:var(--bg-card); white-space:nowrap; }
-    .gh-kebab { width:26px; height:27px; border-radius:7px; border:0;
-        background:none; color:var(--text-muted); font-size:15px; line-height:1;
-        display:inline-flex; align-items:center; justify-content:center; text-decoration:none; }
-    .gh-kebab:hover { background:var(--bg-card-hover, rgba(128,128,128,.1)); }
 
     /* What happens if you click a gig: five columns, each with a preview. */
     .gh-deep { display:grid; grid-template-columns:repeat(5, minmax(0,1fr)); gap:14px; }
@@ -343,8 +339,18 @@
                                 <span class="gh-acts">
                                     @if($event)
                                         <a class="gh-btn" href="{{ route('professional.gigs.show', $event) }}">View</a>
-                                        <a class="gh-kebab" href="{{ route('professional.gigs.show', $event) }}"
-                                           aria-label="Open {{ $event->title }}">&#8942;</a>
+                                        {{-- Ali, 13 November: this was an <a> to the same URL as the
+                                             View button beside it. It looked like a menu and behaved
+                                             as a redirect. It is a menu. --}}
+                                        <span class="rowmenu" data-row-menu>
+                                            <button type="button" class="rowmenu-btn" aria-haspopup="true"
+                                                    aria-expanded="false" aria-label="More for {{ $event->title }}">&#8942;</button>
+                                            <div class="rowmenu-pop" data-row-menu-pop>
+                                                <a href="{{ route('professional.gigs.show', $event) }}">View event details</a>
+                                                <a href="{{ route('professional.gig-hub.index', ['tab' => 'contracts']) }}">Open contracts</a>
+                                                <a href="{{ route('professional.chat.index') }}">Message the client</a>
+                                            </div>
+                                        </span>
                                     @endif
                                 </span>
                             </td>
@@ -498,3 +504,6 @@
         </div>
     </aside>
 </div>
+
+@include('partials._row-menu-styles')
+@include('partials._row-menu-script')

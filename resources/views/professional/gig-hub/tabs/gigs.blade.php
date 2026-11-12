@@ -112,7 +112,6 @@
     .mg-status-in_progress { background: rgba(99,102,241,0.15); color: var(--accent-text); }
     .mg-status-not_started, .mg-status-not_scheduled { background: var(--border-color); color: var(--text-muted); }
     .mg-status-cancelled   { background: rgba(239,68,68,0.15); color: var(--bad-text); }
-    .mg-row-kebab { background: none; border: none; cursor: pointer; color: var(--text-muted); font-size: 16px; padding: 2px 6px; text-decoration: none; }
 
     /* Bid-status overview bar */
     .mg-pso { margin-top: 18px; }
@@ -294,7 +293,17 @@
                             <td><span class="mg-status-pill mg-status-{{ $gig->status }}">{{ ucfirst(str_replace('_', ' ', $gig->status)) }}</span></td>
                             <td style="white-space:nowrap;font-weight:600;color:var(--text-primary);">${{ number_format($budget, 0) }} / ${{ number_format($earned, 0) }}</td>
                             <td style="padding-right:18px;text-align:right;">
-                                <a href="{{ route('professional.gigs.show', $gig) }}" class="mg-row-kebab">⋯</a>
+                                {{-- Was an <a> straight to the gig wearing a menu's
+                                     three dots, and the only control in the row. --}}
+                                <span class="rowmenu" data-row-menu>
+                                    <button type="button" class="rowmenu-btn" aria-haspopup="true"
+                                            aria-expanded="false" aria-label="More for {{ $gig->title }}">&#8942;</button>
+                                    <div class="rowmenu-pop" data-row-menu-pop>
+                                        <a href="{{ route('professional.gigs.show', $gig) }}">View this gig</a>
+                                        <a href="{{ route('professional.proposals.index') }}">See my proposals</a>
+                                        <a href="{{ route('professional.chat.index') }}">Message the client</a>
+                                    </div>
+                                </span>
                             </td>
                         </tr>
                     @empty
@@ -436,3 +445,6 @@
     </aside>
 
 </div>{{-- /.mg-layout --}}
+
+@include('partials._row-menu-styles')
+@include('partials._row-menu-script')

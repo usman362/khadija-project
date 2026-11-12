@@ -169,59 +169,18 @@ class ProfessionalBidWizardController extends Controller
      * A professional may only bid on something actually open to them. This is
      * the same gate the board applies, enforced again here because a wizard URL
      * can be reached directly.
+     *
+     * The rules themselves live in App\Support\BidAccess, because the pages
+     * that link here have to ask the same question before offering the link.
+     * They were not asking, and on 13 November every "Open the request" link
+     * on the Leads CRM answered 403 or 410.
      */
     private function assertBiddable(Request $request, Event $event): void
     {
-        $user = $request->user();
+        $denial = \App\Support\BidAccess::denial($request->user(), $event->loadMissing('categories'));
 
-        // DSRs are targeted: only the named professional may respond.
-        if ($event->source === 'direct_offer') {
-            abort_unless((int) $event->supplier_id === (int) $user->id, 403);
-        } else {
-            abort_unless((bool) $event->is_published, 404);
-        }
-
-        abort_if(in_array($event->status, ['completed', 'cancelled'], true), 410,
-            'This request is closed.');
-
-        // Rule R38 — same-state only, and the ratification is explicit that
-        // enforcement is server-side authoritative. The board already filters
-        // the list, but a filtered list is a courtesy: this URL is reachable
-        // directly, and this is where the rule actually holds.
-        abort_unless(
-            \App\Support\StateMatching::matches($event->state, \App\Support\StateMatching::stateOf($user))
-                || ! \App\Support\StateMatching::appliesTo($user),
-            403,
-            'This request is in another state.'
-        );
-
-        // Rule R61 — "Bid/Respond stays gated to actual listed services."
-        // The feed's related block shows work outside them on purpose and
-        // says it is not actionable; this is the half that makes that true.
-        // A professional who has listed nothing is not blocked — they have
-        // not opted out of anything, and the feed already asks them to add
-        // their services rather than assuming they have none.
-        $mine = \App\Support\FitScore::servicesOf($user);
-
-        if ($mine->isNotEmpty() && $event->source !== 'direct_offer') {
-            abort_unless(
-                $event->categories->pluck('id')->intersect($mine)->isNotEmpty(),
-                403,
-                'Add this service to your profile before bidding on it.',
-            );
-        }
-
-        /*
-         * Rule R33 §7 — no new proposal while the listing is not open.
-         *
-         * Asked of the lifecycle rather than of the deadline alone. The
-         * deadline check missed two cases the rule cares about: a request
-         * the client closed by hand, and a request whose event date has
-         * already gone by. Both looked open here purely because nobody had
-         * set a deadline in the past.
-         */
-        if (! \App\Domain\Requests\RequestLifecycle::acceptsProposals($event)) {
-            abort(410, 'This request is not accepting proposals right now.');
+        if ($denial !== null) {
+            abort($denial['code'], $denial['message']);
         }
     }
 

@@ -1,6 +1,8 @@
 @extends('layouts.professional')
 
 @section('title', 'Reviews & Reputation')
+@section('page-title', 'Reviews & Reputation')
+@section('page-subtitle', 'What clients said after the work, and what it adds up to.')
 
 {{-- ════════════════════════════════════════════════════════════════
      Professional "Reviews, Ratings & Reputation" — the flow for a pro to

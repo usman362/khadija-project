@@ -388,7 +388,15 @@
                             <a title="Messages" href="{{ route('professional.chat.index') }}">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
                             </a>
-                            <a title="Open the request" href="{{ route('professional.bid.step', ['event' => $lead['event_id']]) }}">
+                            {{-- The bid wizard only where it will open. This used to
+                                 point every row at the wizard and all seven answered
+                                 403 or 410: requests outside the services this
+                                 professional lists, or already closed to proposals.
+                                 Those rows go to the request instead. --}}
+                            <a title="{{ $lead['can_bid'] ? 'Open the request' : 'View this request' }}"
+                               href="{{ $lead['can_bid']
+                                    ? route('professional.bid.step', ['event' => $lead['event_id']])
+                                    : route('professional.gigs.show', $lead['event_id']) }}">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
                             </a>
                             <a title="Calendar" href="{{ route('professional.calendar.index') }}">
@@ -451,7 +459,11 @@
                                 <h4>What you can do</h4>
                                 <div class="lc-quick">
                                     <a href="{{ route('professional.chat.index') }}">Open messages</a>
-                                    <a href="{{ route('professional.bid.step', ['event' => $lead['event_id']]) }}">Open the request</a>
+                                    @if($lead['can_bid'])
+                                        <a href="{{ route('professional.bid.step', ['event' => $lead['event_id']]) }}">Bid on this request</a>
+                                    @else
+                                        <a href="{{ route('professional.gigs.show', $lead['event_id']) }}">View this request</a>
+                                    @endif
                                 </div>
                             </div>
                         </div>

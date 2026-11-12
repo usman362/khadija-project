@@ -1,6 +1,8 @@
 @extends('layouts.professional')
 
 @section('title', 'Reports')
+@section('page-title', 'Reports')
+@section('page-subtitle', 'What your account has done, in figures you can export.')
 
 @php
     /*

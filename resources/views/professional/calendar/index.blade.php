@@ -1,6 +1,8 @@
 @extends('layouts.professional')
 
 @section('title', 'My Calendar')
+@section('page-title', 'My Calendar')
+@section('page-subtitle', 'Every booking, shift and block you have, on one calendar.')
 
 {{-- My Calendar — explainer + a live snapshot of the pro's schedule.
      REAL data: agenda unifies assigned Shifts + booking Events; the month

@@ -122,7 +122,12 @@
         color:var(--text-primary); font-family:inherit; }
     .pm-dates input:focus { outline:none; }
 
-    .pm-table { width:100%; border-collapse:collapse; font-size:12.5px; table-layout:fixed; }
+    /* The colgroup below fixes nine column widths, which come to more than a
+       1024px window has: the table reached 1151px and took the page sideways.
+       It scrolls inside the card between 900 and that width; under 900 the
+       rows stack and both the floor and the scroller come off. */
+    .pm-tablewrap { overflow-x:auto; -webkit-overflow-scrolling:touch; margin:0 -4px; padding:0 4px; }
+    .pm-table { width:100%; min-width:1060px; border-collapse:collapse; font-size:12.5px; table-layout:fixed; }
     .pm-table th { text-align:left; font-size:9.5px; font-weight:800; color:var(--text-muted);
         text-transform:uppercase; letter-spacing:.2px; padding:10px 6px;
         border-bottom:1px solid var(--border-color); line-height:1.4; }
@@ -208,7 +213,19 @@
         .pm-table thead { display:none; }
         .pm-table td { display:block; border:0; padding:3px 0; }
         .pm-table tr { display:block; border-bottom:1px solid var(--border-color); padding:12px 0; }
+        /* The rows were told to stack but the <colgroup> was not told to stop.
+           Nine fixed column widths plus table-layout:fixed held the table at
+           897px on a 390px phone, so it ran half a screen past the card and
+           the page scrolled sideways. A table laid out as a block ignores its
+           colgroup, which is what the stacked rows need. */
+        .pm-table { display:block; table-layout:auto; width:100%; min-width:0; }
+        .pm-tablewrap { overflow-x:visible; margin:0; padding:0; }
+        .pm-table colgroup { display:none; }
+        .pm-table tbody { display:block; width:100%; }
     }
+    /* Two columns of summary at 390px left a 24px money figure 12px wider
+       than its half of the row. */
+    @media (max-width: 560px) { .pm-sums { grid-template-columns:1fr; } }
 </style>
 @endpush
 
@@ -464,6 +481,7 @@
 
 <div class="pm-card">
 @if($transactions->count())
+    <div class="pm-tablewrap">
     <table class="pm-table">
         <colgroup>
             <col style="width:86px;"><col style="width:21%;"><col style="width:94px;">
@@ -640,6 +658,7 @@
         @endforeach
         </tbody>
     </table>
+    </div>
 
     <div class="pm-foot">
         <span class="pm-muted">

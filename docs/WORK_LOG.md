@@ -39,6 +39,72 @@ blue slab wrapped around a search box and nothing saying what you were looking
 at. The page name is the part worth keeping, so the subtitle gives way first
 and the search box after it. On a phone the bar now reads "Leads CRM".
 
+### Deep pass over every professional screen
+Ali asked for a proper pass: every page, every width, every three-dot menu,
+nothing left to report twice. Twenty-six pages were checked at seven window
+widths, from a 390px phone to a 1600px monitor, 182 checks in all. What it
+found:
+
+**Three-dot menus that were links.** Priority Actions, the Gig Operations Hub
+overview and the Hub's gigs list each drew a three-dot "more actions" control
+and made it a link to the same place as the button beside it. Clicking it went
+straight there instead of opening anything. The Hub's two are real menus now;
+Priority Actions has one destination and nothing else to offer, so the
+duplicate is gone rather than made into a menu of one item.
+
+**A menu that opened where you could not see it.** Proposals & Bids built its
+own menu, and the card its table scrolls inside cut the menu off: on the lower
+rows you saw a sliver and thought the button was dead. All four menus share one
+implementation now, which places the popup so that nothing can clip it.
+
+**Three dead controls in Messages.** A telephone, a video camera and a
+three-dot menu sat at the top of every conversation. None of them did
+anything, and the first two offered calls this platform does not make.
+
+**Five pages that did not say what they were.** Calendar, Team, Messages,
+Reports and Reviews showed "Welcome back" in the blue bar instead of their own
+name, because they never set one and the bar fell back to the dashboard's
+greeting. All twenty-four professional pages name themselves now.
+
+**Four tables wider than the window.** Leads at 1280, My Clients and Payments &
+Payouts at 1024, and the Payments table again on a phone, where nine fixed
+column widths ignored the instruction to stack. Each one took the whole page
+into a sideways scroll with its right-hand columns off the screen. They scroll
+inside their own card now. The filter row on My Services did the same thing
+from 1150px down, and wraps instead.
+
+No page has a horizontal scroll at any of the seven widths. No page logs a
+script error. No image is missing.
+
+### Every "Open the request" on the Leads CRM was a dead end
+Worth saying on its own, because it is the biggest thing the pass turned up.
+
+Every link on the Leads CRM that offered to open a request answered 403 or 410.
+All seven of them. Six were requests for services the professional does not
+offer, which the rules bar them from bidding on, and one had closed.
+
+Behind it was something worse. The Leads list already leaves out an open
+request in another state, on the stated grounds that a lead you are not
+allowed to take is not a lead. It never applied the same reasoning to the rule
+about services. So the demonstration account was shown thirteen new leads worth
+$5,995, and not one of them could be touched. The figure was not small and it
+was not real.
+
+The question "can this professional bid on this?" now has one home, and the
+bid wizard, the Leads list and the dashboard's Bid button all ask it. Leads
+that cannot be bid on go to the request instead of the bidding form, and the
+dashboard says "Closed to bids" rather than offering a button that fails.
+
+Two consequences worth knowing before the demonstration. The New Lead count
+changes, because it was counting work the account could not take. And the
+demonstration data never contained a single open request addressed to what
+these accounts actually offer, so the seeder now creates three per
+professional: real rows, in their state, in a service they list, on which the
+bidding form opens.
+
+Also: a closed request answered 410 and there was no page for it, so it came
+out as a bare error screen. It has a page now.
+
 ### Grey initials hanging out of the avatar
 On the same list, the client's initials sat grey in the top-left corner of the
 blue disc with half the letters outside it. One line of styling for the text

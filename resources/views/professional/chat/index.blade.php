@@ -1,6 +1,8 @@
 @extends('layouts.professional')
 
 @section('title', 'Messages: Inbox')
+@section('page-title', 'Messages')
+@section('page-subtitle', 'Your conversations with clients, newest first.')
 
 {{-- Professional Messages — Inbox. Server-rendered: real conversations +
      thread + derived stats; compose posts to conversations.messages.store.
@@ -273,11 +275,13 @@
                         <div class="pm-th-sub">{{ $thread['subject'] }}@if($thread['date']) · {{ $thread['date'] }}@endif</div>
                     </div>
                     <div class="pm-th-actions">
-                        <span class="pm-icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72c.13.96.36 1.9.7 2.81a2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45c.91.34 1.85.57 2.81.7A2 2 0 0 1 22 16.92z"/></svg></span>
-                        <span class="pm-icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="23 7 16 12 23 17 23 7"/><rect x="1" y="5" width="15" height="14" rx="2"/></svg></span>
-                        <span class="pm-icon-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="1"/><circle cx="12" cy="5" r="1"/><circle cx="12" cy="19" r="1"/></svg></span>
-                        {{-- A real control among the decoration: this side
-                             could not archive or restore anything. --}}
+                        {{-- A telephone, a video camera and a three-dot menu used
+                             to sit here. All three were <span>s with nothing
+                             behind them: clicking did nothing at all, and the
+                             first two offered calls this platform does not make.
+                             Ali, 13 November. Removed rather than wired up: the
+                             archive button below is the one thing this header
+                             can actually do. --}}
                         <form method="POST" action="{{ $thread['archiveUrl'] }}" style="display:inline;">
                             @csrf
                             <button type="submit" class="pm-icon-btn" style="border:0;cursor:pointer;"

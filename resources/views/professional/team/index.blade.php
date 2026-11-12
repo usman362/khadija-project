@@ -1,6 +1,8 @@
 @extends('layouts.professional')
 
 @section('title', 'Team & Staffing')
+@section('page-title', 'Team & Staffing')
+@section('page-subtitle', 'The people you work with and the shifts they are on.')
 
 {{-- Team & Staffing — full backend (StaffMember + Shift). Real crew,
      on-shift / open shifts, fill-shift, add staff/shift, and a real

@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\{AvailabilityDay, Booking, Conversation, DisputeCase, DisputeEvent, Finalization, Message, User};
+use App\Models\{AvailabilityDay, Booking, Conversation, DisputeCase, DisputeEvent, Event, Finalization, Message, User};
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Carbon;
 
@@ -39,6 +39,24 @@ class DemoProfessionalActivitySeeder extends Seeder
      */
     public function run(): void
     {
+        /*
+         * Never on production, and now it refuses rather than trusting
+         * whoever typed the command.
+         *
+         * It writes agreements, message threads, a dispute and, since 13
+         * November, open requests that appear on the public bidding board.
+         * A seeder was once run on the live database and left 47 duplicate
+         * rows; this one would publish invented gigs to real professionals.
+         *
+         * SEED_DEMO_ON_PRODUCTION=true is the deliberate override, for a
+         * staging copy that runs with APP_ENV=production.
+         */
+        if (app()->isProduction() && ! env('SEED_DEMO_ON_PRODUCTION', false)) {
+            $this->command?->warn('DemoProfessionalActivitySeeder skipped: this is production.');
+
+            return;
+        }
+
         $pros = User::query()
             ->whereHas('roles', fn ($q) => $q->where('name', 'professional'))
             ->get();
@@ -54,6 +72,7 @@ class DemoProfessionalActivitySeeder extends Seeder
             $this->threads($pro);
             $this->availability($pro);
             $this->dispute($pro);
+            $this->openLeads($pro);
 
             $touched++;
         }
@@ -333,5 +352,84 @@ class DemoProfessionalActivitySeeder extends Seeder
             'visible_to_parties' => true,
             'created_at'         => now()->subDay(),
         ]);
+    }
+
+    /**
+     * Open requests this professional could actually bid on.
+     *
+     * Until 13 November the Leads CRM counted every open request in the
+     * professional's state, whether or not they offered the work. This
+     * account was shown thirteen new leads worth $5,995 and all thirteen
+     * answered 403: they were for services it does not list. The page is
+     * honest now, which left it with none at all, because nothing in the
+     * demonstration data was ever addressed to what these accounts offer.
+     *
+     * So: three open requests per professional, in their state, in a service
+     * they have actually listed, with nobody assigned and a deadline still
+     * ahead. They are real rows on the bidding board, and the bid wizard
+     * opens on every one of them.
+     */
+    private function openLeads(User $pro): void
+    {
+        $mine = \App\Support\FitScore::servicesOf($pro);
+        $state = $pro->profile?->state;
+
+        if ($mine->isEmpty() || ! $state) {
+            return;
+        }
+
+        $client = User::whereHas('roles', fn ($q) => $q->where('name', 'client'))
+            ->where('id', '!=', $pro->id)
+            ->orderBy('id')
+            ->first();
+
+        if (! $client) {
+            return;
+        }
+
+        $briefs = [
+            ['Wedding reception, 120 guests', 24, 6500],
+            ['Corporate awards night',        38, 4200],
+            ['Birthday party, 60 guests',     17, 2300],
+        ];
+
+        foreach ($briefs as $i => [$title, $days, $budget]) {
+            $marker = sprintf('Demo open request for professional %d, number %d.', $pro->id, $i + 1);
+
+            // Matched on the marker so a second run adds nothing. The title
+            // carries the state in brackets: no spaced dash anywhere a user
+            // reads, which PlainPunctuation holds the whole project to.
+            $event = Event::where('client_id', $client->id)
+                ->where('description', $marker)
+                ->first();
+
+            if ($event) {
+                continue;
+            }
+
+            $event = new Event([
+                'title'       => sprintf('%s (%s)', $title, $state),
+                'description' => $marker,
+                'client_id'   => $client->id,
+            ]);
+
+            $event->fill([
+                'created_by'       => $client->id,
+                'status'           => 'published',
+                'is_published'     => true,
+                'supplier_id'      => null,
+                'source'           => 'user',
+                'state'            => $state,
+                'location'         => $pro->profile?->city ?: $state,
+                'city'             => $pro->profile?->city,
+                'starts_at'        => now()->addDays($days),
+                'budget'           => $budget,
+                'proposal_deadline' => now()->addDays(max(3, (int) ($days / 2))),
+            ])->save();
+
+            // The service it is for: one this professional has listed, so the
+            // board shows it to them and the wizard opens.
+            $event->categories()->syncWithoutDetaching([$mine[$i % $mine->count()]]);
+        }
     }
 }

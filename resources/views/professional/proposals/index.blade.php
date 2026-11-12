@@ -141,19 +141,8 @@
     .pp-acts .pp-btn { padding:6px 8px; font-size:10.5px; }
     .pp-acts .pp-btn svg { width:12px; height:12px; }
     .pp-acts .pp-chev { margin-left:auto; }
-    .pp-kebab { width:26px; height:28px; border-radius:7px; border:1px solid var(--border-color);
-        background:var(--bg-card); color:var(--text-muted); cursor:pointer; font-size:14px; line-height:1; padding:0; }
     .pp-chev { background:none; border:0; cursor:pointer; color:var(--text-muted); padding:2px 4px; font-family:inherit; }
     .pp-chev svg { width:15px; height:15px; }
-    .pp-menu { position:relative; }
-    .pp-menu ul { position:absolute; right:0; top:32px; z-index:30; min-width:178px; margin:0; padding:5px;
-        list-style:none; background:var(--bg-card); border:1px solid var(--border-color);
-        border-radius:10px; box-shadow:0 10px 26px rgba(0,0,0,.14); }
-    .pp-menu ul[hidden] { display:none; }
-    .pp-menu li button, .pp-menu li a { display:block; width:100%; text-align:left; font:inherit; font-size:12px;
-        font-weight:600; padding:7px 9px; border:0; border-radius:7px; background:none; color:var(--text-primary);
-        text-decoration:none; cursor:pointer; }
-    .pp-menu li button:hover, .pp-menu li a:hover { background:var(--bg-page, rgba(128,128,128,.1)); }
 
     /* The opened row: four panels, in her order. */
     .pp-detail { display:grid; grid-template-columns:repeat(auto-fit, minmax(235px,1fr)); gap:18px; padding:4px 0 6px; }
@@ -566,25 +555,31 @@
                             <button type="button" class="pp-btn pp-ghost" data-prop="{{ $booking->id }}">
                                 {!! $svg('search') !!} {{ $booking->status === 'cancelled' ? 'View Reason' : 'View Details' }}
                             </button>
-                            <span class="pp-menu">
-                                <button type="button" class="pp-kebab" data-menu="{{ $booking->id }}" aria-label="More for this proposal">&#8942;</button>
-                                <ul id="menu-{{ $booking->id }}" hidden>
+                            {{-- Ali, 13 November: this menu opened and was then cut off
+                                 by .pp-tablewrap, which scrolls on both axes, so on the
+                                 lower rows you saw a sliver and thought the button was
+                                 dead. The shared script places the popup FIXED, which
+                                 escapes every clipping ancestor. --}}
+                            <span class="rowmenu" data-row-menu>
+                                <button type="button" class="rowmenu-btn" aria-haspopup="true"
+                                        aria-expanded="false" aria-label="More for this proposal">&#8942;</button>
+                                <div class="rowmenu-pop" data-row-menu-pop>
                                     @if($booking->event)
-                                        <li><a href="{{ route('professional.gigs.show', $booking->event) }}">View event details</a></li>
+                                        <a href="{{ route('professional.gigs.show', $booking->event) }}">View event details</a>
                                     @endif
                                     @if($booking->status === 'requested')
-                                        <li><a href="{{ route('professional.gig-hub.index', ['tab' => 'contracts']) }}">Manage in Gig Hub</a></li>
+                                        <a href="{{ route('professional.gig-hub.index', ['tab' => 'contracts']) }}">Manage in Gig Hub</a>
                                     @endif
-                                    <li><a href="{{ route('professional.chat.index') }}">Message the client</a></li>
-                                    <li><button type="submit" formaction="{{ route('professional.proposals.archive') }}"
-                                                onclick="document.getElementById('pp-ids').value='{{ $booking->id }}';">
-                                        {{ $booking->archived_at ? 'Put back' : 'Archive this proposal' }}</button></li>
+                                    <a href="{{ route('professional.chat.index') }}">Message the client</a>
+                                    <button type="submit" formaction="{{ route('professional.proposals.archive') }}"
+                                            onclick="document.getElementById('pp-ids').value='{{ $booking->id }}';">
+                                        {{ $booking->archived_at ? 'Put back' : 'Archive this proposal' }}</button>
                                     @if($booking->status === 'requested')
-                                        <li><button type="submit" formaction="{{ route('professional.proposals.withdraw') }}"
-                                                    onclick="document.getElementById('pp-ids').value='{{ $booking->id }}'; return confirm('Withdraw this proposal?');">
-                                            Withdraw this proposal</button></li>
+                                        <button type="submit" class="danger" formaction="{{ route('professional.proposals.withdraw') }}"
+                                                onclick="document.getElementById('pp-ids').value='{{ $booking->id }}'; return confirm('Withdraw this proposal?');">
+                                            Withdraw this proposal</button>
                                     @endif
-                                </ul>
+                                </div>
                             </span>
                             <button type="button" class="pp-chev" data-prop="{{ $booking->id }}" aria-label="Open this proposal">{!! $svg('chev') !!}</button>
                         </span>
@@ -771,19 +766,11 @@
         });
     });
 
-    document.querySelectorAll('[data-menu]').forEach(function (btn) {
-        btn.addEventListener('click', function (e) {
-            e.stopPropagation();
-            var list = document.getElementById('menu-' + btn.dataset.menu);
-            var open = list && list.hidden;
-            document.querySelectorAll('.pp-menu ul').forEach(function (u) { u.hidden = true; });
-            if (list) { list.hidden = !open; }
-        });
-    });
-
-    document.addEventListener('click', function () {
-        document.querySelectorAll('.pp-menu ul').forEach(function (u) { u.hidden = true; });
-    });
+    /* The row menus are partials/_row-menu-script now: one document listener,
+       and a popup positioned fixed so .pp-tablewrap cannot clip it. */
 })();
 </script>
 @endsection
+
+@include('partials._row-menu-styles')
+@include('partials._row-menu-script')
