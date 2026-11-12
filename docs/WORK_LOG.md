@@ -47,6 +47,21 @@ being the more specific of the two it won: the disc lost both its centring and
 its white letter. The one line now says which spans it means. The initials are
 white and centred again.
 
+### The pipeline strip: two thirds of every card was blank
+Ali asked whether the five stage cards were right. They were not. Each card
+held four short lines stacked against its left edge, so on a wide screen the
+right two thirds of every card was empty. The card is two rows spanning its
+full width now: the stage name along the top, the count and the money along
+the bottom.
+
+The second thing was worse than the spacing. Each card carried a bare "(15%)",
+"(20%)", "(100%)", which reads as that stage's share of the pipeline. It is
+not a share, and the five of them come to 165. It is the weight: the part of a
+lead's budget a stage at that point is counted for, which Peter set in October,
+and the money printed just above it has already had it applied. The card says
+"15% weight" now, and the line above the strip says the totals are the budgets
+after it.
+
 Live: not yet deployed.
 
 ---

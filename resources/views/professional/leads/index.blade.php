@@ -56,19 +56,29 @@
     /* Five across, one row, with the arrows living in the gaps rather than
        as flex children that can be wrapped onto a line of their own. */
     .lc-stages { display:grid; grid-template-columns:repeat(5, minmax(0,1fr)); gap:22px; }
-    .lc-stage { position:relative; display:flex; gap:9px; align-items:center; text-decoration:none;
-        border:1px solid color-mix(in srgb, var(--c) 35%, transparent); border-radius:12px; padding:11px 12px;
+    /* Ali, 13 November: the card was a column of four short lines huddled
+       against its left edge, so on a wide screen two thirds of every card was
+       blank. The card is two rows that span it instead: the stage and its
+       weight along the top, the count and the money along the bottom. */
+    .lc-stage { position:relative; display:flex; flex-direction:column; gap:9px; text-decoration:none;
+        border:1px solid color-mix(in srgb, var(--c) 35%, transparent); border-radius:12px; padding:12px 14px;
         background:color-mix(in srgb, var(--c) 9%, transparent); min-width:0; }
     .lc-stage.on { box-shadow:0 0 0 2px var(--c) inset; }
-    .lc-stage > .ic { width:30px; height:30px; border-radius:9px; flex:none; display:flex; align-items:center;
+    .lc-stage .top { display:flex; align-items:center; gap:9px; min-width:0; }
+    .lc-stage > .top > .ic { width:30px; height:30px; border-radius:9px; flex:none; display:flex; align-items:center;
         justify-content:center; background:color-mix(in srgb, var(--c) 20%, transparent); color:var(--c); }
-    .lc-stage > .ic svg { width:15px; height:15px; }
-    .lc-stage .meta { min-width:0; }
-    .lc-stage .l { display:block; font-size:11px; font-weight:800; color:var(--c);
+    .lc-stage > .top > .ic svg { width:15px; height:15px; }
+    .lc-stage .l { flex:1 1 auto; min-width:0; font-size:12px; font-weight:800; color:var(--c);
         white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-    .lc-stage .n { display:block; font-size:20px; font-weight:800; color:var(--text-primary); line-height:1.15; }
-    .lc-stage .v { font-size:11.5px; font-weight:700; color:var(--text-primary); }
-    .lc-stage .w { font-size:10.5px; color:var(--text-muted); margin-left:3px; }
+    /* It read as "(15%)" and nothing more, so it looked like this stage's share
+       of the pipeline. It is not a share: it is Peter's weight, the part of a
+       lead's budget this stage is counted for, and the five of them come to
+       165. The money above it has already had it applied, so the card says so. */
+    .lc-stage .w { font-size:10px; font-weight:800; letter-spacing:.2px; color:var(--text-muted); white-space:nowrap; }
+    .lc-stage .bot { display:flex; align-items:flex-end; justify-content:space-between; gap:10px; min-width:0; }
+    .lc-stage .n { font-size:23px; font-weight:800; color:var(--text-primary); line-height:1; }
+    .lc-stage .fig { display:flex; flex-direction:column; align-items:flex-end; gap:2px; min-width:0; }
+    .lc-stage .v { font-size:13px; font-weight:700; color:var(--text-primary); white-space:nowrap; line-height:1.1; }
 
     /* The arrow sits in the gap after every card but the last. */
     .lc-arrow { display:none; }
@@ -210,7 +220,7 @@
         <span class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/></svg></span>
         <div>
             <b>Lead pipeline</b>
-            <span>Click a stage to filter the leads below. Counts and totals come from the same records.</span>
+            <span>Click a stage to filter the leads below. Counts and totals come from the same records, and each total is that stage's budgets after its weight.</span>
         </div>
     </div>
 
@@ -224,15 +234,20 @@
             <a class="lc-stage {{ $filters['stage'] === $key ? 'on' : '' }}"
                style="--c: {{ $s['colour'] }};"
                href="{{ $filters['stage'] === $key ? $link(['stage' => null]) : $link(['stage' => $key, 'page' => null]) }}">
-                <span class="ic">{!! $stageIcons[$key] !!}</span>
-                <span class="meta">
+                <span class="top">
+                    <span class="ic">{!! $stageIcons[$key] !!}</span>
                     <span class="l">{{ $s['label'] }}</span>
+                    {{-- With no leads at all there is no value and no weight
+                         worth printing, so the stage is a filter and nothing
+                         more. --}}
+                </span>
+                <span class="bot">
                     <span class="n">{{ $s['count'] }}</span>
-                    {{-- With no leads at all there is no value and no share of
-                         one, so the stage is a filter and nothing more. --}}
                     @if($total > 0)
-                        <span class="v">{{ $money($s['weighted']) }}</span>
-                        <span class="w">({{ $s['weight'] }}%)</span>
+                        <span class="fig">
+                            <span class="v">{{ $money($s['weighted']) }}</span>
+                            <span class="w" title="A lead at this stage counts for {{ $s['weight'] }}% of its budget.">{{ $s['weight'] }}% weight</span>
+                        </span>
                     @endif
                 </span>
             </a>
