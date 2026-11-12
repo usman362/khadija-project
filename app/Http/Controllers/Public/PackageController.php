@@ -39,6 +39,40 @@ class PackageController extends Controller
      *
      * @return array<int, string>
      */
+    /**
+     * Every tag that counts as "this category", for matching a package.
+     *
+     * A package is tagged with what its professional ticked, which is their
+     * own level-3 services: "Buffet Catering", not "Catering & Food
+     * Services". The client's filter is the 27 categories, so matching the
+     * category name alone found none of them. This answers with the category
+     * AND the services under it, and the category name stays in the list
+     * because older packages are tagged that way.
+     *
+     * @return array<int, string>
+     */
+    public static function namesUnder(string $category): array
+    {
+        return \Illuminate\Support\Facades\Cache::remember(
+            'packages.names-under.' . md5($category),
+            now()->addHour(),
+            function () use ($category) {
+                $parent = \App\Models\Category::query()
+                    ->where('kind', \App\Models\Category::SERVICE_CATEGORY)
+                    ->where('name', $category)
+                    ->first();
+
+                $under = $parent
+                    ? \App\Models\Category::where('parent_id', $parent->id)
+                        ->where('kind', \App\Models\Category::SERVICE)
+                        ->pluck('name')->all()
+                    : [];
+
+                return array_values(array_unique(array_merge([$category], $under)));
+            },
+        );
+    }
+
     public static function services(): array
     {
         return \Illuminate\Support\Facades\Cache::remember(
@@ -115,8 +149,9 @@ class PackageController extends Controller
         $serviceCounts = [];
         $counted = $countBase()->get(['packages.id', 'packages.services']);
         foreach (self::services() as $svc) {
+            $names = self::namesUnder($svc);
             $serviceCounts[$svc] = $counted
-                ->filter(fn ($p) => in_array($svc, $p->services ?? [], true))
+                ->filter(fn ($p) => array_intersect($names, $p->services ?? []) !== [])
                 ->count();
         }
 
@@ -247,9 +282,22 @@ class PackageController extends Controller
                 ->orWhere('description', 'like', "%{$f['q']}%")))
             ->when($f['event_type'] !== '', fn ($qr) => Occasions::apply($qr, $f['event_type']));
 
-        // AND-match every selected service against the JSON services column.
+        /*
+         * AND between the chosen categories, OR within each one.
+         *
+         * A client ticking "Catering & Food Services" and "Photography &
+         * Videography" wants packages that do both, and a package that does
+         * both will be tagged with a service from each rather than with the
+         * category names themselves.
+         */
         foreach ($f['selected'] as $svc) {
-            $query->whereJsonContains('services', $svc);
+            $names = self::namesUnder($svc);
+
+            $query->where(function ($w) use ($names) {
+                foreach ($names as $name) {
+                    $w->orWhereJsonContains('services', $name);
+                }
+            });
         }
 
         // 3. Location. Deliberately not a mile radius: R38 means a package is

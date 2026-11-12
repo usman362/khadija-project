@@ -10,6 +10,7 @@ use App\Services\ImagePipelineService;
 use App\Support\PackageProgress;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 
@@ -487,10 +488,26 @@ class ProfessionalPackageController extends Controller
     /** Normalise the array/derived fields the base validator leaves as raw input. */
     private function richFields(Request $request): array
     {
-        // Solo packages have no partner; only keep valid palette services.
+        /*
+         * The services this package is tagged with.
+         *
+         * This used to intersect against PackageController::services(), which
+         * is the 27 CATEGORY names the client's browse filter is built from.
+         * Step 1 of this builder asks a professional to tick their own
+         * level-3 services, so every tick was thrown away on save: a
+         * professional with services listed built a package, chose two, and
+         * saved a package tagged with nothing, which then never appeared in
+         * Package Search and could not meet the "two or more services" rule
+         * the whole product rests on. Proven on real data: of
+         * "Professional Bartenders" and "Buffet Catering", zero survived.
+         *
+         * The palette is what the form can legitimately offer: the real
+         * services a professional may offer, and the category names for the
+         * older path a professional with nothing listed still sees.
+         */
         $services = collect((array) $request->input('services'))
             ->map(fn ($s) => trim((string) $s))->filter()
-            ->intersect(PackageController::services())->values()->all();
+            ->intersect(self::palette())->values()->all();
 
         $eventTypes = collect((array) $request->input('event_types'))
             ->map(fn ($s) => trim((string) $s))->filter()
@@ -550,6 +567,29 @@ class ProfessionalPackageController extends Controller
             ->sortBy('price')
             ->values()
             ->all();
+    }
+
+    /**
+     * Every name a package may be tagged with.
+     *
+     * The level-3 services a professional is allowed to offer, by Sir Peter's
+     * classification, plus the 27 category names. Both, because step 1 shows
+     * the professional's own services when they have listed any and the
+     * category list when they have not, and a save has to accept whichever
+     * screen they were looking at.
+     *
+     * @return array<int, string>
+     */
+    public static function palette(): array
+    {
+        $services = Cache::remember('packages.palette.services', now()->addHour(), fn () => Category::query()
+            ->where('kind', Category::SERVICE)
+            ->where('is_active', true)
+            ->offerableBy('professional')
+            ->pluck('name')
+            ->all());
+
+        return array_values(array_unique(array_merge($services, PackageController::services())));
     }
 
     /** Turn min/max guest inputs into a display label, e.g. "50–150" / "Up to 150". */
