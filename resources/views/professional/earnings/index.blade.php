@@ -453,12 +453,16 @@
             <option value="not_earned" @selected($filters['payment'] === 'not_earned')>Not Earned</option>
         </select>
 
+        {{-- Built from the events this professional has been paid for, so it
+             stays out of the row until there is more than one to choose. --}}
+        @if(count($types) > 0)
         <select class="pm-in" name="type" aria-label="Event type">
             <option value="">All Event Types</option>
             @foreach($types as $t)
                 <option value="{{ $t }}" @selected($filters['type'] === $t)>{{ $t }}</option>
             @endforeach
         </select>
+        @endif
 
         {{-- One control, two real inputs: her range reads as a single pill. --}}
         <span class="pm-dates">

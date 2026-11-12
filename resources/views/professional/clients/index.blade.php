@@ -143,18 +143,25 @@
                 <option value="{{ $key }}" @selected($rel === $key)>{{ $label }}</option>
             @endforeach
         </select>
+        {{-- Both are built from this professional's own clients, so until
+             there are two places or a tag in use they offer nothing to pick
+             and only take up the row. --}}
+        @if(count($places) > 0)
         <select class="mc-in" name="state" aria-label="State">
             <option value="">Anywhere</option>
             @foreach($places as $place)
                 <option value="{{ $place }}" @selected($state === $place)>{{ $place }}</option>
             @endforeach
         </select>
+        @endif
+        @if(count($allTags) > 0)
         <select class="mc-in" name="tag" aria-label="Tag">
             <option value="">Any tag</option>
             @foreach($allTags as $t)
                 <option value="{{ $t }}" @selected($tag === $t)>{{ $t }}</option>
             @endforeach
         </select>
+        @endif
         <button type="submit" class="mc-btn">Search</button>
         @if($q !== '' || $rel !== '' || $tag !== '' || $state !== '')
             <a class="mc-clear" href="{{ route('professional.clients.index', $show === 'all' ? [] : ['show' => $show]) }}">Clear</a>

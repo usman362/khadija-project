@@ -374,7 +374,7 @@
 
         {{-- Gig Overview donut --}}
         <div class="mg-rail-card">
-            <div class="mg-rail-head"><div class="mg-rail-title">Gig Overview</div><select class="mg-rail-sel" aria-label="All Time"><option>All Time</option></select></div>
+            <div class="mg-rail-head"><div class="mg-rail-title">Gig Overview</div></div>{{-- A select with one option, no name and no form sat here, saying "All Time". There was no period to choose and nothing to submit it to. Ali, 13 November. --}}
             @php
                 $gvTotal = max(1, $stats['total']);
                 $gvPie = [
@@ -411,7 +411,7 @@
 
         {{-- Earnings Summary --}}
         <div class="mg-rail-card">
-            <div class="mg-rail-head"><div class="mg-rail-title">Earnings Summary</div><select class="mg-rail-sel" aria-label="All Time"><option>All Time</option></select></div>
+            <div class="mg-rail-head"><div class="mg-rail-title">Earnings Summary</div></div>{{-- A select with one option, no name and no form sat here, saying "All Time". There was no period to choose and nothing to submit it to. Ali, 13 November. --}}
             <div style="font-size:11px;color:var(--text-muted);">Total Earned</div>
             <div class="mg-pay-total">${{ number_format($totalEarned, 0) }}</div>
             <div class="mg-pay-grid">

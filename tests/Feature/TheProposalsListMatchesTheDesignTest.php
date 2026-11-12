@@ -385,8 +385,19 @@ class TheProposalsListMatchesTheDesignTest extends TestCase
 
     // ------------------------------------------------------------- filtering
 
-    /** Each of her four dropdowns narrows the list for real. */
-    public function test_the_dropdowns_filter_the_list(): void
+    /**
+     * The filters that are left, and the tabs that took over from the two
+     * that went.
+     *
+     * Her screen had four dropdowns. Two of them, proposal status and client
+     * activity, said nothing the row of tabs below them does not already
+     * say: Replied is the Needs My Response tab, no reply yet is Awaiting
+     * Client, Accepted and Declined are tabs by those names. One screen
+     * asking the same question in three vocabularies is three chances to
+     * disagree with itself, so on 13 November those two came off and the one
+     * thing only they offered, finished work, became a tab.
+     */
+    public function test_the_filters_narrow_the_list(): void
     {
         $wedding = $this->proposal();
         $gala    = $this->proposal(['title' => 'Annual Corporate Gala', 'event_type' => 'Corporate Event'],
@@ -396,12 +407,10 @@ class TheProposalsListMatchesTheDesignTest extends TestCase
         $this->assertStringContainsString('Annual Corporate Gala', $byType);
         $this->assertStringNotContainsString('Dana Whitfield Wedding Reception', $byType);
 
-        $byStatus = $this->page(['status' => 'accepted']);
-        $this->assertStringContainsString('Annual Corporate Gala', $byStatus);
-        $this->assertStringNotContainsString('Dana Whitfield Wedding Reception', $byStatus);
-
-        $byActivity = $this->page(['activity' => 'accepted']);
-        $this->assertStringContainsString('Annual Corporate Gala', $byActivity);
+        // What the status dropdown used to do, the tab does.
+        $byTab = $this->page(['tab' => 'accepted']);
+        $this->assertStringContainsString('Annual Corporate Gala', $byTab);
+        $this->assertStringNotContainsString('Dana Whitfield Wedding Reception', $byTab);
 
         // Both were created just now, so a week's window keeps both.
         $recent = $this->page(['period' => '7']);
@@ -433,5 +442,81 @@ class TheProposalsListMatchesTheDesignTest extends TestCase
 
         $this->assertStringContainsString('Showing 1&ndash;6 of 8 proposals', $flat($this->page()));
         $this->assertStringContainsString('Showing 1&ndash;8 of 8 proposals', $flat($this->page(['per' => 12])));
+    }
+
+    /**
+     * Ali, 13 November. Three things on this screen that did not do what they
+     * looked like they did.
+     */
+    public function test_export_gives_you_the_list_you_are_looking_at(): void
+    {
+        $this->proposal();
+        $this->proposal(['title' => 'Annual Corporate Gala', 'event_type' => 'Corporate Event'],
+                        ['status' => 'confirmed']);
+
+        $filtered = $this->actingAs($this->pro)
+            ->get(route('professional.proposals.export', ['type' => 'Corporate Event']))
+            ->streamedContent();
+
+        $this->assertStringContainsString('Annual Corporate Gala', $filtered);
+        $this->assertStringNotContainsString('Dana Whitfield Wedding Reception', $filtered,
+            'Export handed back every proposal on the account whatever the screen was showing.');
+    }
+
+    public function test_the_export_button_carries_the_filters_with_it(): void
+    {
+        // The button lives inside the list, so the filter has to leave a row
+        // behind for there to be a button to look at.
+        $this->proposal();
+        $this->proposal(['title' => 'Annual Corporate Gala', 'event_type' => 'Corporate Event']);
+
+        $html = $this->page(['type' => 'Corporate Event']);
+
+        $this->assertMatchesRegularExpression(
+            '/href="[^"]*proposals\/export\?[^"]*type=Corporate/',
+            $html,
+            'The button linked at the bare route, so the filtered page exported everything.'
+        );
+    }
+
+    public function test_there_is_no_more_filters_button_that_opens_nothing(): void
+    {
+        $html = $this->page();
+
+        $this->assertStringNotContainsString('More Filters', $html,
+            'It was a <span> styled as a button, with a count on it and nothing behind it.');
+    }
+
+    public function test_the_page_asks_about_status_in_one_vocabulary(): void
+    {
+        // A proposal, so the event-type filter has something to offer: an
+        // account with nothing on it is not shown a box that filters nothing.
+        $this->proposal();
+
+        $html = $this->page();
+
+        $this->assertStringNotContainsString('All Proposal Statuses', $html);
+        $this->assertStringNotContainsString('All Client Activity', $html);
+        $this->assertStringContainsString('All Event Types', $html);
+        $this->assertStringContainsString('All Time', $html);
+    }
+
+    public function test_finished_work_can_still_be_asked_for_on_its_own(): void
+    {
+        $this->proposal();
+        $done = $this->proposal(['title' => 'Annual Corporate Gala'], ['status' => 'completed']);
+
+        $html = $this->page(['tab' => 'completed']);
+
+        $this->assertStringContainsString('Annual Corporate Gala', $html);
+        $this->assertStringNotContainsString('Dana Whitfield Wedding Reception', $html);
+    }
+
+    public function test_a_filter_with_nothing_to_choose_is_not_shown(): void
+    {
+        $html = $this->page();
+
+        $this->assertStringNotContainsString('All Event Types', $html,
+            'On an account with no proposals the box could only ever say "All Event Types".');
     }
 }

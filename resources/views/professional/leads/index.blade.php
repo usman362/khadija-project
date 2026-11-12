@@ -265,12 +265,18 @@
                 <option value="{{ $key }}" @selected($filters['stage'] === $key)>{{ $label }}</option>
             @endforeach
         </select>
+        {{-- A filter with one option filters nothing. These are built from the
+             leads this professional actually has, so on an account whose leads
+             are all one type, or have no type at all, the box could only ever
+             say "All event types". It waits until there is a choice to make. --}}
+        @if(count($types) > 0)
         <select class="lc-sel" name="type" aria-label="Event type">
             <option value="">All event types</option>
             @foreach($types as $type)
                 <option value="{{ $type }}" @selected($filters['type'] === $type)>{{ $type }}</option>
             @endforeach
         </select>
+        @endif
         <select class="lc-sel" name="source" aria-label="Lead source">
             <option value="">All sources</option>
             @foreach($sources as $source)

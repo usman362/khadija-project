@@ -42,17 +42,29 @@
     .pp-card { background:var(--bg-card); border:1px solid var(--border-color); border-radius:14px; padding:16px 18px; margin-bottom:16px; }
 
     /* Four cards: icon in a tinted box, then the label, the figure, the note. */
+    /* Ali, 13 November: these were left as they were when the Leads pipeline
+       cards were rebuilt, and they had the same fault. Icon and four lines
+       piled against the left edge, so on a wide screen the right half of
+       every card was blank and the number sat level with a wrapped sentence.
+       Two rows across the full width: who the card is about along the top,
+       the figure along the bottom with its note beside it. */
     .pp-sums { display:grid; grid-template-columns:repeat(4, minmax(0,1fr)); gap:14px; margin-bottom:16px; }
-    .pp-sum { display:flex; gap:13px; align-items:flex-start; text-decoration:none;
+    .pp-sum { display:flex; flex-direction:column; gap:11px; text-decoration:none; min-width:0;
         border:1px solid var(--border-color); border-radius:13px; padding:15px 16px; background:var(--bg-card); }
     .pp-sum.on { border-color:var(--c); background:color-mix(in srgb, var(--c) 7%, var(--bg-card)); }
-    .pp-sum .ic { width:38px; height:38px; border-radius:10px; flex:none; display:flex;
+    .pp-sum .top { display:flex; align-items:center; gap:11px; min-width:0; }
+    .pp-sum .ic { width:36px; height:36px; border-radius:10px; flex:none; display:flex;
         align-items:center; justify-content:center; color:var(--c);
         background:color-mix(in srgb, var(--c) 13%, transparent); }
-    .pp-sum .ic svg { width:19px; height:19px; }
-    .pp-sum .k { display:block; font-size:12.5px; font-weight:800; color:var(--c); }
-    .pp-sum .v { display:block; font-size:27px; font-weight:800; color:var(--text-primary); line-height:1.15; margin:1px 0 3px; }
-    .pp-sum .n { display:block; font-size:11px; color:var(--text-muted); line-height:1.45; }
+    .pp-sum .ic svg { width:18px; height:18px; }
+    .pp-sum .k { flex:1 1 auto; min-width:0; font-size:12.5px; font-weight:800; color:var(--c);
+        white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+    .pp-sum .bot { display:flex; align-items:flex-end; justify-content:space-between; gap:12px; min-width:0; }
+    .pp-sum .v { font-size:27px; font-weight:800; color:var(--text-primary); line-height:1; flex:none; }
+    .pp-sum .n { flex:1 1 auto; min-width:0; text-align:right; font-size:11px;
+        color:var(--text-muted); line-height:1.35; }
+    @media (max-width: 1200px) { .pp-sums { grid-template-columns:repeat(2, minmax(0,1fr)); } }
+    @media (max-width: 640px)  { .pp-sums { grid-template-columns:minmax(0,1fr); } }
 
     .pp-filters { display:flex; gap:9px; align-items:center; flex-wrap:wrap; }
     .pp-search { position:relative; flex:1 1 210px; min-width:180px; }
@@ -108,6 +120,7 @@
     .pp-facts span { display:flex; align-items:center; gap:4px; font-size:10.5px; color:var(--text-muted);
         min-width:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
     .pp-facts svg { width:11px; height:11px; flex:none; }
+    .pp-applied { font-size:11.5px; font-weight:800; color:var(--text-muted); white-space:nowrap; }
     .pp-chips { display:flex; gap:4px; flex-wrap:wrap; margin-top:5px; }
     .pp-tag { font-size:9.5px; font-weight:800; padding:3px 8px; border-radius:5px; white-space:nowrap; }
 
@@ -247,6 +260,10 @@
         'mine'      => ['Needs My Response', $stats['mine'],      '#dc2626', 'chat'],
         'theirs'    => ['Awaiting Client',   $stats['theirs'],    '#7c3aed', 'clock'],
         'accepted'  => ['Accepted',          $stats['accepted'],  '#059669', 'check'],
+        // Ali, 13 November: the two dropdowns this row replaced said one
+        // thing the row did not, which is work that is finished. Accepted
+        // counts it too, so it needs a place of its own to be asked for.
+        'completed' => ['Completed',         $stats['completed'], '#0891b2', 'check'],
         'declined'  => ['Declined',          $stats['declined'],  '#dc2626', 'alert'],
         'expired'   => ['Expired',           $stats['expired'],   '#ea580c', 'clock'],
         'withdrawn' => ['Withdrawn',         $stats['withdrawn'], '#d97706', 'undo'],
@@ -257,8 +274,6 @@
         'tab'      => $tab !== 'all' ? $tab : null,
         'search'   => $search ?: null,
         'type'     => $type ?: null,
-        'status'   => $status ?: null,
-        'activity' => $activity ?: null,
         'period'   => $period ?: null,
         'per'      => $perPage !== 6 ? $perPage : null,
     ]), $over));
@@ -286,9 +301,11 @@
     ] as [$key, $label, $note, $colour, $icon])
         <a class="pp-sum {{ $tab === $key ? 'on' : '' }}" style="--c: {{ $colour }};"
            href="{{ $link(['tab' => $key === 'all' ? null : $key, 'page' => null]) }}">
-            <span class="ic">{!! $svg($icon) !!}</span>
-            <span>
+            <span class="top">
+                <span class="ic">{!! $svg($icon) !!}</span>
                 <span class="k">{{ $label }}</span>
+            </span>
+            <span class="bot">
                 <span class="v">{{ $stats[$key] }}</span>
                 <span class="n">{{ $note }}</span>
             </span>
@@ -307,29 +324,28 @@
                    placeholder="Search proposals by event name, client, or location...">
         </span>
 
+        {{-- Built from the proposals this professional has, so it waits until
+             there is a second type to choose between. A filter with one
+             option filters nothing. --}}
+        @if(count($types) > 0)
         <select class="pp-in" name="type" aria-label="Event type">
             <option value="">All Event Types</option>
             @foreach($types as $t)
                 <option value="{{ $t }}" @selected($type === $t)>{{ $t }}</option>
             @endforeach
         </select>
+        @endif
 
-        <select class="pp-in" name="status" aria-label="Proposal status">
-            <option value="">All Proposal Statuses</option>
-            <option value="pending"     @selected($status === 'pending')>Pending</option>
-            <option value="negotiation" @selected($status === 'negotiation')>In Negotiation</option>
-            <option value="accepted"    @selected($status === 'accepted')>Accepted</option>
-            <option value="completed"   @selected($status === 'completed')>Completed</option>
-            <option value="declined"    @selected($status === 'declined')>Declined</option>
-        </select>
+        {{-- "All Proposal Statuses" and "All Client Activity" used to sit
+             here, and between them they said nothing the row of tabs below
+             does not already say, in a second and third set of words for the
+             same thing. Replied is Needs My Response. No reply yet is
+             Awaiting Client. Accepted and Declined are tabs by those names.
+             One screen asking the same question three ways, in three
+             vocabularies, is three chances to disagree with itself.
 
-        <select class="pp-in" name="activity" aria-label="Client activity">
-            <option value="">All Client Activity</option>
-            <option value="replied"  @selected($activity === 'replied')>Replied</option>
-            <option value="silent"   @selected($activity === 'silent')>No reply yet</option>
-            <option value="accepted" @selected($activity === 'accepted')>Accepted</option>
-            <option value="declined" @selected($activity === 'declined')>Declined</option>
-        </select>
+             Finished work was the one thing only the dropdown offered, so it
+             is a tab now. These two are gone. Ali, 13 November. --}}
 
         <select class="pp-in" name="period" aria-label="Time period">
             <option value="">All Time</option>
@@ -339,11 +355,16 @@
             <option value="365" @selected($period === '365')>Last 12 months</option>
         </select>
 
-        <span class="pp-btn pp-ghost" style="cursor:default; padding:9px 12px;">
-            {!! $svg('filter') !!} More Filters @if($applied)({{ $applied }})@endif
-        </span>
-
+        {{-- "More Filters" was a <span> styled as a button, with a count on
+             it and nothing behind it: there were no more filters to open and
+             clicking it did nothing. Every filter this page has is on this
+             row. What the count was really saying is how many are on, so it
+             says that, as text, next to the Clear that turns them off. --}}
         <button type="submit" class="pp-btn">{!! $svg('search') !!} Search</button>
+
+        @if($applied)
+            <span class="pp-applied">{{ $applied }} {{ \Illuminate\Support\Str::plural('filter', $applied) }} on</span>
+        @endif
 
         @if($search !== '' || $applied)
             <a class="pp-clear" href="{{ route('professional.proposals.index', $tab === 'all' ? [] : ['tab' => $tab]) }}">Clear</a>
@@ -386,7 +407,11 @@
                 {!! $svg('undo') !!} Withdraw
             </button>
 
-            <a class="pp-btn pp-ghost" href="{{ route('professional.proposals.export') }}">
+            {{-- With the filters, not without them. It linked at the bare
+                 route and handed back every proposal on the account whatever
+                 the screen was showing, while the note above this block said
+                 it sent the list as filtered. Ali, 13 November. --}}
+            <a class="pp-btn pp-ghost" href="{{ route('professional.proposals.export', collect(request()->query())->except(['page', 'per'])->all()) }}">
                 {!! $svg('down') !!} Export CSV
             </a>
 
@@ -684,7 +709,7 @@
             {{ $bookings->onEachSide(1)->links() }}
             <form method="GET" action="{{ route('professional.proposals.index') }}">
                 @if($tab !== 'all')<input type="hidden" name="tab" value="{{ $tab }}">@endif
-                @foreach(['search' => $search, 'type' => $type, 'status' => $status, 'activity' => $activity, 'period' => $period] as $k => $v)
+                @foreach(['search' => $search, 'type' => $type, 'period' => $period] as $k => $v)
                     @if($v !== '')<input type="hidden" name="{{ $k }}" value="{{ $v }}">@endif
                 @endforeach
                 <select class="pp-in" name="per" onchange="this.form.submit()" aria-label="Proposals per page">

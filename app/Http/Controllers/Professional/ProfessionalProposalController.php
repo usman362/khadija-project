@@ -89,92 +89,7 @@ class ProfessionalProposalController extends Controller
 
         $tab = $request->string('tab')->toString() ?: 'all';
 
-        $withdrawnEvents = \App\Models\Bid::where('supplier_id', $user->id)
-            ->where('status', 'withdrawn')
-            ->pluck('event_id');
-
-        match ($tab) {
-            'mine'      => $query->where('status', 'requested')->whereIn('id', $replied),
-            'theirs'    => $query->where('status', 'requested')->whereNotIn('id', $replied->isEmpty() ? [0] : $replied),
-            'accepted'  => $query->whereIn('status', ['confirmed', 'in_progress', 'completed']),
-            'declined'  => $query->where('status', 'cancelled'),
-            // Still open on this side, but the client stopped taking
-            // proposals, so nothing more is going to happen to it.
-            'expired'   => $query->where('status', 'requested')
-                ->whereHas('event', fn ($q) => $q
-                    ->whereNotNull('proposal_deadline')
-                    ->where('proposal_deadline', '<', now())),
-            // Taken off the table by this professional, which is a different
-            // thing from the client declining it.
-            'withdrawn' => $query->whereIn('event_id', $withdrawnEvents->isEmpty() ? [0] : $withdrawnEvents),
-            default     => null,
-        };
-
-        // Archived rows are out of the list but never out of the record, so
-        // they are hidden everywhere except the tab that asks for them.
-        if ($tab !== 'archived') {
-            $query->whereNull('archived_at');
-        } else {
-            $query->whereNotNull('archived_at');
-        }
-
-        /*
-         * Khadijah's four dropdowns. Each one filters something the platform
-         * actually records: an event type, where the proposal stands, whether
-         * the client has said anything, and how far back to look.
-         */
-        if ($request->filled('status')) {
-            match ($request->string('status')->toString()) {
-                'pending'     => $query->where('status', 'requested')
-                    ->whereNotIn('id', $replied->isEmpty() ? [0] : $replied),
-                'negotiation' => $query->where('status', 'requested')->whereIn('id', $replied),
-                'accepted'    => $query->whereIn('status', ['confirmed', 'in_progress']),
-                'completed'   => $query->where('status', 'completed'),
-                'declined'    => $query->where('status', 'cancelled'),
-                default       => null,
-            };
-        }
-
-        if ($request->filled('activity')) {
-            match ($request->string('activity')->toString()) {
-                'replied'  => $query->whereIn('id', $replied->isEmpty() ? [0] : $replied),
-                'silent'   => $query->whereNotIn('id', $replied->isEmpty() ? [0] : $replied),
-                'accepted' => $query->whereIn('status', ['confirmed', 'in_progress', 'completed']),
-                'declined' => $query->where('status', 'cancelled'),
-                default    => null,
-            };
-        }
-
-        // "All Time" is the default, so a period only ever narrows the list.
-        $days = match ($request->string('period')->toString()) {
-            '7'   => 7,
-            '30'  => 30,
-            '90'  => 90,
-            '365' => 365,
-            default => null,
-        };
-
-        if ($days) {
-            $query->where('bookings.created_at', '>=', now()->subDays($days));
-        }
-
-        // Search
-        if ($request->filled('type')) {
-            $wanted = $request->string('type')->toString();
-            $query->whereHas('event', fn ($e) => $e->where('event_type', $wanted));
-        }
-
-        if ($request->filled('search')) {
-            $search = $request->string('search')->toString();
-            $query->where(function ($q) use ($search) {
-                // Event name, client, or location: the three the box offers.
-                $q->whereHas('event', fn ($eq) => $eq
-                    ->where('title', 'like', "%{$search}%")
-                    ->orWhere('location', 'like', "%{$search}%")
-                    ->orWhere('city', 'like', "%{$search}%"));
-                $q->orWhereHas('client', fn ($cq) => $cq->where('name', 'like', "%{$search}%"));
-            });
-        }
+        $this->narrow($request, $query, $replied, $user, $tab);
 
         // The footer offers a page size, so the page has to honour it.
         $perPage = (int) $request->integer('per', 6);
@@ -194,13 +109,13 @@ class ProfessionalProposalController extends Controller
                     ->map(fn (Booking $b) => $b->event?->event_type)
                     ->filter()->unique()->sort()->values()->all(),
                 'type'    => (string) $request->query('type', ''),
-                'status'  => (string) $request->query('status', ''),
-                'activity'=> (string) $request->query('activity', ''),
                 'period'  => (string) $request->query('period', ''),
                 'perPage' => $perPage,
-                // "More Filters (3)" on her screen counts the ones in use, so
-                // a professional can see at a glance that a list is narrowed.
-                'applied' => collect(['type', 'status', 'activity', 'period'])
+                // How many filters are narrowing the list, so a professional
+                // can see at a glance that they are not looking at all of it.
+                // It used to be the number on a "More Filters" button that
+                // opened nothing.
+                'applied' => collect(['type', 'period'])
                     ->filter(fn ($k) => $request->filled($k))->count(),
             ],
         ));
@@ -460,14 +375,116 @@ class ProfessionalProposalController extends Controller
     }
 
     /** The proposals as they are filtered on screen, as a file. */
+    /**
+     * Everything that narrows the list: the tab, and Khadijah's four
+     * dropdowns, and the search box.
+     *
+     * It lives here because Export has to give you the list you are looking
+     * at. Ali, 13 November: it gave you every proposal on the account
+     * instead, whatever the screen said, and the comment above the button
+     * claimed otherwise. Asking in one place is what makes the claim true.
+     *
+     * @param  \Illuminate\Support\Collection  $replied  Booking ids the client has written on.
+     */
+    private function narrow(
+        Request $request,
+        \Illuminate\Database\Eloquent\Builder $query,
+        \Illuminate\Support\Collection $replied,
+        \App\Models\User $user,
+        string $tab,
+    ): void {
+        $withdrawnEvents = \App\Models\Bid::where('supplier_id', $user->id)
+            ->where('status', 'withdrawn')
+            ->pluck('event_id');
+
+        match ($tab) {
+            'mine'      => $query->where('status', 'requested')->whereIn('id', $replied),
+            'theirs'    => $query->where('status', 'requested')->whereNotIn('id', $replied->isEmpty() ? [0] : $replied),
+            'accepted'  => $query->whereIn('status', ['confirmed', 'in_progress', 'completed']),
+            // Finished, which Accepted counts as well. It is asked for on
+            // its own because the dropdown that used to ask for it is gone.
+            'completed' => $query->where('status', 'completed'),
+            'declined'  => $query->where('status', 'cancelled'),
+            // Still open on this side, but the client stopped taking
+            // proposals, so nothing more is going to happen to it.
+            'expired'   => $query->where('status', 'requested')
+                ->whereHas('event', fn ($q) => $q
+                    ->whereNotNull('proposal_deadline')
+                    ->where('proposal_deadline', '<', now())),
+            // Taken off the table by this professional, which is a different
+            // thing from the client declining it.
+            'withdrawn' => $query->whereIn('event_id', $withdrawnEvents->isEmpty() ? [0] : $withdrawnEvents),
+            default     => null,
+        };
+
+        // Archived rows are out of the list but never out of the record, so
+        // they are hidden everywhere except the tab that asks for them.
+        if ($tab !== 'archived') {
+            $query->whereNull('archived_at');
+        } else {
+            $query->whereNotNull('archived_at');
+        }
+
+        /*
+         * What is left of Khadijah's four dropdowns: the event type and how
+         * far back to look.
+         *
+         * The other two, proposal status and client activity, said nothing
+         * the tabs above them do not already say, in two more vocabularies
+         * for the same question. Removed 13 November, and the one thing only
+         * they offered, finished work, is a tab of its own now.
+         */
+        // "All Time" is the default, so a period only ever narrows the list.
+        $days = match ($request->string('period')->toString()) {
+            '7'   => 7,
+            '30'  => 30,
+            '90'  => 90,
+            '365' => 365,
+            default => null,
+        };
+
+        if ($days) {
+            $query->where('bookings.created_at', '>=', now()->subDays($days));
+        }
+
+        // Search
+        if ($request->filled('type')) {
+            $wanted = $request->string('type')->toString();
+            $query->whereHas('event', fn ($e) => $e->where('event_type', $wanted));
+        }
+
+        if ($request->filled('search')) {
+            $search = $request->string('search')->toString();
+            $query->where(function ($q) use ($search) {
+                // Event name, client, or location: the three the box offers.
+                $q->whereHas('event', fn ($eq) => $eq
+                    ->where('title', 'like', "%{$search}%")
+                    ->orWhere('location', 'like', "%{$search}%")
+                    ->orWhere('city', 'like', "%{$search}%"));
+                $q->orWhereHas('client', fn ($cq) => $cq->where('name', 'like', "%{$search}%"));
+            });
+        }
+    }
+
     public function export(Request $request): \Symfony\Component\HttpFoundation\StreamedResponse
     {
         $user = $request->user();
 
-        $rows = Booking::where('supplier_id', $user->id)
+        $query = Booking::where('supplier_id', $user->id)
             ->with(['event:id,title,starts_at,proposal_deadline', 'client:id,name'])
-            ->latest()
-            ->get();
+            ->latest();
+
+        $replied = \App\Models\Message::whereIn(
+                'booking_id',
+                Booking::where('supplier_id', $user->id)->pluck('id')
+            )
+            ->where('sender_id', '!=', $user->id)
+            ->pluck('booking_id')
+            ->unique();
+
+        $this->narrow($request, $query, $replied, $user, $request->string('tab')->toString() ?: 'all');
+
+        $rows = $query->get();
 
         return response()->streamDownload(function () use ($rows, $user) {
             $out = fopen('php://output', 'wb');

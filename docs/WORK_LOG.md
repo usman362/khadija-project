@@ -39,6 +39,71 @@ blue slab wrapped around a search box and nothing saying what you were looking
 at. The page name is the part worth keeping, so the subtitle gives way first
 and the search box after it. On a phone the bar now reads "Leads CRM".
 
+### Proposals & Bids: three controls that did not do what they looked like
+Ali asked whether anything on this screen was extra, whether the card was
+right, and whether the buttons work. Three things were wrong.
+
+**Export gave you everything.** Whatever the screen was showing, the button
+handed back every proposal on the account. The note in the code above the
+button said it sent the list as filtered, which made it worse: the claim was
+written and not kept. The filtering now lives in one place and both the list
+and the export ask it, and the button carries the filters in its link.
+
+**"More Filters" opened nothing.** It was styled as a button, it carried a
+count, and it was a span with no behaviour behind it. There were no more
+filters to open; every filter the page has is on that row. The count was
+really saying how many filters are on, so it says that in words, beside the
+Clear that turns them off.
+
+**The same question, asked three ways.** "All Proposal Statuses" and "All
+Client Activity" said nothing the row of tabs beneath them does not already
+say: Replied is the Needs My Response tab, no reply yet is Awaiting Client,
+Accepted and Declined are tabs by those names. One screen with three
+vocabularies for one question is three chances to disagree with itself. Both
+dropdowns are gone. Finished work was the one thing only they offered, so it
+is a tab now. What is left filters a different thing each: event type, a time
+window, and the search box.
+
+And the four cards along the top had the fault the Leads pipeline cards had
+before they were rebuilt, which was missed at the time: everything piled
+against the left edge with the right half of each card blank. Two rows across
+the full width now, same as the Leads ones.
+
+### Controls that could not do anything
+Working outward from the Proposals screen, the same question was asked of
+every professional page: is there a control here that cannot do what it looks
+like it does?
+
+- The Gig Operations Hub's gigs tab had two boxes reading "All Time", one over
+  Gig Overview and one over Earnings Summary. Each had a single option, no
+  name and no form to submit to. There was no period to choose.
+- Five filters could only ever offer their own "all" line, because they are
+  built from the account's own records and the account had none of that kind
+  yet: event type on Leads, Proposals and Payments, and place and tag on My
+  Clients. A filter with one option filters nothing, so they wait until there
+  is a choice to make.
+
+Checked and found honest: the payout method on Transactions is part of the
+Request Payout form, not a filter, and the content filter beside it does
+narrow the list.
+
+### A whole job, walked from the professional's side
+Ali asked for the real round trip tested: a client posts an event, a
+professional bids, and nothing breaks for either of them.
+
+There was already a walk of the client's path, but where the professional
+should bid it wrote the bid straight into the database. So the bid wizard
+itself, the six screens a professional actually fills in, had never been
+walked by anything.
+
+It is walked now, through the real routes, in forty-nine steps: the client
+posts the request through their own wizard, it reaches the board and the
+leads list, the professional fills in price, availability, plan, terms, files
+and review, the bid appears on My Bids and in Proposals, the client compares
+and starts the agreement, both sides accept and sign, a booking exists, every
+professional screen that should know about it opens, the professional marks
+it delivered, and the money is on the ledger. All forty-nine pass.
+
 ### Deep pass over every professional screen
 Ali asked for a proper pass: every page, every width, every three-dot menu,
 nothing left to report twice. Twenty-six pages were checked at seven window
