@@ -67,6 +67,35 @@
     .lmd-bar.is-bare { background: none; border-top: 0; box-shadow: none; pointer-events: none; }
     .lmd-bar.is-bare .lmd-mid { display: none; }
     .lmd-bar.is-bare .lmd-ctrls { pointer-events: auto; }
+
+    /* Bare, the four controls become one.
+       Sir Peter, 13 November: they looked odd. With no bar behind them they
+       were four separate white boxes scattered over whatever the page had at
+       the bottom of the screen — in his picture, over a row of Place a bid
+       buttons. Grouped into a single pill they read as one deliberate control
+       and cover a quarter of what they did. The bar itself is unchanged the
+       moment a conversation is open, which is when it has something to say. */
+    .lmd-bar.is-bare .lmd-ctrls {
+        gap: 0;
+        border: 1.5px solid var(--border-color, #e5e7eb);
+        border-radius: 13px;
+        background: var(--bg-card, #fff);
+        box-shadow: 0 10px 28px -14px rgba(15, 27, 53, .45);
+        overflow: hidden;
+    }
+    .lmd-bar.is-bare .lmd-cbtn {
+        border: 0;
+        border-radius: 0;
+        background: none;
+        box-shadow: none;
+        width: 40px;
+        height: 40px;
+    }
+    /* Hairlines between them, so the pill still reads as four buttons. */
+    .lmd-bar.is-bare .lmd-cbtn + .lmd-cbtn {
+        border-left: 1px solid var(--border-color, #e5e7eb);
+    }
+    .lmd-bar.is-bare .lmd-cbtn:hover { background: var(--lmd-tint); }
     /* The page keeps room for the bar, so it never covers a Save, Accept or
        Continue at the bottom of a page. */
     body.has-lmd .cl-main { padding-bottom: 86px; }

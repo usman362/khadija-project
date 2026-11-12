@@ -154,6 +154,33 @@ class LiveMessageDockTest extends TestCase
         $this->assertStringContainsString('body.has-lmd .cl-main { padding-bottom: 86px; }', $dock);
     }
 
+    /**
+     * Sir Peter, 13 November: the controls looked odd.
+     *
+     * With no conversation open the bar goes bare, and the four controls were
+     * then four separate white boxes scattered over whatever the page had at
+     * the bottom of the screen. In his picture they sat across a row of Place
+     * a bid buttons. Grouped into one pill they read as a single deliberate
+     * control and cover a quarter of what they did.
+     */
+    public function test_the_bare_controls_are_one_pill_and_not_four_boxes(): void
+    {
+        $dock = file_get_contents(resource_path('views/partials/_live_message_dock.blade.php'));
+
+        // The group gets the border, the radius and the background.
+        $this->assertMatchesRegularExpression(
+            '/\.lmd-bar\.is-bare \.lmd-ctrls \{[^}]*border-radius:/s',
+            $dock,
+        );
+
+        // And the buttons inside it give theirs up, or it is four boxes in a
+        // box rather than one control.
+        $this->assertMatchesRegularExpression(
+            '/\.lmd-bar\.is-bare \.lmd-cbtn \{[^}]*border: 0;/s',
+            $dock,
+        );
+    }
+
     /** §10: a phone gets one bubble, not a shrunken bar. */
     public function test_a_phone_gets_a_bubble(): void
     {
