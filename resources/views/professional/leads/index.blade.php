@@ -135,7 +135,13 @@
     .lc-table td { padding:11px 9px; border-bottom:1px solid var(--border-color); vertical-align:top; color:var(--text-primary); }
     .lc-table tr.detail td { border-bottom:1px solid var(--border-color); background:var(--bg-page, var(--bg-card)); }
     .lc-who b { display:block; font-size:13px; font-weight:700; }
-    .lc-who span { display:block; font-size:11px; color:var(--text-muted); }
+    /* Only the lines under the name. The avatar is a <span class="lc-av"> and
+       it lives inside .lc-who too, so a bare ".lc-who span" caught it as well:
+       one class plus one element beats the single class on .lc-av, so the
+       circle lost its centring and its white letter and the initials sat grey
+       in the top-left corner, half of them outside the disc. :not keeps this
+       rule to what it was written for. */
+    .lc-who span:not(.lc-av) { display:block; font-size:11px; color:var(--text-muted); }
     .lc-tag { display:inline-block; font-size:10.5px; font-weight:700; padding:3px 9px; border-radius:20px; white-space:nowrap; }
     .lc-muted { color:var(--text-muted); }
     .lc-prio { display:inline-block; font-size:10.5px; font-weight:700; padding:2px 8px;

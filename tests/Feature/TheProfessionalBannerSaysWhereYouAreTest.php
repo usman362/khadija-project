@@ -78,4 +78,23 @@ class TheProfessionalBannerSaysWhereYouAreTest extends TestCase
             'The leads table needs a scroller of its own, or the page scrolls sideways.'
         );
     }
+
+    public function test_the_lead_avatar_keeps_its_white_centred_initials(): void
+    {
+        $html = $this->actingAs($this->professional())
+            ->get(route('professional.leads.index'))
+            ->assertOk()
+            ->getContent();
+
+        /* ".lc-who span" is one class and one element, ".lc-av" is one class,
+           so the row rule won and the avatar lost display:flex and color:#fff.
+           The initials went grey and sat in the disc's top-left corner, half
+           of them outside it. The row rule has to exclude the avatar. */
+        $this->assertDoesNotMatchRegularExpression(
+            '/\.lc-who\s+span\s*\{/',
+            $html,
+            'A bare ".lc-who span" rule also catches the avatar and overrides it.'
+        );
+        $this->assertStringContainsString('.lc-who span:not(.lc-av)', $html);
+    }
 }

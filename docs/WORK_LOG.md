@@ -39,6 +39,14 @@ blue slab wrapped around a search box and nothing saying what you were looking
 at. The page name is the part worth keeping, so the subtitle gives way first
 and the search box after it. On a phone the bar now reads "Leads CRM".
 
+### Grey initials hanging out of the avatar
+On the same list, the client's initials sat grey in the top-left corner of the
+blue disc with half the letters outside it. One line of styling for the text
+under a client's name was written loosely enough to catch the disc as well, and
+being the more specific of the two it won: the disc lost both its centring and
+its white letter. The one line now says which spans it means. The initials are
+white and centred again.
+
 Live: not yet deployed.
 
 ---
