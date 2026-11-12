@@ -12,6 +12,33 @@ code.
 
 ## 2026-11-12 (professional side)
 
+### The service card, the way the owner drew it
+On My Services & Pricing, the service name now sits inside the coloured band
+with the status beside it, and the category line underneath is gone.
+
+His reason was a good one. The same service can belong to two different
+headings, like 360 Photo Booths and 360 Video Booths, and printing the heading
+under each made two separate services look like one entered twice.
+
+Checked with the longest service name on the site, which wraps onto three
+lines without pushing the status badge out of the card, and at phone width in
+both light and dark.
+
+The List View needed nothing: its headings are already the categories, so the
+rows never repeated them. That view is effectively the third option he
+offered.
+
+Not done, and he needs to choose: breaking up the service titles that contain
+an "&". That contradicts the first instruction on his own master list, which
+was to keep the 241 titles unchanged, and it would also break every
+professional's saved services and every package that names one.
+
+### Demo packages could not be found in Package Search
+Nearly every demo package was labelled with words that are not services, so
+the page that gets demonstrated returned nothing whatever a client ticked. The
+labels are real service names now, in the demo data and in the rows that
+already existed.
+
 ### Every service now says who may offer it
 The owner's master service list, built. Until now every service in the system
 was silently a professional's: there was no way to say that Valet Parking is

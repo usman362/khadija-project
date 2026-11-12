@@ -111,6 +111,19 @@ class DemoPackagesSeeder extends Seeder
             if ($package->serves_regions !== $supplier->profile?->state) {
                 $package->update(['serves_regions' => $supplier->profile?->state]);
             }
+
+            /*
+             * And the services, for the same reason.
+             *
+             * These were written as labels of their own invention until
+             * 2026-11-12 and matched nothing a client can filter by. A row
+             * created before that keeps them for ever under firstOrCreate, so
+             * the list is re-synced here as well and a correction to this
+             * file reaches rows that already exist.
+             */
+            if ($package->services !== $data['services']) {
+                $package->update(['services' => $data['services']]);
+            }
         }
 
         $this->command?->info('Seeded ' . count($this->packages()) . ' demo packages.');
@@ -126,12 +139,25 @@ class DemoPackagesSeeder extends Seeder
             ?? Category::where('is_active', true)->inRandomOrder()->first();
     }
 
+    /**
+     * The demo packages.
+     *
+     * Service names here are REAL rows from the v2 tree, not labels. They
+     * used to be a vocabulary of their own — "Catering / Food", "Lighting &
+     * Tech" — which matched nothing a client can filter by, so eighteen of
+     * the nineteen demo packages never appeared in Package Search. The page
+     * Sir Peter demonstrates was empty whatever he ticked.
+     *
+     * Anything added here has to exist in
+     * ProfessionalPackageController::palette(), which is what a real save is
+     * checked against.
+     */
     private function packages(): array
     {
         return [
             [
                 'title' => 'Elegant Wedding Photo & Video Package', 'owner' => 'elena.demo@example.test', 'category' => 'Photograph', 'type' => 'solo',
-                'services' => ['Photography', 'Videography', 'Floral Design', 'Planning / Coordination'],
+                'services' => ['Wedding Photography', 'Videography & Cinematic Films', 'Bridal & Ceremony Florals', 'Day-Of Coordination'],
                 'price' => 3250, 'price_unit' => 'from', 'duration' => 'Up to 10 Hours', 'coverage' => 'Up to 10 Hours',
                 'team' => ['1 Lead Photographer', '1 Videographer', '1 Floral Designer'], 'guests' => 'Up to 150',
                 'availability' => 'Available Weekends', 'savings_pct' => 15,
@@ -141,7 +167,7 @@ class DemoPackagesSeeder extends Seeder
             ],
             [
                 'title' => 'Ultimate Visual Bundle', 'owner' => 'duy.demo@example.test', 'category' => 'Photograph', 'type' => 'solo',
-                'services' => ['Photography', 'Videography'],
+                'services' => ['Wedding Photography', 'Videography & Cinematic Films'],
                 'price' => 4850, 'price_unit' => 'from', 'duration' => 'Up to 12 Hours', 'coverage' => 'Up to 12 Hours',
                 'team' => ['1 Lead Photographer', '1 Assistant', '1 Videographer', '1 Drone Pilot'], 'guests' => 'Up to 200',
                 'availability' => 'Available Weekends', 'savings_pct' => 20,
@@ -151,7 +177,7 @@ class DemoPackagesSeeder extends Seeder
             ],
             [
                 'title' => 'Luxury Event Styling & Floral Experience', 'owner' => 'bloomvine.demo@example.test', 'category' => 'Floral', 'type' => 'solo',
-                'services' => ['Floral Design', 'Decor & Design', 'Lighting & Tech', 'Planning / Coordination'],
+                'services' => ['Bridal & Ceremony Florals', 'Themed Decor Design', 'Lighting Design (Event-Wide)', 'Day-Of Coordination'],
                 'price' => 2950, 'price_unit' => 'from', 'duration' => 'Setup + Event Day', 'coverage' => 'Setup + Event Day',
                 'team' => ['2 Designers', '2 Floral Stylists', '1 Tech Specialist'], 'guests' => 'Up to 150',
                 'availability' => 'Available Weekends', 'savings_pct' => 15,
@@ -161,7 +187,7 @@ class DemoPackagesSeeder extends Seeder
             ],
             [
                 'title' => 'Complete Celebration: Photo, DJ & Décor', 'owner' => 'mixmasters.demo@example.test', 'category' => 'DJ', 'type' => 'solo',
-                'services' => ['Photography', 'DJ / Entertainment', 'Decor & Design', 'Lighting & Tech'],
+                'services' => ['Wedding Photography', 'Wedding DJs', 'Themed Decor Design', 'Lighting Design (Event-Wide)'],
                 'price' => 5600, 'price_unit' => 'from', 'duration' => 'Up to 8 Hours', 'coverage' => 'Up to 8 Hours',
                 'team' => ['1 Photographer', '1 DJ + MC', '1 Décor Lead', '1 Lighting Tech'], 'guests' => 'Up to 250',
                 'availability' => 'Available Weekends', 'savings_pct' => 18,
@@ -171,7 +197,7 @@ class DemoPackagesSeeder extends Seeder
             ],
             [
                 'title' => 'Corporate Conference: Catering & AV', 'owner' => 'saffron.demo@example.test', 'category' => 'Cater', 'type' => 'solo',
-                'services' => ['Catering / Food', 'Lighting & Tech', 'Planning / Coordination'],
+                'services' => ['Full-Service Catering', 'Lighting Design (Event-Wide)', 'Day-Of Coordination'],
                 'price' => 8400, 'price_unit' => 'from', 'duration' => 'Multi-day', 'coverage' => 'Up to 3 Days',
                 'team' => ['Catering crew (6)', '2 AV Technicians', '1 Event Coordinator'], 'guests' => 'Up to 400',
                 'availability' => 'Weekdays & Weekends', 'savings_pct' => 12,
@@ -181,7 +207,7 @@ class DemoPackagesSeeder extends Seeder
             ],
             [
                 'title' => 'Full-Service Wedding Planning', 'owner' => 'grandaffair.demo@example.test', 'category' => 'Planning', 'type' => 'solo',
-                'services' => ['Planning / Coordination', 'Decor & Design', 'Floral Design'],
+                'services' => ['Day-Of Coordination', 'Themed Decor Design', 'Bridal & Ceremony Florals'],
                 'price' => 4200, 'price_unit' => 'from', 'duration' => '3–6 months lead', 'coverage' => 'Planning + Event Day',
                 'team' => ['1 Lead Planner', '1 Day-of Coordinator', '1 Assistant'], 'guests' => 'Up to 200',
                 'availability' => 'Available Weekends', 'savings_pct' => 14,
@@ -191,7 +217,7 @@ class DemoPackagesSeeder extends Seeder
             ],
             [
                 'title' => 'Cinematic Videography + Drone', 'owner' => 'duy.demo@example.test', 'category' => 'Video', 'type' => 'solo',
-                'services' => ['Videography'],
+                'services' => ['Videography & Cinematic Films'],
                 'price' => 2600, 'price_unit' => 'from', 'duration' => 'Full day', 'coverage' => 'Up to 10 Hours',
                 'team' => ['1 Lead Videographer', '1 Drone Pilot'], 'guests' => 'Up to 180',
                 'availability' => 'Available Weekends', 'savings_pct' => null,
@@ -201,7 +227,7 @@ class DemoPackagesSeeder extends Seeder
             ],
             [
                 'title' => 'DJ & Live Sound: Reception Party', 'owner' => 'horizon.demo@example.test', 'category' => 'DJ', 'type' => 'solo',
-                'services' => ['DJ / Entertainment', 'Lighting & Tech'],
+                'services' => ['Wedding DJs', 'Lighting Design (Event-Wide)'],
                 'price' => 1200, 'price_unit' => 'from', 'duration' => '5 hours', 'coverage' => 'Up to 5 Hours',
                 'team' => ['1 DJ + MC', '1 Sound Tech'], 'guests' => 'Up to 150',
                 'availability' => 'Available Weekends', 'savings_pct' => 10,
@@ -211,7 +237,7 @@ class DemoPackagesSeeder extends Seeder
             ],
             [
                 'title' => 'Birthday & Celebration Décor', 'owner' => 'lumiere.demo@example.test', 'category' => 'Decor', 'type' => 'solo',
-                'services' => ['Decor & Design', 'Floral Design'],
+                'services' => ['Themed Decor Design', 'Bridal & Ceremony Florals'],
                 'price' => 550, 'price_unit' => 'from', 'duration' => 'Per event', 'coverage' => 'Setup + Event Day',
                 'team' => ['1 Décor Stylist', '1 Assistant'], 'guests' => 'Up to 80',
                 'availability' => 'Available Weekends', 'savings_pct' => null,
@@ -228,7 +254,7 @@ class DemoPackagesSeeder extends Seeder
                 'status' => 'draft',
                 // Deliberately unfinished: one service and no price, so the
                 // shelf shows it stopped at step 2 with a real reason.
-                'services' => ['Photography'],
+                'services' => ['Wedding Photography'],
                 'price' => 0, 'price_unit' => 'flat', 'duration' => null, 'coverage' => null,
                 'team' => [], 'guests' => 'Up to 40',
                 'availability' => null, 'savings_pct' => null,
@@ -240,7 +266,7 @@ class DemoPackagesSeeder extends Seeder
                 'title' => 'Anniversary Portrait Session', 'owner' => 'elena.demo@example.test', 'category' => 'Photograph', 'type' => 'solo',
                 // Finished, just not live — this is the "Ready to Publish" state.
                 'status' => 'draft',
-                'services' => ['Photography', 'Videography'],
+                'services' => ['Wedding Photography', 'Videography & Cinematic Films'],
                 'price' => 1600, 'price_unit' => 'from', 'duration' => 'Up to 4 Hours', 'coverage' => 'Up to 4 Hours',
                 'team' => [], 'guests' => 'Up to 30',
                 'availability' => 'Weekdays & Weekend', 'savings_pct' => null,
@@ -251,7 +277,7 @@ class DemoPackagesSeeder extends Seeder
             [
                 'title' => 'Summer Wedding Add-On: Drone Coverage', 'owner' => 'elena.demo@example.test', 'category' => 'Video', 'type' => 'solo',
                 'status' => 'paused',
-                'services' => ['Videography', 'Photography'],
+                'services' => ['Videography & Cinematic Films', 'Wedding Photography'],
                 'price' => 650, 'price_unit' => 'from', 'duration' => 'Up to 2 Hours', 'coverage' => 'Up to 2 Hours',
                 'team' => [], 'guests' => 'Up to 150',
                 'availability' => 'Available Weekends', 'savings_pct' => null,
@@ -262,7 +288,7 @@ class DemoPackagesSeeder extends Seeder
             [
                 'title' => 'Winter 2025 Holiday Party Package', 'owner' => 'elena.demo@example.test', 'category' => 'Photograph', 'type' => 'solo',
                 'status' => 'archived',
-                'services' => ['Photography', 'Decor & Design'],
+                'services' => ['Wedding Photography', 'Themed Decor Design'],
                 'price' => 1900, 'price_unit' => 'from', 'duration' => 'Up to 5 Hours', 'coverage' => 'Up to 5 Hours',
                 'team' => [], 'guests' => 'Up to 80',
                 'availability' => 'Available Weekends', 'savings_pct' => null,
@@ -272,7 +298,7 @@ class DemoPackagesSeeder extends Seeder
             ],
             [
                 'title' => 'Grand Gala Production Package', 'owner' => 'grandaffair.demo@example.test', 'category' => 'Planning', 'type' => 'solo',
-                'services' => ['Planning / Coordination', 'Catering / Food', 'Lighting & Tech', 'DJ / Entertainment'],
+                'services' => ['Day-Of Coordination', 'Full-Service Catering', 'Lighting Design (Event-Wide)', 'Wedding DJs'],
                 'price' => 15000, 'price_unit' => 'from', 'duration' => 'Per event', 'coverage' => 'Full Production',
                 'team' => ['1 Production Lead', 'Catering crew (8)', '2 AV Techs', '1 DJ', 'Event staff (6)'], 'guests' => 'Up to 500',
                 'availability' => 'By Arrangement', 'savings_pct' => 16,

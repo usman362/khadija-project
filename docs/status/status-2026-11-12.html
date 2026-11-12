@@ -1,0 +1,103 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>GigResource: Status, 12 November</title>
+<style>
+  @page { size: A4; margin: 15mm 14mm 13mm; }
+  * { box-sizing: border-box; }
+  body { font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+         color: #1e293b; font-size: 10.5pt; line-height: 1.5; margin: 0; }
+  h1 { font-size: 19pt; margin: 0 0 1mm; color: #ea580c; letter-spacing: -0.3px; }
+  .sub { color: #64748b; font-size: 10pt; margin: 0 0 6mm; }
+  h2 { font-size: 11.5pt; margin: 7mm 0 2.5mm; padding-bottom: 1.5mm;
+       border-bottom: 2px solid #ea580c; color: #0f172a; }
+  table { width: 100%; border-collapse: collapse; font-size: 9.8pt; margin-top: 2mm; }
+  th, td { border: 1px solid #e2e8f0; padding: 2.2mm 3mm; text-align: left; vertical-align: top; }
+  th { background: #f8fafc; font-size: 9.2pt; }
+  td.ok { color: #047857; font-weight: 700; white-space: nowrap; }
+  .note { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 3mm;
+          padding: 3.5mm 4.5mm; margin: 0 0 5mm; font-size: 10pt; }
+  .note b { color: #0f172a; }
+  ul { margin: 2mm 0 0; padding-left: 5mm; }
+  li { margin-bottom: 1.6mm; }
+  .two { column-count: 2; column-gap: 7mm; }
+  .flag { background: #fff7ed; border: 1px solid #fed7aa; border-radius: 3mm; padding: 3.5mm 4.5mm; }
+  .foot { margin-top: 7mm; font-size: 8.8pt; color: #94a3b8; text-align: center; }
+</style>
+</head>
+<body>
+
+<h1>Where the build stands</h1>
+<p class="sub">GigResource &middot; 12 November 2026</p>
+
+<div class="note">
+  <b>The Professional Portal sprint is finished, three days before its deadline.</b>
+  All twenty modules on the 5 November checklist are built and were opened and
+  checked today, one by one. Eighteen of them already existed; two were genuinely
+  missing and have been built. Checking the other eighteen found eight faults,
+  listed below, all now fixed.
+</div>
+
+<h2>The twenty modules</h2>
+
+<table>
+  <tr><th style="width:42%">Module</th><th style="width:16%">State</th><th>Note</th></tr>
+  <tr><td>Dashboard</td><td class="ok">Working</td><td></td></tr>
+  <tr><td>Priority Actions</td><td class="ok">Working</td><td></td></tr>
+  <tr><td>Agreements</td><td class="ok">Working</td><td>Includes the 24 hour reminders</td></tr>
+  <tr><td>Team &amp; Workforce</td><td class="ok">Working</td><td>Staff, photographs, supervisor and on-site contact</td></tr>
+  <tr><td>Create a Package</td><td class="ok">Working</td><td>Price levels added today</td></tr>
+  <tr><td>My Packages</td><td class="ok">Working</td><td>Was returning an error; fixed today</td></tr>
+  <tr><td>My Services &amp; Pricing</td><td class="ok">Working</td><td>Card redesigned to your 10 November screen</td></tr>
+  <tr><td>Gig Operations Hub</td><td class="ok">Working</td><td>Check-in added today</td></tr>
+  <tr><td>Calendar</td><td class="ok">Working</td><td></td></tr>
+  <tr><td>Messages</td><td class="ok">Working</td><td></td></tr>
+  <tr><td>Leads CRM</td><td class="ok">Working</td><td></td></tr>
+  <tr><td>Proposals / Bids</td><td class="ok">Working</td><td></td></tr>
+  <tr><td>Bidding Board &amp; Direct Requests</td><td class="ok">Working</td><td></td></tr>
+  <tr><td>My Clients</td><td class="ok">Working</td><td></td></tr>
+  <tr><td>GigResource IQ (Tools &amp; Tiers)</td><td class="ok">Working</td><td>Twenty tools</td></tr>
+  <tr><td>Reviews &amp; Reputation</td><td class="ok">Working</td><td></td></tr>
+  <tr><td>Invoices &amp; Reports</td><td class="ok">Working</td><td>Downloads as spreadsheet and PDF</td></tr>
+  <tr><td>Disputes &amp; No-shows</td><td class="ok">Working</td><td>Time limits and fees still need your decision</td></tr>
+  <tr><td>Requests &amp; Submissions</td><td class="ok">Working</td><td></td></tr>
+  <tr><td>Profile &amp; Settings</td><td class="ok">Working</td><td></td></tr>
+</table>
+
+<h2>Built today, because they were the only two missing</h2>
+<ul>
+  <li><b>Price levels on a package.</b> A professional can offer two or three levels, like Silver and Gold, each with its own price and a line saying what makes it different. The client picks one and is charged that. The price shown on the cards is always the cheapest level, so nobody is advertised a figure they cannot buy at.</li>
+  <li><b>Check-in on the day.</b> The Gig Operations Hub opens with what is happening today and the professional marks that they are on site. The client sees it and can confirm it. The two are recorded separately, because the professional saying they arrived and the client agreeing are different facts.</li>
+</ul>
+
+<h2>Found while checking the other eighteen, and fixed</h2>
+<ul>
+  <li><b>My Packages would not open at all</b> for any professional whose package listed a crew.</li>
+  <li><b>A package threw away every service the professional chose.</b> They would tick two services, save, and get a package tagged with nothing, which then never appeared in Package Search.</li>
+  <li><b>Most demo packages could not be found</b> in Package Search, because they were labelled with words that are not services. This is the page that gets demonstrated.</li>
+  <li><b>Four pages ran off the side of a phone:</b> the Operations Hub, Services &amp; Pricing, Proposals, and Transactions.</li>
+  <li><b>The Transactions filter row</b> put every filter on its own line, so a row of five looked like five rows.</li>
+</ul>
+
+<h2>Your master service list is in</h2>
+<p>All 241 of your existing titles matched ours exactly and stayed where they were, so nothing was renamed or moved. The three groups are live: <b>213</b> professional only, <b>28</b> either, <b>15</b> influencer services under a new heading. The 15 and their heading are switched off, because you called them proposals for approval.</p>
+
+<h2>The client side</h2>
+<p>Checked the same way at phone, tablet and desktop width: nothing runs off the screen anywhere. Money now comes from one place, so the figures agree across Bookings, Payments, Spending and the dashboard, and a deposit shows as paid everywhere instead of nowhere.</p>
+
+<h2>What is waiting on you</h2>
+<div class="flag">
+<ul>
+  <li><b>The 28 shared services</b>, reviewed with Khadijah, as you asked.</li>
+  <li><b>Breaking up the "&amp;" service titles.</b> This contradicts your own first instruction on the master list, which was to keep the 241 titles unchanged. It is worth deciding which you want.</li>
+  <li><b>Funeral Officiants appears twice</b> under two headings and is a genuine duplicate. 360 Photo Booths and 360 Video Booths are not; your list is right to keep both.</li>
+  <li><b>Package photo limit</b> by membership level: three numbers.</li>
+  <li><b>Dispute time limits and fees.</b></li>
+</ul>
+</div>
+
+<p class="foot">GigResource &middot; status at 12 November 2026</p>
+
+</body>
+</html>

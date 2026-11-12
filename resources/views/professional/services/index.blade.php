@@ -85,15 +85,25 @@
     .sp-svc { flex-direction:column; border:1px solid var(--border-color); border-radius:13px;
         overflow:hidden; background:var(--bg-card); }
     .sp-svc.is-resting { opacity:.72; }
-    .sp-svc .media { position:relative; display:flex; align-items:center; justify-content:center; height:112px;
+    /* The band carries the name. A header strip, not a picture frame: it is
+       as tall as the words need and no taller, where the old tile was 112px
+       of colour holding a single letter. */
+    .sp-svc .media { position:relative; display:flex; align-items:center; gap:11px; padding:13px 15px;
+        min-height:62px;
         background:linear-gradient(135deg, color-mix(in srgb, var(--t) 85%, #000), color-mix(in srgb, var(--t) 45%, #000)); }
-    .sp-svc .media .initial { font-size:28px; font-weight:800; color:rgba(255,255,255,.85); }
-    .sp-svc .live { position:absolute; top:9px; right:9px; font-size:10.5px; font-weight:700; padding:3px 10px;
-        border-radius:20px; background:rgba(209,250,229,.95); color:#047857; }
+    .sp-svc .media .mark { flex:none; width:34px; height:34px; border-radius:10px;
+        display:flex; align-items:center; justify-content:center;
+        font-size:15px; font-weight:800; color:#fff;
+        background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.22); }
+    .sp-svc .media .name { flex:1 1 auto; min-width:0; font-size:14.5px; font-weight:800; color:#fff;
+        line-height:1.25; }
+    /* Static, so the pill sits beside the name instead of over it: the name
+       is as long as it is, and a service called "Point-of-Sale & Cashless
+       Payment Systems" would have run underneath an absolute one. */
+    .sp-svc .live { position:static; flex:none; align-self:flex-start; font-size:10.5px; font-weight:700;
+        padding:3px 10px; border-radius:20px; background:rgba(209,250,229,.95); color:#047857; }
     .sp-svc .live.off { background:rgba(241,245,249,.95); color:#475569; }
     .sp-svc .body { padding:12px 14px; flex:1 1 auto; }
-    .sp-svc .body b { display:block; font-size:14px; font-weight:800; color:var(--text-primary); line-height:1.3; }
-    .sp-svc .cat { display:block; font-size:11.5px; color:var(--text-muted); margin-top:2px; }
     .sp-svc .chips { display:flex; gap:5px; flex-wrap:wrap; margin:9px 0 11px; }
     .sp-svc .chip { display:inline-flex; align-items:center; gap:4px; font-size:10px; font-weight:700;
         padding:3px 8px; border-radius:6px; background:var(--bg-page, rgba(128,128,128,.08));
@@ -421,18 +431,25 @@
                          data-cat="{{ $service->parent?->name }}"
                          data-status="{{ $resting ? 'resting' : 'active' }}"
                          data-priced="{{ $hasPrice ? 'priced' : 'unpriced' }}">
-                    {{-- No photograph is stored for a service, so this is a
-                         tile rather than a stock picture of somebody else's
-                         work. --}}
+                    {{-- Sir Peter, 10 November: the service name belongs IN the
+                         band, and the category line under it comes out.
+
+                         His reason is a real one. The same service can sit in
+                         two categories — 360 Photo Booths under Photo Booths
+                         and 360 Video Booths under Photography — and printing
+                         the category under each made two different services
+                         look like one filed twice.
+
+                         Still a tile and not a photograph: no picture is
+                         stored for a service, and a stock image of somebody
+                         else's work would be a claim about this one. --}}
                     <span class="media" style="--t: {{ $tint }};">
-                        <span class="initial">{{ Str::upper(Str::substr($service->name, 0, 1)) }}</span>
+                        <span class="mark" aria-hidden="true">{{ Str::upper(Str::substr($service->name, 0, 1)) }}</span>
+                        <b class="name">{{ $service->name }}</b>
                         <span class="live {{ $resting ? 'off' : '' }}">{{ $resting ? 'Inactive' : 'Active' }}</span>
                     </span>
 
                     <div class="body">
-                        <b>{{ $service->name }}</b>
-                        <span class="cat">{{ $service->parent?->name ?? 'Service' }}</span>
-
                         <span class="chips">
                             @if ($hasPrice)
                                 <span class="chip amber">{!! $ico('bolt') !!} Quick Bid Ready</span>

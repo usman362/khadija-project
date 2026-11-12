@@ -73,6 +73,37 @@ class AProfessionalCanPriceTheirOwnServicesTest extends TestCase
             ->assertSee('Event Photography');
     }
 
+    /**
+     * Sir Peter, 10 November: the service name belongs in the coloured band
+     * and the category line under it comes out.
+     *
+     * His reason is a real one, and it is the whole point of the change: the
+     * same service can sit in two categories — 360 Photo Booths under Photo
+     * Booths, 360 Video Booths under Photography — and printing the category
+     * under each made two different services look like one filed twice.
+     */
+    public function test_the_card_carries_the_name_and_not_the_category(): void
+    {
+        $parent = Category::firstOrCreate(
+            ['slug' => 'entertainment-and-music'],
+            ['name' => 'Entertainment & Music', 'kind' => Category::SERVICE_CATEGORY, 'is_active' => true],
+        );
+
+        $this->dj->update(['parent_id' => $parent->id]);
+
+        $html = $this->actingAs($this->pro)->get(route('professional.services.index'))
+            ->assertOk()->getContent();
+
+        // The name, inside the band rather than under it.
+        $this->assertMatchesRegularExpression(
+            '/<span class="media"[^>]*>.*?<b class="name">Wedding DJ<\/b>/s',
+            $html,
+        );
+
+        // And nothing printing the category beneath it.
+        $this->assertStringNotContainsString('class="cat"', $html);
+    }
+
     public function test_a_service_they_do_not_offer_is_not_in_their_list(): void
     {
         $other = $this->service('Catering', 'catering');

@@ -169,8 +169,18 @@ class TheLastFourProfessionalScreensMatchTheDesignTest extends TestCase
 
         $html = $this->page('professional.services.index');
 
-        $this->assertStringContainsString('class="initial"', $html);
+        /*
+         * The drawn tile, which is still the point: nothing stores a picture
+         * per service and a stock photograph would be a claim about somebody
+         * else's work. The class was `initial` until 2026-11-12, when the
+         * service name moved into the band beside it and the mark became a
+         * tile rather than a letter floating in colour.
+         */
+        $this->assertStringContainsString('class="mark"', $html);
         $this->assertStringNotContainsString('unsplash', $html);
+
+        // And the name is in the band now, not under it.
+        $this->assertStringContainsString('<b class="name">Wedding DJ</b>', $html);
     }
 
     /** The rail she has, with its three cards. */
