@@ -10,6 +10,39 @@ code.
 
 ---
 
+## 2026-11-13
+
+### The Leads CRM ran off the side of the screen
+Ali sent a photograph of the Leads list with the right-hand columns cut off the
+screen and the whole page sliding sideways. The table is eight columns of small
+labels, and every one of those labels was set never to break onto a second
+line, so a single row wanted about 1,431 pixels. On anything narrower than a
+very wide monitor the table grew straight through the card it sits in and took
+the page with it: Budget, Stage, Priority and Last contacted were simply off
+the screen, and so was the card's own edge.
+
+Two changes. A label inside a table cell is allowed to wrap now, which brought
+a row down to 976 pixels, and the table has a scroll of its own inside the
+card, so on a narrow window it is the table that moves and never the page. On a
+phone the rows still stack into blocks as before. The list now fits a 1,280
+laptop with all eight columns showing.
+
+### A page title with another page's subtitle under it
+The blue bar at the top of every professional page showed the page name with
+"Your business at a glance, Nov 13" beneath it. That line belongs to the
+dashboard. Twenty-one professional pages name themselves and only six give a
+subtitle of their own, so fifteen of them were carrying the dashboard's
+greeting under their own title. The greeting now appears only on the dashboard.
+
+The same bar hid its text entirely on any window under 1,200 pixels, leaving a
+blue slab wrapped around a search box and nothing saying what you were looking
+at. The page name is the part worth keeping, so the subtitle gives way first
+and the search box after it. On a phone the bar now reads "Leads CRM".
+
+Live: not yet deployed.
+
+---
+
 ## 2026-11-12 (professional side)
 
 ### Four screens that were built, working, and empty
@@ -391,9 +424,10 @@ down and understood, and none of them is started.
 
 ## Still waiting on the client
 
-- **Duplicate services.** 360 Photo Booths and 360 Video Booths are the same
-  thing entered twice, and so are Funeral Officiants and Funeral Officiants &
-  Ceremony Leaders. Waiting on which name to keep in each pair.
+- **Duplicate services.** Funeral Officiants and Funeral Officiants & Ceremony
+  Leaders are the same thing entered twice: identical lists beneath them.
+  Waiting on which name to keep. (360 Photo Booths and 360 Video Booths were
+  reported as a pair as well and are not one: the lists beneath them differ.)
 - **Influencer hiring.** Peter confirmed "Both" means either way, and that the
   same-state rule applies. The remaining work is that influencers cannot be
   hired at all yet.

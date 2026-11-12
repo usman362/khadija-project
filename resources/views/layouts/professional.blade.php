@@ -536,11 +536,15 @@
         /* Solid, not translucent. A 20%-white disc over the blue lands close enough
            to the banner that white initials on it measured 3.6:1 — the letter read as
            a smudge. Inverted: white disc, blue letter, 5.6:1. */
-        .pro-banner-text { flex-shrink: 0; }
-        .pro-banner-text h1 { font-size: 17px; font-weight: 800; color: #fff; margin: 0; }
+        /* It was flex-shrink: 0, so a long page name pushed the search box out
+           of the banner and made it a different width on every page. The client
+           side settled this on 29 September: the search keeps one width and the
+           title gives way instead. Same rule here. */
+        .pro-banner-text { flex: 1 1 auto; min-width: 0; overflow: hidden; }
+        .pro-banner-text h1 { font-size: 17px; font-weight: 800; color: #fff; margin: 0; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         /* 0.82 alpha put this at 4.2:1 at 11.5px — under the 4.5 small-text bar. */
-        .pro-banner-text p { font-size: 11.5px; color: rgba(255,255,255,0.95); margin: 2px 0 0; }
-        .pro-banner-search { flex: 1; min-width: 120px; position: relative; margin-left: 6px; }
+        .pro-banner-text p { font-size: 11.5px; color: rgba(255,255,255,0.95); margin: 2px 0 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .pro-banner-search { flex: 0 0 300px; min-width: 120px; position: relative; margin-left: 6px; }
         .pro-banner-search > svg { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); width: 16px; height: 16px; color: var(--text-muted); }
         .pro-banner-search input { width: 100%; height: 42px; border-radius: 10px; border: none; padding: 0 44px 0 40px; background: #fff; font-size: 13px; color: #1e293b; outline: none; }
         .pro-banner-search kbd { position: absolute; right: 12px; top: 50%; transform: translateY(-50%); font-size: 10px; color: var(--text-muted); background: var(--bg-card-hover); border: 1px solid var(--border-color); border-radius: 5px; padding: 2px 6px; }
@@ -577,8 +581,29 @@
         .pro-btn-ghost { background: var(--bg-card); border: 1px solid var(--border-color); color: var(--text-primary); }
         .pro-btn-primary { background: #2563eb; border: none; color: #fff; }
         .pro-btn-primary:hover { background: #1d4ed8; }
-        @media (max-width: 1200px) { .pro-banner-text { display: none; } }
-        @media (max-width: 860px) { .pro-topbar { flex-direction: column; } .pro-topbar-right { width: 100%; justify-content: flex-end; } .pro-avatar-meta { display: none; } }
+        /* Below 1200 the whole title block used to be hidden, which left the
+           banner as a blue slab wrapped around a search box: no page name, no
+           greeting, nothing saying what you were looking at. On a phone, where
+           the bar also stacks, that slab sat between the menu button and the
+           account controls and read as a stray floating element.
+
+           The page name is the part worth keeping, so the subtitle goes first
+           and the search goes next. The banner always says where you are. */
+        @media (max-width: 1200px) {
+            .pro-banner-text p { display: none; }
+            /* The search goes, not the title. Sharing what is left between the
+               two gave a title reading "Leads ..." beside a search box too
+               narrow to read a query in: neither was usable. Below this width
+               the banner says where you are and nothing else, and every page
+               that needs a search of its own already has one in the page. */
+            .pro-banner-search { display: none; }
+        }
+        @media (max-width: 860px) {
+            .pro-topbar { flex-direction: column; }
+            .pro-topbar-right { width: 100%; justify-content: flex-end; }
+            .pro-avatar-meta { display: none; }
+            .pro-banner { width: 100%; }
+        }
 
         .cl-mobile-toggle {
             display: none;
@@ -1296,9 +1321,25 @@
                      screen was the page named. Those pages are shared between
                      both portals; the client saw a title and the professional
                      did not. --}}
+                @php
+                    /* The subtitle used to fall back to the dashboard greeting whenever a
+                       page did not set one. Twenty-one professional pages name themselves
+                       and only six give a subtitle, so fifteen of them carried a line that
+                       belonged to another page: "Leads CRM" over "Your business at a
+                       glance, Nov 13". The greeting is the dashboard's, so it only shows
+                       when the dashboard's title does. */
+                    $__proTitle = trim($__env->yieldContent('page-title'));
+                    $__proSub   = trim($__env->yieldContent('page-subtitle'));
+                    if ($__proTitle === '') {
+                        $__proTitle = 'Welcome back, ' . e(auth()->user()?->name ?? 'there') . '! 👋';
+                        $__proSub   = $__proSub !== '' ? $__proSub : 'Your business at a glance, ' . now()->format('M d') . '.';
+                    }
+                @endphp
                 <div class="pro-banner-text">
-                    <h1>@yield('page-title', 'Welcome back, ' . (auth()->user()?->name ?? 'there') . '! 👋')</h1>
-                    <p>@yield('page-subtitle', 'Your business at a glance, ' . now()->format('M d') . '.')</p>
+                    <h1>{!! $__proTitle !!}</h1>
+                    @if($__proSub !== '')
+                        <p>{!! $__proSub !!}</p>
+                    @endif
                 </div>
                 <div class="pro-banner-search">
                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>

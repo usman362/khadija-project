@@ -118,7 +118,18 @@
     .lc-chip.on { border-color:#ef4444; color:#b91c1c; background:rgba(239,68,68,0.1); }
 
     /* ── The table ── */
-    .lc-table { width:100%; border-collapse:collapse; font-size:12.5px; }
+    /* Eight columns of chips that each refuse to wrap. On a 1000px window the
+       row needed about 1150 and the table simply grew past the card, taking
+       the whole page into a sideways scroll: the right-hand columns were cut
+       off the screen and the card's own border ran off with them. The table
+       keeps its floor and scrolls inside the card instead. Below 860 the rows
+       stack into blocks, so there is nothing to scroll and the floor goes. */
+    .lc-tablewrap { overflow-x:auto; -webkit-overflow-scrolling:touch; margin:0 -4px; padding:0 4px; }
+    /* A chip has to stay on one line in a filter row, where it is the whole
+       control. In a table cell it is a label, and holding the place name and
+       the date on one line each was most of the 1431px the row wanted. */
+    .lc-table .lc-chiplet { white-space:normal; }
+    .lc-table { width:100%; min-width:940px; border-collapse:collapse; font-size:12.5px; }
     .lc-table th { text-align:left; font-size:10px; font-weight:800; text-transform:uppercase; letter-spacing:.4px;
         color:var(--text-muted); padding:0 9px 8px; border-bottom:1px solid var(--border-color); }
     .lc-table td { padding:11px 9px; border-bottom:1px solid var(--border-color); vertical-align:top; color:var(--text-primary); }
@@ -171,7 +182,9 @@
         .lc-bottom { grid-template-columns:1fr; } }
     @media (max-width: 860px) { .lc-table thead { display:none; }
         .lc-table td { display:block; border:0; padding:3px 0; }
-        .lc-table tr { display:block; border-bottom:1px solid var(--border-color); padding:11px 0; } }
+        .lc-table tr { display:block; border-bottom:1px solid var(--border-color); padding:11px 0; }
+        .lc-table { min-width:0; }
+        .lc-tablewrap { overflow-x:visible; margin:0; padding:0; } }
 </style>
 @endpush
 
@@ -267,6 +280,7 @@
             @endif
         </p>
     @else
+        <div class="lc-tablewrap">
         <table class="lc-table">
             <thead>
                 <tr>
@@ -425,6 +439,7 @@
             @endforeach
             </tbody>
         </table>
+        </div>
 
         <div class="lc-foot">
             <span class="lc-note" style="margin:0;">
