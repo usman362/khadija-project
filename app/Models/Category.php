@@ -21,6 +21,7 @@ class Category extends Model
         'parent_id',
         'taxonomy_version',
         'kind',
+        'eligibility',
         'archetype',
         'popularity_tier',
         'cross_fit_alt',
@@ -63,6 +64,24 @@ class Category extends Model
     public const SERVICE_CATEGORY = 'service_category';
     public const SERVICE = 'service';
     public const SERVICE_SPECIALTY = 'service_specialty';
+
+    /**
+     * Who may offer a service, from Sir Peter's Master Service Classification
+     * of 8 November: 213 professional only, 28 either, 15 influencer only.
+     *
+     * A property of the service, not of the person. "Valet Parking" is not
+     * something an influencer does and "Social Media Takeovers" is not
+     * something a caterer does, whoever is asking.
+     */
+    public const ELIGIBLE_PROFESSIONAL = 'professional';
+    public const ELIGIBLE_BOTH = 'both';
+    public const ELIGIBLE_INFLUENCER = 'influencer';
+
+    public const ELIGIBILITIES = [
+        self::ELIGIBLE_PROFESSIONAL => 'Professionals only',
+        self::ELIGIBLE_BOTH         => 'Professionals and influencers',
+        self::ELIGIBLE_INFLUENCER   => 'Influencers only',
+    ];
 
     /**
      * Two category trees live in this table at once — the original one and Sir
@@ -123,6 +142,37 @@ class Category extends Model
     public function scopeAnyTaxonomy($query)
     {
         return $query->withoutGlobalScope('taxonomy');
+    }
+
+    /**
+     * The services one kind of provider may offer.
+     *
+     * A professional sees the 213 that are theirs plus the 28 shared; an
+     * influencer sees the 15 plus the same 28. Anyone else, which in practice
+     * means a client searching, sees everything: a client is not offering the
+     * service, they are looking for someone who does.
+     *
+     * Passing a role rather than a User because three of the callers have a
+     * portal and not a person, and because a user can hold both roles and the
+     * question is always "which side of the site is this".
+     */
+    public function scopeOfferableBy($query, ?string $role)
+    {
+        return match ($role) {
+            'professional' => $query->whereIn('eligibility', [self::ELIGIBLE_PROFESSIONAL, self::ELIGIBLE_BOTH]),
+            'influencer'   => $query->whereIn('eligibility', [self::ELIGIBLE_INFLUENCER, self::ELIGIBLE_BOTH]),
+            default        => $query,
+        };
+    }
+
+    /** Can this row be offered by that kind of provider? */
+    public function offerableBy(?string $role): bool
+    {
+        return match ($role) {
+            'professional' => in_array($this->eligibility, [self::ELIGIBLE_PROFESSIONAL, self::ELIGIBLE_BOTH], true),
+            'influencer'   => in_array($this->eligibility, [self::ELIGIBLE_INFLUENCER, self::ELIGIBLE_BOTH], true),
+            default        => true,
+        };
     }
 
     /** Rows of one v2 kind: event types, service categories, or services. */

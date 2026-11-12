@@ -53,6 +53,17 @@ class ImportTaxonomyV2 extends Command
             if ($this->option('prune')) {
                 $this->prune(array_merge(...$seen));
             }
+
+            /*
+             * And who may offer what.
+             *
+             * Sir Peter's classification of 8 November is part of the tree
+             * now, not a one-off correction to it. Applied here as well as in
+             * its own migration because on a fresh database the migration
+             * runs before any of this exists, and the 28 shared services
+             * would never be marked.
+             */
+            \App\Domain\Taxonomy\ServiceEligibility::apply();
         });
 
         // The archetype and tier maps are cached forever, so a reimport that

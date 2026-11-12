@@ -12,6 +12,33 @@ code.
 
 ## 2026-11-12 (professional side)
 
+### Every service now says who may offer it
+The owner's master service list, built. Until now every service in the system
+was silently a professional's: there was no way to say that Valet Parking is
+not something an influencer offers, or that Social Media Takeovers is not
+something a caterer offers.
+
+His list turned out to be an exact export of what we already have, all 241
+titles matching and each under the same heading, so nothing had to be renamed
+or moved. What it adds is the answer to that question: 213 for professionals
+only, 28 for either, and 15 new ones for influencers.
+
+The 15 are switched off, along with the heading that holds them, because he
+called them proposals for approval. They come on when they are approved and
+when influencers can actually be hired, which is the same moment. Until then a
+client choosing services is not shown a heading with nothing behind it.
+
+A professional is now offered 241 services, an influencer 43, and a client
+searching sees all of them, because a client is not offering the service, they
+are looking for someone who does. The rule is enforced when services are
+saved, not only hidden on the screen.
+
+One correction to something I reported earlier: of the two pairs of duplicate
+services I flagged, only one is really a duplicate. 360 Photo Booths and 360
+Video Booths are different things, and the owner's list is right to keep both.
+Funeral Officiants appears twice under two headings, and that one still needs
+his decision.
+
 ### The professional side, checked page by page
 Every page of the professional portal opened and measured at phone width, the
 same check that found the faults on the client side.

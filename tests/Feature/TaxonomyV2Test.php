@@ -38,13 +38,27 @@ class TaxonomyV2Test extends TestCase
     {
         $this->importV2();
 
+        /*
+         * The SHEET's size, which is what this guards: a row lost in the
+         * import. Counted without the influencer additions rather than by
+         * raising the numbers, so the sheet is still held to 241 and 27 after
+         * Sir Peter's classification added 15 services and a category on
+         * 2026-11-12, and after whatever is added next.
+         */
         $of = fn (string $kind) => Category::anyTaxonomy()
-            ->where('taxonomy_version', 'v2')->where('kind', $kind)->count();
+            ->where('taxonomy_version', 'v2')->where('kind', $kind)
+            ->where('eligibility', '!=', Category::ELIGIBLE_INFLUENCER)
+            ->count();
 
         $this->assertSame(106, $of(Category::EVENT_TYPE));
         $this->assertSame(27, $of(Category::SERVICE_CATEGORY));
         $this->assertSame(241, $of(Category::SERVICE));
         $this->assertSame(139, CategoryRelevance::count());
+
+        // And the additions themselves, so the other half cannot go quiet.
+        $this->assertSame(15, Category::anyTaxonomy()
+            ->where('kind', Category::SERVICE)
+            ->where('eligibility', Category::ELIGIBLE_INFLUENCER)->count());
     }
 
     public function test_v2_is_invisible_while_v1_is_live(): void
@@ -54,7 +68,8 @@ class TaxonomyV2Test extends TestCase
         $this->importV2();
 
         $this->assertSame(1, Category::count(), 'ordinary queries must not see the other tree');
-        $this->assertSame(375, Category::anyTaxonomy()->count());
+        // 375 from the sheet, plus the 16 rows of Sir Peter's classification.
+        $this->assertSame(391, Category::anyTaxonomy()->count());
     }
 
     public function test_switching_the_config_swaps_which_tree_is_visible(): void
@@ -64,7 +79,7 @@ class TaxonomyV2Test extends TestCase
 
         config(['taxonomy.version' => 'v2']);
 
-        $this->assertSame(374, Category::count());
+        $this->assertSame(390, Category::count());
         $this->assertNotNull(Category::where('name', 'Catering & Food Services')->first());
         $this->assertNull(Category::where('name', 'Catering Services')->first());
     }
@@ -101,7 +116,9 @@ class TaxonomyV2Test extends TestCase
         // the parent so neither overwrites the other.
         $this->assertSame(
             241,
-            Category::ofKind(Category::SERVICE)->count(),
+            Category::ofKind(Category::SERVICE)
+                ->where('eligibility', '!=', Category::ELIGIBLE_INFLUENCER)
+                ->count(),
             'no service was lost to a slug collision',
         );
     }

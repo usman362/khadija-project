@@ -47,6 +47,13 @@ class PackageController extends Controller
             fn () => \App\Models\Category::query()
                 ->where('kind', \App\Models\Category::SERVICE_CATEGORY)
                 ->where('is_active', true)
+                // A package is a professional's bundle of their own services,
+                // so the influencer-only category added by Sir Peter's
+                // classification is not one of its filters, and is not
+                // something a package can be validated into either: this list
+                // is the palette ProfessionalPackageController intersects
+                // against.
+                ->offerableBy('professional')
                 ->orderBy('name')
                 ->pluck('name')
                 ->all(),

@@ -26,6 +26,9 @@ class ProfessionalProfileController extends Controller
         // for the category list there.
         $categories = $tab === 'professional'
             ? \App\Models\Category::active()->bookableServices()
+                // Sir Peter's classification, 8 November: the 15 influencer
+                // services are not on offer here, and the 28 shared ones are.
+                ->offerableBy('professional')
                 ->orderBy('name')->get(['id', 'name'])
             : collect();
 
@@ -118,8 +121,21 @@ class ProfessionalProfileController extends Controller
         // one id per name. Saving those ids verbatim would quietly drop the pro
         // from every other branch carrying the same service. Expand back out:
         // offering a service means offering it wherever a client browses to it.
-        $names = \App\Models\Category::whereIn('id', $picked)->pluck('name');
-        $ids   = \App\Models\Category::whereIn('name', $names)->pluck('id')->all();
+        /*
+         * And only services a professional may offer.
+         *
+         * Sir Peter's classification puts 15 services beyond this side of the
+         * site: a caterer does not offer Social Media Takeovers. The picker
+         * does not show them, so this refuses rather than explains; a form
+         * that could not have produced this does not need an error message.
+         */
+        $names = \App\Models\Category::whereIn('id', $picked)
+            ->offerableBy('professional')
+            ->pluck('name');
+
+        $ids = \App\Models\Category::whereIn('name', $names)
+            ->offerableBy('professional')
+            ->pluck('id')->all();
 
         // NOT serviceCategories()->sync(): both relations share one pivot and
         // sync's delete ignores the kind filter, so that call wiped every
