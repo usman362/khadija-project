@@ -506,7 +506,7 @@ class ProfessionalProposalController extends Controller
             }
 
             fclose($out);
-        }, 'proposals-' . now()->format('Y-m-d') . '.csv', ['Content-Type' => 'text/csv']);
+        }, 'proposals-' . \App\Support\DisplayTimezone::today($user)->format('Y-m-d') . '.csv', ['Content-Type' => 'text/csv']);
     }
 
     /**

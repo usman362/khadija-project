@@ -163,20 +163,40 @@ class CalendarTimeGridTest extends TestCase
         $this->assertSame(ClientCalendar::OPENS_AT * ClientCalendar::HOUR_PX - 24, $g['scrollTo']);
     }
 
-    /** An empty today opens at the hour it is, which is the part of it left. */
+    /**
+     * An empty today opens at the hour it is, which is the part of it left.
+     *
+     * Half past seven in the evening HERE. The hour axis is drawn from the
+     * events' own hours, which arrive on the reader's clock, so the now line
+     * has to be read on that clock too. This test used to travel to 19:30
+     * UTC and expect the line at 7:30 PM, which pinned the fault it was
+     * meant to guard: half past two in the afternoon here.
+     *
+     * The instant is handed to travelTo in UTC, which matters more than it
+     * looks. Carbon fills the parts a format string does not specify from
+     * the test-now, its timezone included — so a test-now carrying Eastern
+     * makes every bare "Y-m-d H:i:s" in the file parse as Eastern, and the
+     * helper above writes its wall-clock times through one conversion too
+     * many. Same moment, no effect on how strings are read.
+     */
     public function test_an_empty_today_opens_at_now(): void
     {
-        $this->travelTo(now()->startOfDay()->setTime(19, 30));
+        $here  = \App\Support\DisplayTimezone::FALLBACK;
+        $today = \Illuminate\Support\Carbon::today($here);
 
-        $g = $this->grid('day', now()->startOfDay());
+        $this->travelTo($today->copy()->setTime(19, 30)->utc());
+
+        // The day being looked at is today here, which after 7pm is no
+        // longer the day UTC is having.
+        $g = $this->grid('day', $today);
 
         // 7:30 PM is 936px down at 48px an hour.
         $this->assertSame(936 - 24, $g['scrollTo']);
 
         // An event on the day still wins: it is the thing worth looking at.
-        $this->event('Breakfast Meeting', now()->startOfDay()->setTime(9, 0), now()->startOfDay()->setTime(10, 0));
+        $this->event('Breakfast Meeting', $today->copy()->setTime(9, 0), $today->copy()->setTime(10, 0));
 
-        $this->assertSame(432 - 24, $this->grid('day', now()->startOfDay())['scrollTo']);
+        $this->assertSame(432 - 24, $this->grid('day', $today)['scrollTo']);
     }
 
     /** No end, or an end that is not after the start, is drawn an hour — never zero. */

@@ -4,6 +4,7 @@ namespace App\Support;
 
 use App\Models\Event;
 use App\Models\User;
+use App\Support\DisplayTimezone;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 
@@ -42,13 +43,17 @@ final class ClientCalendar
     public static function build(User $client, ?string $view, ?string $anchor): array
     {
         $view = in_array($view, self::VIEWS, true) ? $view : 'month';
-        $now  = Carbon::now();
+
+        // Today on this client's clock, not UTC's. Carbon::now() is the
+        // application zone, so after 8pm Eastern the calendar opened on
+        // tomorrow's month and highlighted tomorrow's cell as today.
+        $now = DisplayTimezone::today($client);
 
         // A bad date in the address is not a broken page; it is today.
         try {
-            $at = $anchor ? Carbon::createFromFormat('Y-m-d', $anchor)->startOfDay() : $now->copy()->startOfDay();
+            $at = $anchor ? Carbon::createFromFormat('Y-m-d', $anchor)->startOfDay() : $now->copy();
         } catch (\Throwable) {
-            $at = $now->copy()->startOfDay();
+            $at = $now->copy();
         }
 
         if ($view === 'list') {
@@ -62,7 +67,7 @@ final class ClientCalendar
         } elseif ($view === 'day') {
             $first = $at->copy()->startOfDay();
             $last  = $at->copy()->endOfDay();
-            $title = $at->isToday() ? 'Today · ' . $at->format('D, M j') : $at->format('l, M j, Y');
+            $title = $at->isSameDay($now) ? 'Today · ' . $at->format('D, M j') : $at->format('l, M j, Y');
             $prev  = $at->copy()->subDay();
             $next  = $at->copy()->addDay();
         } elseif ($view === 'week') {
@@ -79,8 +84,19 @@ final class ClientCalendar
             $next  = $at->copy()->startOfMonth()->addMonth();
         }
 
+        // $first and $last are local days; the column they are compared
+        // against is UTC. Built with startOfDay/endOfDay the bounds were five
+        // hours short at each end, so the last day of a month lost its
+        // evening events and the first borrowed the night before it.
+        //
+        // The grouping needs no conversion: Event reads its dates through
+        // ShowsTimesWhereTheReaderIs, so starts_at is already on the reader's
+        // clock by the time it gets here.
+        [$rangeFrom, $rangeTo] = DisplayTimezone::rangeWindow($first, $last, $client);
+
         $byDate = Event::where('client_id', $client->id)
-            ->whereBetween('starts_at', [$first->copy()->startOfDay(), $last->copy()->endOfDay()])
+            ->where('starts_at', '>=', $rangeFrom)
+            ->where('starts_at', '<', $rangeTo)
             ->orderBy('starts_at')
             // city/state/location come along because the day cell shows where,
             // the way Sir Peter's calendar does. Selected rather than loading
@@ -181,7 +197,8 @@ final class ClientCalendar
             $cols[] = ['date' => $d, 'items' => $items, 'lanes' => max(1, count($laneEnds))];
         }
 
-        $now = Carbon::now();
+        // The "now" line belongs on the reader's clock for the same reason.
+        $now = Carbon::now(DisplayTimezone::current());
         $nowMin = $now->hour * 60 + $now->minute - $from * 60;
 
         /*
@@ -192,7 +209,7 @@ final class ClientCalendar
          */
         $firstEvent = collect($cols)->flatMap(fn ($col) => array_column($col['items'], 'start'))->min();
         $opensAt = $firstEvent
-            ?? (collect($days)->contains(fn ($d) => $d->isToday())
+            ?? (collect($days)->contains(fn ($d) => $d->isSameDay($now))
                 ? max(0, $nowMin)
                 : (self::OPENS_AT - $from) * 60);
 

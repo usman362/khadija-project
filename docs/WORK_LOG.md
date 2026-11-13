@@ -10,6 +10,55 @@ code.
 
 ---
 
+## 2026-11-14
+
+### The Availability page was a 500, and four calendars were on the wrong clock
+Ali saw the error himself: opening Availability on the live site returned
+Internal Server Error, every time, for every professional. The page asked the
+database for a column named `event_date`. There has never been a column by
+that name. One line, one page, dead since the day it was written.
+
+That is the whole crash, and it was quick. The rest of the morning went on the
+question it raised: where else does the site ask for something that is not
+there, and where else does it ask the wrong question about a date?
+
+**Nothing else asks for a missing column.** Every place in the application
+that names specific columns was checked against the real database, all
+sixty-odd of them. The Availability page was the only one wrong. That check is
+now a test, so the next one cannot reach the live site: a bad column name
+inside a line of code is invisible to a reader and raises nothing until
+somebody opens that page.
+
+**Four calendars were reading the clock in London, not here.** Separately from
+the crash, the calendars were deciding "what day is it" and "which days am I
+showing" against UTC rather than Eastern. From seven in the evening onwards,
+every evening:
+
+- the client's calendar and the dashboard calendar opened on tomorrow's month
+  and drew the box around tomorrow as though it were today;
+- the day and week views put the red "now" line five hours down the page;
+- any month or week lost the evening events of its last day completely. A
+  wedding on the last Saturday of a month simply was not on the calendar.
+
+All four are fixed, and each one is pinned by a test that fails if it comes
+back. Export files were also being named for the wrong day and now are not.
+
+**What was checked and found to be fine.** The times shown on events were
+right all along, and this is worth writing down because it looks like it ought
+to be part of the same fault. The site already converts every stored time to
+Eastern as it is read, so event times, booked days and the dates in downloaded
+spreadsheets were correct. Five changes written on the assumption that they
+were wrong were measured, found to change nothing, and taken back out.
+
+One existing test had the fault written into it: it set the clock to half past
+seven in the evening UTC and expected the page to behave as though it were
+half past seven here. It was agreeing with the bug rather than guarding
+against it. Corrected.
+
+Live: not yet. Needs the usual pull on the server.
+
+---
+
 ## 2026-11-13
 
 ### A demonstration business, on one named account, reversible

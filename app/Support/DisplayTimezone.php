@@ -165,6 +165,52 @@ final class DisplayTimezone
         ];
     }
 
+    /**
+     * The pair of UTC instants bounding a run of days on the platform's clock.
+     *
+     * dayWindow() for a calendar rather than a day. The same trap in its
+     * other form: whereBetween('starts_at', [$first->startOfDay(),
+     * $last->endOfDay()]) builds its bounds from local intent and compares
+     * them against a UTC column, so a month grid loses the late events of its
+     * last day and borrows them from the day after its first.
+     *
+     * Half-open, [start, end), to match dayWindow.
+     *
+     * @return array{0: Carbon, 1: Carbon}
+     */
+    public static function rangeWindow(Carbon|string $firstDay, Carbon|string $lastDay, ?User $user = null): array
+    {
+        // Read by the calendar date each bound is written as, not by moving
+        // it between clocks. A grid's edges arrive as startOfMonth and
+        // endOfWeek, which Carbon builds in the application zone: converting
+        // 1 November 00:00 UTC to Eastern gives the evening of 31 October,
+        // and a month that begins a day early is a different bug from the
+        // one being fixed. dayWindow does the converting, from a plain date.
+        return [
+            self::dayWindow(self::plainDay($firstDay), $user)[0],
+            self::dayWindow(self::plainDay($lastDay), $user)[1],
+        ];
+    }
+
+    /** A bound as the day it is written as, with no clock attached. */
+    private static function plainDay(Carbon|string $day): string
+    {
+        return $day instanceof Carbon ? $day->format('Y-m-d') : $day;
+    }
+
+    /**
+     * Today, on the platform's clock.
+     *
+     * Carbon::today() is the UTC today, which after 8pm Eastern is tomorrow:
+     * a calendar built on it highlights the wrong cell all evening, every
+     * evening. Screens that hand-rolled this from config() got the platform
+     * zone but not the account's.
+     */
+    public static function today(?User $user = null): Carbon
+    {
+        return Carbon::today($user ? self::forUser($user) : self::current());
+    }
+
     public static function platformDefault(): string
     {
         $configured = (string) config('app.display_timezone', self::FALLBACK);

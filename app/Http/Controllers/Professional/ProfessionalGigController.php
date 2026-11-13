@@ -31,9 +31,10 @@ class ProfessionalGigController extends Controller
     public function export(Request $request): \Symfony\Component\HttpFoundation\StreamedResponse
     {
         $gigs = $this->indexData($request)['myGigs'];
-        $me   = $request->user()->id;
+        $who  = $request->user();
+        $me   = $who->id;
 
-        return response()->streamDownload(function () use ($gigs, $me) {
+        return response()->streamDownload(function () use ($gigs, $me, $who) {
             $out = fopen('php://output', 'w');
 
             fputcsv($out, ['Gig', 'Date', 'Start', 'Client', 'Services', 'Status', 'Bids', 'Budget', 'Earned']);
@@ -55,7 +56,7 @@ class ProfessionalGigController extends Controller
             }
 
             fclose($out);
-        }, 'my-gigs-' . now()->toDateString() . '.csv', ['Content-Type' => 'text/csv; charset=UTF-8']);
+        }, 'my-gigs-' . \App\Support\DisplayTimezone::today($who)->toDateString() . '.csv', ['Content-Type' => 'text/csv; charset=UTF-8']);
     }
 
     public function indexData(Request $request): array

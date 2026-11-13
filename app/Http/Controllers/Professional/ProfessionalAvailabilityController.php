@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Booking;
 use App\Models\Category;
 use App\Models\StaffMember;
+use App\Support\DisplayTimezone;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
@@ -36,7 +37,7 @@ class ProfessionalAvailabilityController extends Controller
     {
         $me = $request->user();
 
-        $today = Carbon::today(config('app.display_timezone', config('app.timezone')));
+        $today = DisplayTimezone::today($me);
         $from  = $today->copy()->startOfMonth();
         $to    = $today->copy()->addMonths(self::MONTHS - 1)->endOfMonth();
 
@@ -44,12 +45,18 @@ class ProfessionalAvailabilityController extends Controller
 
         // Booked days are drawn as booked and are not answerable here: a day
         // that already has a gig on it is not a question.
+        //
+        // The column is starts_at. event_date has never been one, and naming
+        // it in the select was a 500 on this page every time it was opened.
+        // The day it lands on needs no conversion here: Event reads its dates
+        // through ShowsTimesWhereTheReaderIs, so starts_at already arrives on
+        // the reader's clock.
         $booked = Booking::where('supplier_id', $me->id)
             ->whereIn('status', ['confirmed', 'in_progress', 'pending'])
-            ->with('event:id,title,event_date')
+            ->with('event:id,title,starts_at')
             ->get()
-            ->filter(fn (Booking $b) => $b->event?->event_date)
-            ->keyBy(fn (Booking $b) => $b->event->event_date->format('Y-m-d'));
+            ->filter(fn (Booking $b) => $b->event?->starts_at)
+            ->keyBy(fn (Booking $b) => $b->event->starts_at->format('Y-m-d'));
 
         $months = [];
 

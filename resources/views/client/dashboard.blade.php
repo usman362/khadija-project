@@ -726,7 +726,9 @@
      * what makes ‹ › work at all — and makes a particular month something the
      * client can bookmark or send to us.
      */
-    $now = \Carbon\Carbon::now();
+    // Today on this client's clock. Carbon::now() is UTC, so all evening the
+    // grid marked tomorrow as today and "Today" jumped a day ahead.
+    $now = \App\Support\DisplayTimezone::today($user);
 
     $calView = in_array(request()->query('calview'), ['day', 'week'], true)
         ? request()->query('calview')
@@ -747,7 +749,7 @@
         // you were already looking at changed nothing at all.
         $firstCalDate = $calAnchor->copy()->startOfDay();
         $lastCalDate  = $calAnchor->copy()->endOfDay();
-        $calTitle     = $calAnchor->isToday()
+        $calTitle     = $calAnchor->isSameDay($now)
             ? 'Today · ' . $calAnchor->format('D j M')
             : $calAnchor->format('D j M Y');
         $calPrev      = $calAnchor->copy()->subDay();
@@ -774,8 +776,15 @@
         request()->query(), $over
     )) . '#calendar';
 
+    // The squares are local days; the column is UTC. startOfDay/endOfDay
+    // bounds were five hours short at each end, so the last row of the grid
+    // dropped its evening events. The grouping itself needs no conversion:
+    // Event reads its dates on the reader's clock already.
+    [$calFrom, $calTo] = \App\Support\DisplayTimezone::rangeWindow($firstCalDate, $lastCalDate, $user);
+
     $eventsByDate = \App\Models\Event::where('client_id', $user->id)
-        ->whereBetween('starts_at', [$firstCalDate->copy()->startOfDay(), $lastCalDate->copy()->endOfDay()])
+        ->where('starts_at', '>=', $calFrom)
+        ->where('starts_at', '<', $calTo)
         ->orderBy('starts_at')
         ->get()
         ->groupBy(fn ($e) => $e->starts_at?->format('Y-m-d'));
@@ -1239,7 +1248,7 @@
                         </a>
                     @empty
                         <p class="od-agenda-empty">
-                            Nothing on {{ $calAnchor->isToday() ? 'today' : $calAnchor->format('D j M') }}.
+                            Nothing on {{ $calAnchor->isSameDay($now) ? 'today' : $calAnchor->format('D j M') }}.
                             <a href="{{ $calLink(['calview' => 'month', 'cal' => $calAnchor->format('Y-m-d')]) }}" data-live style="font-weight:600;">See the month</a>
                         </p>
                     @endforelse
