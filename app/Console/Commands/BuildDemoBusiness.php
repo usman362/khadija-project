@@ -46,12 +46,14 @@ class BuildDemoBusiness extends Command
 
         if (! $pro) {
             $this->error('No account with that email.');
+            $this->suggest('professional');
 
             return self::FAILURE;
         }
 
         if (! $pro->hasRole('professional')) {
             $this->error($pro->email.' is not a professional account.');
+            $this->suggest('professional');
 
             return self::FAILURE;
         }
@@ -63,13 +65,44 @@ class BuildDemoBusiness extends Command
             : $this->give($demo, $pro);
     }
 
+    /**
+     * Name the accounts that would have worked.
+     *
+     * The demonstration logins were created as name@example.com and renamed
+     * to the live domain afterwards, so the defaults here are wrong on the
+     * live site and right everywhere else. Guessing a replacement would be
+     * worse than saying what is actually there: this command writes a year of
+     * bookings onto whichever account it is pointed at.
+     */
+    private function suggest(string $role): void
+    {
+        $found = User::whereHas('roles', fn ($q) => $q->where('name', $role))
+            ->orderBy('id')
+            ->limit(12)
+            ->get(['name', 'email']);
+
+        if ($found->isEmpty()) {
+            $this->line("There are no {$role} accounts on this database at all.");
+
+            return;
+        }
+
+        $this->newLine();
+        $this->line(ucfirst($role).' accounts here:');
+
+        foreach ($found as $one) {
+            $this->line(sprintf('  %-38s %s', $one->email, $one->name));
+        }
+    }
+
     private function give(DemoBusiness $demo, User $pro): int
     {
         $email  = $this->option('client') ?: 'client@example.com';
         $client = User::where('email', $email)->first();
 
         if (! $client || ! $client->hasRole('client')) {
-            $this->error("No client account at {$email}. Pass one with --client.");
+            $this->error("No client account at {$email}.");
+            $this->suggest('client');
 
             return self::FAILURE;
         }
