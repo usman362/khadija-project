@@ -98,6 +98,34 @@ professional who had completed everything watched it vanish rather than be told
 they were ready. It now stays and turns green, listing what is done with a tick
 against each, which is what the reference screen shows.
 
+### Each opportunity now says why it suits you
+The Opportunity Feed was a list of rows with a fit percentage on the right. It
+told a professional how well a job suited them without telling them why, which
+is a number to be taken on trust. The reference screen puts three cards across
+instead, and under each job three plain statements: whether it is work they
+offer, whether it is inside the distance they travel, and who posted it.
+
+All three are answered from records. The services line is already the
+difference between the feed's two halves. The travel line measures the
+distance between where they work out of and where the job is, against the
+radius they set themselves, and the same two points the board uses to decide
+whether they may see the job at all, so a card cannot say twenty miles beside
+a board that refused the same job. A job whose address could not be placed
+says the distance is not known, rather than printing nought miles, which would
+claim it was next door.
+
+The reference calls the third line "Verified Client". There is no client badge
+on this platform and inventing one would repeat the fault that the
+verification rules exist to prevent, so the card says the strongest thing that
+is true: that this professional has worked for them before, that the client's
+identity has been checked, or that they are new. New is a fact about a client,
+not a warning about one.
+
+Each card also carries the services the job names, the date with how far off
+it is, the budget, and one button. Three fit the column on a wide screen, two
+on a laptop and one on a phone, and anything past three is a line to the board
+rather than a longer list.
+
 ### Demo requests that were all the same sentence
 Each demonstration professional was posting the same three job titles on the
 same three dates for the same three budgets. With fifteen of them, one

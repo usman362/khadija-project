@@ -96,6 +96,32 @@ final class RadiusMatching
         return $miles <= (float) $pro->profile->travel_radius_miles;
     }
 
+    /**
+     * How far this job is from where the professional works out of.
+     *
+     * Null when the question cannot be answered — the professional has no
+     * placed origin, or the client's address could not be resolved to a
+     * point. A feed that prints "0 mi" in that case is claiming the job is
+     * next door, which is the one answer the data definitely does not
+     * support, so the card says the distance is not known instead.
+     *
+     * Uses the same two points allows() measures between, so a card cannot
+     * say twenty miles beside a board that refused the same job.
+     */
+    public static function milesBetween(?User $pro, ?Event $event): ?float
+    {
+        if (! self::originIsMatchable($pro) || ! self::eventIsMatchable($event)) {
+            return null;
+        }
+
+        return round(Haversine::miles(
+            (float) $pro->profile->origin_lat,
+            (float) $pro->profile->origin_lng,
+            (float) $event->location_lat,
+            (float) $event->location_lng,
+        ), 1);
+    }
+
     /** Drop unresolved / out-of-radius gigs from a loaded board collection. */
     public static function filterEventsForProfessional(Collection $events, ?User $pro): Collection
     {

@@ -169,16 +169,34 @@ class DemoProfessionalBusinessSeeder extends Seeder
             ]
         );
 
-        // Identity verified.
         $profile = $pro->getOrCreateProfile();
 
-        if (! $profile->identity_verified_at) {
-            $profile->forceFill([
-                'identity_submitted_at' => now()->subMonths(8),
-                'identity_verified_at'  => now()->subMonths(8)->addDays(2),
-                'travel_radius_miles'   => $profile->travel_radius_miles ?: 120,
-            ])->save();
-        }
+        /*
+         * Where they travel from, placed on the map.
+         *
+         * Without a resolved origin the Opportunity Feed cannot work out how
+         * far a job is, so every card said "Set where you travel from" rather
+         * than the distance and the radius tick the reference screen shows.
+         * Baltimore's own coordinates, to the city, which is what a
+         * professional who gives a city rather than a street gets.
+         */
+        $city = [
+            'Baltimore'  => [39.2904, -76.6122],
+            'Richmond'   => [37.5407, -77.4360],
+            'Washington' => [38.9072, -77.0369],
+        ][$profile->city ?? 'Baltimore'] ?? [39.2904, -76.6122];
+
+        $profile->forceFill(array_filter([
+            'identity_submitted_at' => $profile->identity_verified_at ? null : now()->subMonths(8),
+            'identity_verified_at'  => $profile->identity_verified_at ? null : now()->subMonths(8)->addDays(2),
+        ]) + [
+            'service_origin_city'  => $profile->city ?? 'Baltimore',
+            'service_origin_state' => $profile->state ?? 'MD',
+            'origin_lat'           => $city[0],
+            'origin_lng'           => $city[1],
+            'origin_precision'     => \App\Domain\Geolocation\LocationPrecision::ZIP,
+            'travel_radius_miles'  => $profile->travel_radius_miles ?: 120,
+        ])->save();
     }
 
     /**

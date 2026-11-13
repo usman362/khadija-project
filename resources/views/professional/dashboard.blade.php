@@ -210,7 +210,7 @@
     .pd-setup-bar i { display: block; height: 100%; background: var(--accent-blue, #2563eb); }
     .pd-setup-steps { display: flex; flex-wrap: wrap; gap: 7px; margin-top: 11px; }
     .pd-step { font-size: 11.5px; font-weight: 700; padding: 4px 10px; border-radius: 20px; text-decoration: none;
-        border: 1px solid var(--border-color); color: var(--accent-blue, #2563eb); }
+        border: 1px solid var(--border-color); color: var(--info-text, #1d4ed8); }
     .pd-step.done { color: var(--ok-text, #047857); border-color: currentColor; opacity: .75; }
     .pd-goal { display: flex; align-items: baseline; gap: 8px; margin: 4px 0 9px; }
     .pd-goal b { font-size: 23px; font-weight: 800; color: var(--text-primary); }
@@ -225,7 +225,7 @@
         border-radius: 10px; padding: 11px 13px; }
     .pd-gap b { display: block; font-size: 12.5px; font-weight: 800; color: var(--text-primary); line-height: 1.35; }
     .pd-gap span { display: block; font-size: 11.5px; color: var(--text-muted); margin: 4px 0 8px; }
-    .pd-gap a { font-size: 12px; font-weight: 700; color: var(--accent-blue, #2563eb); text-decoration: none; }
+    .pd-gap a { font-size: 12px; font-weight: 700; color: var(--info-text, #1d4ed8); text-decoration: none; }
 
     /* ── Finance Hub ── */
     .pd-fin-grid { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 9px; }
@@ -293,7 +293,7 @@
     .pd-setup-done .tick svg { width: 14px; height: 14px; color: var(--ok-text, #047857); flex-shrink: 0; }
     .pd-setup-all { font-size: 11.5px; font-weight: 800; color: var(--ok-text, #047857); }
     .pd-setup-cta { margin-left: auto; font-size: 11.5px; font-weight: 700; padding: 7px 13px; border-radius: 8px;
-        border: 1px solid var(--pd-line, rgba(37,99,235,0.2)); color: var(--accent-blue, #2563eb); text-decoration: none; white-space: nowrap; }
+        border: 1px solid var(--pd-line, rgba(37,99,235,0.2)); color: var(--info-text, #1d4ed8); text-decoration: none; white-space: nowrap; }
 
     /* Needs your attention: an icon per row, and the priority as a chip. */
     .pd-attn-row { grid-template-columns: 30px minmax(0,1fr) auto auto; }

@@ -217,12 +217,21 @@ class OpportunityFeedTest extends TestCase
     {
         // A professional who taps a percentage and lands on a trade they do
         // not work in stops trusting the number on every other card too.
-        $this->gig('Live band for a gala', $this->liveBands);
+        $band = $this->gig('Live band for a gala', $this->liveBands);
 
         $page = $this->actingAs($this->dj)->get(route('professional.dashboard'));
 
         $page->assertSee('Outside your listed services');
-        $page->assertSee('Not your service');
+
+        /*
+         * The card used to say "Not your service" and stop there. It now says
+         * the same thing and offers the way out of it, which is the only
+         * thing a professional looking at work they cannot bid for can
+         * usefully do. What this test is for is unchanged: the block is
+         * labelled, and there is no way into the wizard from it.
+         */
+        $page->assertSee('Add the service');
+        $page->assertDontSee(route('professional.bid.step', ['event' => $band->id]));
     }
 
     /* ── R61: bidding stays gated to listed services ───────── */

@@ -369,6 +369,43 @@ class DemoProfessionalActivitySeeder extends Seeder
      * ahead. They are real rows on the bidding board, and the bid wizard
      * opens on every one of them.
      */
+    /**
+     * A point for the job, a few miles from where the professional works.
+     *
+     * Without one the request cannot be measured against anybody's travel
+     * radius, so the Opportunity Feed could not say how far a job was and
+     * every card read "Distance not known yet". Three briefs at three
+     * different distances also make the radius check visibly do something.
+     *
+     * @return array<string, mixed>
+     */
+    private function placed(User $pro, int $n): array
+    {
+        $origin = [
+            (float) ($pro->profile?->origin_lat ?: 39.2904),
+            (float) ($pro->profile?->origin_lng ?: -76.6122),
+        ];
+
+        /*
+         * Roughly 69 miles to a degree of latitude, so these land between
+         * about five and forty miles out. The professional's own id shifts
+         * the sequence as well as the brief's position, or three jobs posted
+         * by three different accounts all came out at exactly the same
+         * distance and the card looked like it was printing a constant.
+         *
+         * Honest about its own precision, which is why it is stored as zip
+         * rather than exact: nobody gave a street address.
+         */
+        $offsets = [0.08, 0.17, 0.26, 0.34, 0.43, 0.52];
+        $step    = $offsets[($n + $pro->id) % count($offsets)];
+
+        return [
+            'location_lat'       => round($origin[0] + $step, 6),
+            'location_lng'       => round($origin[1] - ($step / 2), 6),
+            'location_precision' => \App\Domain\Geolocation\LocationPrecision::ZIP,
+        ];
+    }
+
     private function openLeads(User $pro): void
     {
         $mine = \App\Support\FitScore::servicesOf($pro);
@@ -415,8 +452,17 @@ class DemoProfessionalActivitySeeder extends Seeder
             ['Baby shower brunch',             10, 1500],
         ];
 
-        $offset = ($pro->id * 3) % count($pool);
-        $drift  = $pro->id % 7;
+        /*
+         * A stride of one, not three.
+         *
+         * `($pro->id * 3) % 12` has only four distinct values, so twelve
+         * briefs collapsed into four windows and accounts 3, 11, 23 and 71
+         * all posted the same three jobs. The feed then showed one
+         * professional three cards reading "Baby shower brunch" at the same
+         * distance, which is the original fault in a new shape.
+         */
+        $offset = $pro->id % count($pool);
+        $drift  = ($pro->id * 3) % 11;
 
         $briefs = [];
         for ($n = 0; $n < 3; $n++) {
@@ -456,7 +502,7 @@ class DemoProfessionalActivitySeeder extends Seeder
                 'starts_at'        => now()->addDays($days),
                 'budget'           => $budget,
                 'proposal_deadline' => now()->addDays(max(3, (int) ($days / 2))),
-            ])->save();
+            ])->fill($this->placed($pro, $i))->save();
 
             // The service it is for: one this professional has listed, so the
             // board shows it to them and the wizard opens.
