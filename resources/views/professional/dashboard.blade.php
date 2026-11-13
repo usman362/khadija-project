@@ -305,7 +305,9 @@
     .pd-next-top { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
     .pd-next-chip { font-size: 10px; font-weight: 800; padding: 3px 9px; border-radius: 7px; white-space: nowrap; }
     .pd-next-src { font-size: 10.5px; color: var(--text-muted); margin-left: auto; white-space: nowrap; }
-    .pd-next.hot { border-left: 3px solid var(--bad-text, #b91c1c); padding-left: 12px;
+    /* The same stripe red as the rows above, for the same reason: a mark is
+       not writing, and does not follow the theme's text colour. */
+    .pd-next.hot { border-left: 3px solid #ef4444; padding-left: 12px;
         background: linear-gradient(90deg, rgba(239,68,68,0.05), transparent 65%); border-radius: 0 10px 10px 0; padding-top: 10px; padding-bottom: 12px; }
 
     /* Since you were last here: four counts, each with its own mark. */
@@ -475,29 +477,34 @@
                     'Payment'    => ['dollar', 'c-green'],
                 ];
                 /*
-                 * Through the theme's own variables, not raw hex.
+                 * Four parts: the label, the chip's text colour, the chip's
+                 * background, and the stripe down the left of the row.
                  *
-                 * A first pass wrote #b91c1c straight into the chip, which is
-                 * a red chosen to be read on white. On the dark theme it sat
-                 * at 2.7 to 1 against the card behind it, below the 4.5 a
-                 * small label needs, so the urgency tag was the hardest thing
-                 * on the page to read on the half of it that is dark. The
-                 * variables already resolve to a different value per theme;
-                 * the hex is only the fallback if one is ever missing.
+                 * The text colour and the stripe are two different jobs and
+                 * a first pass used one value for both. Chip text has to be
+                 * read, so it goes through the theme's own variables and
+                 * comes out dark on the light theme and light on the dark
+                 * one. A stripe is a mark, not writing: given the same
+                 * variable, "Open" drew a near-black bar on the light theme
+                 * and a white one on the dark, which made the least urgent
+                 * row on the card the loudest thing on it.
+                 *
+                 * So the stripes are fixed colours that read as themselves on
+                 * either background, and the quiet one is quiet.
                  */
                 $pdTones = [
-                    'urgent' => ['High',     'var(--bad-text, #b91c1c)',       'rgba(239,68,68,0.14)'],
-                    'soon'   => ['Due soon', 'var(--warn-text, #b45309)',      'rgba(245,158,11,0.16)'],
-                    'new'    => ['New',      'var(--info-text, #1d4ed8)',      'rgba(37,99,235,0.14)'],
+                    'urgent' => ['High',     'var(--bad-text, #b91c1c)',  'rgba(239,68,68,0.14)',   '#ef4444'],
+                    'soon'   => ['Due soon', 'var(--warn-text, #b45309)', 'rgba(245,158,11,0.16)',  '#f59e0b'],
+                    'new'    => ['New',      'var(--info-text, #1d4ed8)', 'rgba(37,99,235,0.14)',   '#3b82f6'],
                 ];
             @endphp
             <div class="pd-attn">
                 @forelse($waiting->take(5) as $item)
                     @php
-                        $pdTone = $pdTones[$item['tone']] ?? ['Open', 'var(--text-secondary, #475569)', 'rgba(100,116,139,0.18)'];
+                        $pdTone = $pdTones[$item['tone']] ?? ['Open', 'var(--text-secondary, #475569)', 'rgba(100,116,139,0.18)', '#94a3b8'];
                         [$pdIcoName, $pdIcoTone] = $pdKindIcon[$item['kind']] ?? ['bolt', 'c-blue'];
                     @endphp
-                    <div class="pd-attn-row" style="border-left-color: {{ $pdTone[1] }};">
+                    <div class="pd-attn-row" style="border-left-color: {{ $pdTone[3] }};">
                         <span class="pd-attn-ico {{ $pdIcoTone }}">@include('professional._pd-icon', ['name' => $pdIcoName])</span>
                         <div>
                             <b>{{ $item['title'] }}</b>
@@ -520,7 +527,7 @@
                 </div>
                 @if($nextBest)
                     @php
-                        $pdNextTone = $pdTones[$nextBest['tone']] ?? ['Open', 'var(--text-secondary, #475569)', 'rgba(100,116,139,0.18)'];
+                        $pdNextTone = $pdTones[$nextBest['tone']] ?? ['Open', 'var(--text-secondary, #475569)', 'rgba(100,116,139,0.18)', '#94a3b8'];
                     @endphp
                     <div class="pd-next {{ $nextBest['tone'] === 'urgent' ? 'hot' : '' }}">
                         {{-- The reference marks this card with the priority
