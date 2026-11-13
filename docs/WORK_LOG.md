@@ -12,6 +12,45 @@ code.
 
 ## 2026-11-13
 
+### A demonstration business, on one named account, reversible
+Ali's question was the practical one: the live dashboard is empty, and walking
+through the whole flow in a meeting to fill it takes twenty minutes of
+clicking in front of whoever is watching.
+
+Seeding the live site is not the answer and that rule has not changed. The
+seed command runs everything against everybody, and one of those seeders once
+left 47 duplicate categories on the live database. So the work that builds a
+demonstration business moved out of the seeder into one place that two things
+can use: the seeder, for a local database, and a new command that takes one
+named account.
+
+    php artisan demo:business pro@example.com
+    php artisan demo:business pro@example.com --force
+    php artisan demo:business pro@example.com --remove --force
+
+It says what it would write before writing anything, asks again if the site is
+live, and every row it makes is marked so it can be taken back off exactly.
+
+What makes it safe on a live site is that none of it is visible to anybody
+else. Every job it creates is already awarded to this professional, and both
+the bidding board and the Opportunity Feed ask for work that has no
+professional on it, so neither can return any of it. The money, the reviews
+and the schedule belong to the two accounts involved. Nothing reaches a real
+professional's screen.
+
+The one thing it will not do is publish open requests. Those are the only part
+of a demonstration business other people can see, and on a live site that
+means real professionals reading, and bidding on, work that does not exist. If
+the Opportunity Feed has to be full for a demonstration, post a request from
+the demonstration client through the site itself and take it down afterwards,
+so at least it is a real request that a real professional could be told about.
+
+Taking it off again had to be got right, and the first pass was not: it swept
+the open requests a different seeder writes along with the bids on them, so
+tidying up a demonstration could have deleted a bid somebody had really
+placed. It is now scoped to this command's own marker and nothing else, which
+is what the test pins.
+
 ### The demo professional had never done a day's work
 Ali put the professional dashboard beside the reference screen and said the
 data did not match and the colours were not the same. He was right about both,
