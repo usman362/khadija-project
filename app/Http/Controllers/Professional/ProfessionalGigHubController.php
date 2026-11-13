@@ -173,9 +173,16 @@ class ProfessionalGigHubController extends Controller
          * date on it cannot be here, and that is correct: nothing can say
          * today is the day.
          */
+        /*
+         * Bounded by the UTC instants either side of today on the platform's
+         * clock. starts_at is stored in UTC, so whereDate against a local
+         * date pushed every evening gig onto the following day.
+         */
+        [$todayFrom, $todayTo] = \App\Support\DisplayTimezone::dayWindow($now, $user);
+
         $liveToday = Booking::where('supplier_id', $user->id)
             ->whereIn('status', ['confirmed', 'in_progress'])
-            ->whereHas('event', fn ($q) => $q->whereDate('starts_at', $now->toDateString()))
+            ->whereHas('event', fn ($q) => $q->where('starts_at', '>=', $todayFrom)->where('starts_at', '<', $todayTo))
             ->with(['event:id,title,starts_at,location', 'client:id,name'])
             ->get()
             ->sortBy(fn (Booking $b) => $b->event?->starts_at)

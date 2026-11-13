@@ -71,6 +71,12 @@ class DatabaseSeeder extends Seeder
             DemoPackagesSeeder::class,
             DemoGigsSeeder::class,
 
+            // A year of finished work, a season, a revenue goal and three
+            // gigs today for the professional logins. Everything after this
+            // hangs off a booking, and the demo professional had none, so
+            // every panel on their dashboard read as empty.
+            DemoProfessionalBusinessSeeder::class,
+
             // ── Things that hang off a booking, so they come after the gigs ──
             DemoDisputesSeeder::class,
             // Agreements, message threads, a dispute and a working calendar:

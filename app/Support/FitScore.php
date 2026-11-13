@@ -98,9 +98,17 @@ final class FitScore
             return 20;   // an undated request cannot clash
         }
 
+        /*
+         * The same calendar day on the platform's clock, as a pair of UTC
+         * instants. whereDate compared UTC dates, so an afternoon job and an
+         * evening job on the same day landed on two different UTC dates and
+         * did not read as a clash at all.
+         */
+        [$from, $to] = \App\Support\DisplayTimezone::dayWindow($event->starts_at, $pro);
+
         $clash = Booking::where('supplier_id', $pro->id)
             ->whereIn('status', ['confirmed', 'completed'])
-            ->whereHas('event', fn ($q) => $q->whereDate('starts_at', $event->starts_at->toDateString()))
+            ->whereHas('event', fn ($q) => $q->where('starts_at', '>=', $from)->where('starts_at', '<', $to))
             ->exists();
 
         return $clash ? 0 : 20;

@@ -387,11 +387,42 @@ class DemoProfessionalActivitySeeder extends Seeder
             return;
         }
 
-        $briefs = [
-            ['Wedding reception, 120 guests', 24, 6500],
-            ['Corporate awards night',        38, 4200],
-            ['Birthday party, 60 guests',     17, 2300],
+        /*
+         * A board, not three briefs repeated fifteen times.
+         *
+         * Every professional used to post the same three titles on the same
+         * three dates for the same three budgets, so the Opportunity Feed —
+         * which ranks by fit and caps at six — showed one professional six
+         * rows all reading "Birthday party, 60 guests" at 98%. A feed whose
+         * six best matches are the same sentence tells somebody nothing.
+         *
+         * Each account takes a different window into the pool, and its own
+         * id shifts the dates and the budgets, so the board reads like work
+         * posted by different people at different times.
+         */
+        $pool = [
+            ['Wedding reception, 120 guests',  24, 6500],
+            ['Corporate awards night',         38, 4200],
+            ['Birthday party, 60 guests',      17, 2300],
+            ['Charity fundraiser dinner',      31, 5400],
+            ['Retirement send off',            12, 1800],
+            ['Product launch evening',         26, 7200],
+            ['School prom night',              45, 3900],
+            ['Engagement celebration',         20, 2700],
+            ['Company summer social',          34, 4800],
+            ['Anniversary dinner, 40 guests',  15, 2100],
+            ['Conference closing reception',   41, 6100],
+            ['Baby shower brunch',             10, 1500],
         ];
+
+        $offset = ($pro->id * 3) % count($pool);
+        $drift  = $pro->id % 7;
+
+        $briefs = [];
+        for ($n = 0; $n < 3; $n++) {
+            [$title, $days, $budget] = $pool[($offset + $n) % count($pool)];
+            $briefs[] = [$title, $days + $drift, $budget + ($drift * 150)];
+        }
 
         foreach ($briefs as $i => [$title, $days, $budget]) {
             $marker = sprintf('Demo open request for professional %d, number %d.', $pro->id, $i + 1);

@@ -24,24 +24,38 @@ class ProfessionalDashboardController extends Controller
         // could actually withdraw — commission had not been taken off.
         $money = Earnings::forProfessional($user);
 
-        $thisMonthGross = (float) Booking::where('supplier_id', $user->id)
-            ->whereIn('status', ['confirmed', 'completed'])
-            ->whereMonth('created_at', now()->month)
-            ->whereYear('created_at', now()->year)
-            ->sum('price');
-
         /*
-         * Last month on the same basis, so the figure beside this month's
-         * revenue is a comparison rather than a decoration. The cards used to
-         * read "$12,840" and "up 22% vs last month", typed into the page, for
-         * every professional including one who had never been paid.
+         * Money is earned when the work is done, so the month is the month
+         * the JOB falls in, not the month its booking record was created.
+         *
+         * This read whereMonth('created_at'). A wedding booked in September
+         * and performed in November counted as September revenue, so a
+         * professional who finished three jobs this month could open the page
+         * and be told they had earned nothing this month, with the revenue
+         * goal reporting them behind on work they had already delivered.
+         *
+         * Only completed work counts, which is the basis App\Support\Earnings
+         * uses for its 'earned' figure. Confirmed work still ahead of them is
+         * money on the way, and it is reported separately as exactly that.
+         *
+         * A booking whose event carries no date cannot be placed in a month
+         * at all, and is left out rather than filed under the month somebody
+         * happened to create the record.
          */
-        $lastMonth      = now()->subMonthNoOverflow();
-        $lastMonthGross = (float) Booking::where('supplier_id', $user->id)
-            ->whereIn('status', ['confirmed', 'completed'])
-            ->whereMonth('created_at', $lastMonth->month)
-            ->whereYear('created_at', $lastMonth->year)
-            ->sum('price');
+        $lastMonth = now()->subMonthNoOverflow();
+
+        $byMonth = Booking::where('supplier_id', $user->id)
+            ->where('status', 'completed')
+            ->whereHas('event', fn ($q) => $q->whereNotNull('starts_at'))
+            ->with('event:id,starts_at')
+            ->get()
+            ->groupBy(fn (Booking $b) => $b->event?->starts_at?->format('Y-n'));
+
+        $sumFor = fn (\Illuminate\Support\Carbon $month) => (float) ($byMonth
+            ->get($month->format('Y-n'))?->sum('price') ?? 0);
+
+        $thisMonthGross = $sumFor(now());
+        $lastMonthGross = $sumFor($lastMonth);
 
         $thisMonthNet = Commission::netOf($thisMonthGross, $user);
         $lastMonthNet = Commission::netOf($lastMonthGross, $user);
@@ -87,10 +101,18 @@ class ProfessionalDashboardController extends Controller
          * to list "Drive to Venue 1:00 PM", "Setup Time", a Corporate Gala
          * Dinner and "Breakdown", the same four lines for every professional
          * on every day of the year.
+         *
+         * Bounded by the UTC instants either side of today on the platform's
+         * clock, not by whereDate. starts_at is stored in UTC, so a nine
+         * o'clock evening gig is written as two in the morning the next day
+         * and whereDate put it on tomorrow's schedule. Most of this
+         * marketplace's work is evening work.
          */
+        [$dayFrom, $dayTo] = \App\Support\DisplayTimezone::dayWindow(null, $user);
+
         $todaySchedule = Booking::where('supplier_id', $user->id)
             ->whereIn('status', ['confirmed', 'completed'])
-            ->whereHas('event', fn ($q) => $q->whereDate('starts_at', now()->toDateString()))
+            ->whereHas('event', fn ($q) => $q->where('starts_at', '>=', $dayFrom)->where('starts_at', '<', $dayTo))
             ->with(['event:id,title,starts_at,ends_at,location'])
             ->get()
             ->sortBy(fn ($b) => $b->event?->starts_at)
@@ -276,9 +298,12 @@ class ProfessionalDashboardController extends Controller
             ->whereIn('status', ['requested', 'pending'])
             ->count();
 
+        // The same window as the schedule above, for the same reason.
+        [$todayFrom, $todayTo] = \App\Support\DisplayTimezone::dayWindow($today, $user);
+
         $todayGigs = Booking::where('supplier_id', $user->id)
             ->whereIn('status', ['confirmed', 'in_progress'])
-            ->whereHas('event', fn ($q) => $q->whereDate('starts_at', $today->toDateString()))
+            ->whereHas('event', fn ($q) => $q->where('starts_at', '>=', $todayFrom)->where('starts_at', '<', $todayTo))
             ->with('event:id,starts_at,title')
             ->get();
 
@@ -464,10 +489,30 @@ class ProfessionalDashboardController extends Controller
 
         $target = (float) $target;
 
+        /*
+         * Where the month should be by now, and how far off that is.
+         *
+         * The reference screen reads "$6,515 behind pace" beside "97% of
+         * month complete". Both halves are arithmetic on the month itself:
+         * a target spread evenly across its days, compared against what has
+         * actually been earned so far. Nothing is predicted, and the figure
+         * is as checkable as the calendar.
+         */
+        $zone  = \App\Support\DisplayTimezone::current();
+        $now   = \Illuminate\Support\Carbon::now($zone);
+        $days  = $now->daysInMonth;
+        $gone  = $now->day;
+        $pace  = $target * ($gone / $days);
+
         return [
-            'target'  => $target,
-            'earned'  => $thisMonth,
-            'percent' => (int) min(100, round($thisMonth / $target * 100)),
+            'target'   => $target,
+            'earned'   => $thisMonth,
+            'percent'  => (int) min(100, round($thisMonth / $target * 100)),
+            'pace'     => round($pace, 2),
+            'off'      => round($thisMonth - $pace, 2),
+            'elapsed'  => (int) round($gone / $days * 100),
+            'day'      => $gone,
+            'days'     => $days,
         ];
     }
 

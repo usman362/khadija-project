@@ -12,6 +12,102 @@ code.
 
 ## 2026-11-13
 
+### The demo professional had never done a day's work
+Ali put the professional dashboard beside the reference screen and said the
+data did not match and the colours were not the same. He was right about both,
+but the two halves had different causes.
+
+The data first. Every panel on the page was already built to read a real
+professional's business: a revenue goal, the months their work falls in,
+today's schedule, what is waiting, what they are owed. The account anybody
+signs in to demonstrate with had no bookings at all, so the page did exactly
+what it should do for somebody who has done no work. It said "Nothing booked
+for today", "Not enough of your own bookings yet", "You have not set a goal",
+and printed $0.00 four times. Against a reference screen showing a working
+season, that reads as an unfinished page rather than an empty account.
+
+The demonstration account now has a year behind it: around forty jobs dated
+across twelve months with a deliberate May to September season, three gigs
+today at different hours, work still ahead with one of them short of crew,
+money earned and money withdrawn, bids won and bids open, two reviews with one
+unanswered, and a profile with every setup step finished. None of it is drawn
+on the page. Every figure the dashboard prints is worked out from those records
+by the same code that would work it out for a real professional, so if the
+arithmetic were wrong the demonstration would show it wrong.
+
+### Nine in the evening was not today
+Setting the demonstration day up turned over a real fault. Times are stored in
+UTC and read on Eastern time, which is five hours behind it, so a gig at nine
+in the evening is written down as two o'clock the following morning. The
+dashboard asked for today's work by comparing the stored date against today's
+date, which put every evening job on tomorrow's schedule and left it off
+today's.
+
+On a marketplace whose work is almost entirely evening work, that is most of
+the day. A professional with a nine o'clock job opened the page on the day of
+it and was told nothing was booked. The same question was being asked in four
+other places, including the check for whether somebody is already booked that
+day, where an afternoon job and an evening job on the same day did not register
+as a clash at all. All five now ask for the day as the pair of moments either
+side of it on our own clock.
+
+### A month's takings, counted from the wrong date
+The revenue goal and "earned this month" were measured from the date a booking
+record was created rather than the date the work happened. A wedding booked in
+September and performed in November counted as September's money, so somebody
+who had finished three jobs this month could be told they had earned nothing
+this month and were behind on a target they had already met. Both figures now
+count completed work by the month the job falls in, which is also the basis the
+"when your work falls" chart has always used.
+
+### A chart that contradicted the numbers printed beside it
+The ring on the Bid Intelligence card was six fixed slices written into the
+stylesheet: a third blue, a quarter purple, and so on, identical on every
+account every day. The figures listed beside it were real. An account with two
+bids, both open, showed a six way split next to a list saying one hundred
+percent open. The ring is now cut from the same counts the list prints, so the
+two halves of the card cannot disagree, and an account with no bids draws no
+ring at all.
+
+### A feed of work, all of it closed
+The Opportunity Feed asked only whether a request had been published and not
+yet awarded. It had no notion of a bidding window having shut, so requests
+whose deadline passed in August were still being offered in November. The card
+holds six rows, so six long dead requests filled it and pushed every live one
+out, and the page then had to print "Closed to bids" against every line of a
+card whose entire job is work you can still take. The feed now shows only
+requests still accepting proposals.
+
+### The colours
+The reference screen reads its state off colour and ours was flat white boxes
+with grey borders. Each of the four cards across the top already carried a
+colour in the code and the page had simply never drawn it. Those are back, with
+a mark on each. Things waiting now carry a symbol for what kind of thing they
+are and their urgency as a coloured tag rather than bare text. The revenue bar
+is green when the month is keeping up and amber when it is not, with how far
+ahead or behind, and how much of the month has gone. The season chart tells its
+busy months from its quiet ones. Rows in the gig list take their colour from
+their own status, so a cancelled job stops wearing the colour that means it
+went well. Today's schedule is a line down the day with each job's length
+rather than two times side by side. The money card leads with the total and
+breaks it down underneath, which is the order somebody asks it in.
+
+### The finished setup bar was the one state we never drew
+The "finish setting up" row disappeared the moment the last step was done, so a
+professional who had completed everything watched it vanish rather than be told
+they were ready. It now stays and turns green, listing what is done with a tick
+against each, which is what the reference screen shows.
+
+### Demo requests that were all the same sentence
+Each demonstration professional was posting the same three job titles on the
+same three dates for the same three budgets. With fifteen of them, one
+professional's feed showed six rows all reading "Birthday party, 60 guests" at
+ninety eight percent. They now draw from a wider list, each account from a
+different point in it, with its own dates and budgets.
+
+Not live yet.
+
+
 ### The Leads CRM ran off the side of the screen
 Ali sent a photograph of the Leads list with the right-hand columns cut off the
 screen and the whole page sliding sideways. The table is eight columns of small

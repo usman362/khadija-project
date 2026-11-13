@@ -136,8 +136,13 @@
 
     /* ── Bid Intelligence donut ── */
     .pd-bid-body { display: flex; gap: 16px; align-items: center; }
+    /* The ring is drawn from the professional's own bids, as an inline
+       conic-gradient built below. It used to be written here as six fixed
+       segments — 32% blue, 24% purple, 16% cyan, 12% amber, 12% green, 4%
+       red — on every account on every day, so a page showing two bids, both
+       open, drew a six-way split beside a legend that said 100% open. */
     .pd-donut { width: 124px; height: 124px; border-radius: 50%; flex-shrink: 0; position: relative;
-        background: conic-gradient(#2563eb 0 32%, #8b5cf6 32% 56%, #06b6d4 56% 72%, #f59e0b 72% 84%, #10b981 84% 96%, #ef4444 96% 100%); }
+        background: var(--border-color); }
     .pd-donut::after { content: ''; position: absolute; inset: 21px; background: var(--bg-card); border-radius: 50%; }
     .pd-donut-c { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; z-index: 1; }
     .pd-donut-c b { font-size: 22px; font-weight: 800; color: var(--text-primary); line-height: 1; }
@@ -258,6 +263,100 @@
     .pd-traffic svg { width: 15px; height: 15px; color: var(--ok-text); flex-shrink: 0; }
     .pd-traffic b { color: var(--text-primary); }
 
+    /* ── Colour, to Khadijah's reference ──────────────────────────────
+       The page was built structurally correct and visually flat: every
+       card was a white box with a grey border, and the reference reads
+       its state off colour. Each tone below belongs to a state the data
+       already knows, so nothing here decorates anything that is not
+       measured. ── */
+
+    /* Cards sit on a faint blue field rather than on white-on-white. */
+    .pd .pd-card, .pd .pd-setup, .pd .pd-sumcard { border-color: var(--pd-line, rgba(37,99,235,0.14)); }
+    .pd { --pd-line: rgba(37,99,235,0.14); }
+
+    /* Summary cards: the icon tile the reference leads each card with. */
+    .pd-sumcard { position: relative; }
+    .pd-sum-head { display: flex; align-items: center; gap: 9px; }
+    .pd-sum-ico { width: 30px; height: 30px; border-radius: 9px; flex-shrink: 0;
+        display: flex; align-items: center; justify-content: center; }
+    .pd-sum-ico svg { width: 15px; height: 15px; }
+    .pd-sumcard .pd-sumlabel { flex: 1; min-width: 0; }
+    .pd-sum-go { width: 13px; height: 13px; color: var(--text-muted); flex-shrink: 0; }
+    .pd-sumval { display: flex; align-items: baseline; gap: 6px; }
+
+    /* Setup bar, finished. Hiding it meant the one state the reference
+       actually shows, "All set", was the one state we never drew. */
+    .pd-setup.ok { border-color: rgba(16,185,129,0.3); background: linear-gradient(90deg, rgba(16,185,129,0.05), transparent 60%); }
+    .pd-setup.ok .pd-setup-bar i { background: var(--ok-text, #047857); }
+    .pd-setup-done { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; margin-top: 11px; }
+    .pd-setup-done .tick { display: inline-flex; align-items: center; gap: 6px; font-size: 11.5px; font-weight: 700; color: var(--text-secondary, #475569); }
+    .pd-setup-done .tick svg { width: 14px; height: 14px; color: var(--ok-text, #047857); flex-shrink: 0; }
+    .pd-setup-all { font-size: 11.5px; font-weight: 800; color: var(--ok-text, #047857); }
+    .pd-setup-cta { margin-left: auto; font-size: 11.5px; font-weight: 700; padding: 7px 13px; border-radius: 8px;
+        border: 1px solid var(--pd-line, rgba(37,99,235,0.2)); color: var(--accent-blue, #2563eb); text-decoration: none; white-space: nowrap; }
+
+    /* Needs your attention: an icon per row, and the priority as a chip. */
+    .pd-attn-row { grid-template-columns: 30px minmax(0,1fr) auto auto; }
+    .pd-attn-ico { width: 30px; height: 30px; border-radius: 9px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .pd-attn-ico svg { width: 15px; height: 15px; }
+    .pd-attn-pri { padding: 3px 9px; border-radius: 7px; font-size: 10px; }
+
+    /* Do this first: the reference marks it, and says where it came from. */
+    .pd-next-top { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+    .pd-next-chip { font-size: 10px; font-weight: 800; padding: 3px 9px; border-radius: 7px; white-space: nowrap; }
+    .pd-next-src { font-size: 10.5px; color: var(--text-muted); margin-left: auto; white-space: nowrap; }
+    .pd-next.hot { border-left: 3px solid var(--bad-text, #b91c1c); padding-left: 12px;
+        background: linear-gradient(90deg, rgba(239,68,68,0.05), transparent 65%); border-radius: 0 10px 10px 0; padding-top: 10px; padding-bottom: 12px; }
+
+    /* Since you were last here: four counts, each with its own mark. */
+    .pd-new > div { display: flex; align-items: center; gap: 9px; }
+    .pd-new-ico { width: 28px; height: 28px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .pd-new-ico svg { width: 14px; height: 14px; }
+    .pd-new-txt { min-width: 0; }
+
+    /* The goal bar is green when it is being met, amber behind pace. */
+    .pd-goalbar { height: 8px; border-radius: 5px; background: var(--border-color); overflow: hidden; }
+    .pd-goalbar i { display: block; height: 100%; border-radius: 5px; background: var(--ok-text, #047857); }
+    .pd-goalbar.behind i { background: var(--warn-text, #b45309); }
+    .pd-goal-pace { display: flex; justify-content: space-between; gap: 10px; margin-top: 8px; font-size: 11px; }
+    .pd-goal-pace .off { font-weight: 800; color: var(--warn-text, #b45309); }
+    .pd-goal-pace .off.ahead { color: var(--ok-text, #047857); }
+    .pd-goal-pace .el { color: var(--text-muted); }
+
+    /* The season reads as a season: its own months stand out from the rest. */
+    .pd-month i { background: rgba(37,99,235,0.28); }
+    .pd-month.peak i { background: var(--accent-blue, #2563eb); }
+
+    /* Gig Operations Hub: the thumb carries the row's state. */
+    .pd-g-thumb.t-on   { background: linear-gradient(135deg,#10b981,#047857); }
+    .pd-g-thumb.t-wait { background: linear-gradient(135deg,#f59e0b,#b45309); }
+    .pd-g-thumb.t-off  { background: linear-gradient(135deg,#f87171,#b91c1c); }
+    .pd-g-thumb.t-idle { background: linear-gradient(135deg,#94a3b8,#475569); }
+
+    /* Today's Schedule as the reference draws it: a line down the times. */
+    .pd-sch-row { position: relative; padding-left: 2px; }
+    .pd-sch-dot { width: 11px; height: 11px; border-radius: 50%; flex-shrink: 0; position: relative; z-index: 1;
+        background: var(--accent-blue, #2563eb); box-shadow: 0 0 0 3px rgba(37,99,235,0.16); }
+    .pd-sch-dot.done { background: var(--ok-text, #047857); box-shadow: 0 0 0 3px rgba(16,185,129,0.16); }
+    .pd-sch-row:not(:last-of-type)::before { content: ''; position: absolute; left: 7px; top: 50%; bottom: -4px;
+        width: 2px; background: var(--border-color); }
+    .pd-sch-dur { font-weight: 700; color: var(--text-secondary, #475569); }
+
+    /* Finance Hub: one headline figure, then what it is made of. */
+    .pd-fin-lead { border: 1px solid var(--pd-line, rgba(37,99,235,0.14)); border-radius: 12px; padding: 13px 14px;
+        background: linear-gradient(135deg, rgba(16,185,129,0.07), rgba(37,99,235,0.04)); margin-bottom: 11px; }
+    .pd-fin-lead .k { font-size: 11px; font-weight: 700; color: var(--text-muted); }
+    .pd-fin-lead .v { font-size: 27px; font-weight: 800; color: var(--text-primary); letter-spacing: -0.02em; margin: 3px 0 2px; }
+    .pd-fin-lead .s { font-size: 11px; color: var(--text-muted); }
+    .pd-fin-split { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 9px; }
+    .pd-fin-cell { display: flex; align-items: center; gap: 9px; min-width: 0; }
+    .pd-fin-cell .ic { width: 28px; height: 28px; border-radius: 8px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .pd-fin-cell .ic svg { width: 14px; height: 14px; }
+    .pd-fin-cell .tx { min-width: 0; }
+    .pd-fin-cell .tx b { display: block; font-size: 14px; font-weight: 800; color: var(--text-primary); }
+    .pd-fin-cell .tx span { display: block; font-size: 10px; color: var(--text-muted); }
+    @media (max-width: 560px) { .pd-fin-split { grid-template-columns: 1fr; } }
+
     @media (min-width: 1680px) { .pd-stats { grid-template-columns: repeat(8, minmax(0,1fr)); } }
     @media (max-width: 1200px) { .pd-row-1, .pd-row-2 { grid-template-columns: 1fr; } }
     @media (max-width: 760px)  { .pd-stats { grid-template-columns: repeat(2, minmax(0,1fr)); } .pd-fin-grid { grid-template-columns: 1fr 1fr; } }
@@ -275,13 +374,30 @@
          number out of 100 would be a figure about their own business that
          nobody worked out. This lists the things that are actually missing
          instead, and every line opens the page that fixes it. --}}
-    @if ($setup['done'] < $setup['total'])
-        <div class="pd-setup">
-            <div class="pd-setup-h">
-                <b>Finish setting up</b>
-                <span>{{ $setup['done'] }} of {{ $setup['total'] }} done</span>
+    @php $pdSetupOk = $setup['done'] >= $setup['total']; @endphp
+    <div class="pd-setup {{ $pdSetupOk ? 'ok' : '' }}">
+        <div class="pd-setup-h">
+            <b>{{ $pdSetupOk ? 'Business setup' : 'Finish setting up' }}</b>
+            <span>{{ $setup['done'] }} of {{ $setup['total'] }} {{ $pdSetupOk ? 'completed' : 'done' }}</span>
+        </div>
+        <div class="pd-setup-bar"><i style="width: {{ round($setup['done'] / $setup['total'] * 100) }}%;"></i></div>
+        @if ($pdSetupOk)
+            {{-- The finished state. This block used to be hidden the moment
+                 the last step was done, so the one state the reference screen
+                 actually shows was the one we never drew, and a professional
+                 who had completed everything saw the row vanish rather than
+                 be told they were ready. --}}
+            <div class="pd-setup-done">
+                @foreach ($setup['steps'] as $step)
+                    <span class="tick">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="8 12 11 15 16 9"/></svg>
+                        {{ $step['label'] }}
+                    </span>
+                @endforeach
+                <span class="pd-setup-all">All set, your profile is complete.</span>
+                <a class="pd-setup-cta" href="{{ route('professional.profile.index') }}">View profile and settings</a>
             </div>
-            <div class="pd-setup-bar"><i style="width: {{ round($setup['done'] / $setup['total'] * 100) }}%;"></i></div>
+        @else
             <div class="pd-setup-steps">
                 @foreach ($setup['steps'] as $step)
                     @if ($step['done'])
@@ -291,8 +407,8 @@
                     @endif
                 @endforeach
             </div>
-        </div>
-    @endif
+        @endif
+    </div>
 
     {{-- Four cards, each carrying the parts it is made of.
 
@@ -301,18 +417,28 @@
          six things are waiting without saying what any of them are, which is
          the same fault the Priority Actions page had. --}}
     @php
+        /*
+         * Each card carries a tone, and until now the view ignored it: the
+         * array below has said 'c-orange' since the day it was written and
+         * nothing ever drew it, so four identically grey cards stood where
+         * the reference has four coloured ones.
+         */
         $pdCards = [
-            ['key' => 'response', 'label' => 'Needs your response', 'tone' => 'c-orange'],
-            ['key' => 'upcoming', 'label' => 'Upcoming gigs',       'tone' => 'c-blue'],
-            ['key' => 'payments', 'label' => 'Payments waiting',    'tone' => 'c-green'],
-            ['key' => 'today',    'label' => "Today's commitments", 'tone' => 'c-purple'],
+            ['key' => 'response', 'label' => 'Needs your response', 'tone' => 'c-orange', 'icon' => 'chat'],
+            ['key' => 'upcoming', 'label' => 'Upcoming gigs',       'tone' => 'c-blue',   'icon' => 'calendar'],
+            ['key' => 'payments', 'label' => 'Payments waiting',    'tone' => 'c-green',  'icon' => 'wallet'],
+            ['key' => 'today',    'label' => "Today's commitments", 'tone' => 'c-purple', 'icon' => 'clock'],
         ];
     @endphp
     <div class="pd-sum">
         @foreach($pdCards as $card)
             @php $c = $summary[$card['key']]; @endphp
             <a class="pd-sumcard" href="{{ $c['to'] }}">
-                <span class="pd-sumlabel">{{ $card['label'] }}</span>
+                <span class="pd-sum-head">
+                    <span class="pd-sum-ico {{ $card['tone'] }}">@include('professional._pd-icon', ['name' => $card['icon']])</span>
+                    <span class="pd-sumlabel">{{ $card['label'] }}</span>
+                    <svg class="pd-sum-go" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 18 15 12 9 6"/></svg>
+                </span>
                 <span class="pd-sumval">{{ $c['count'] }}</span>
                 <span class="pd-sumparts">{{ $c['parts'] ? implode(' · ', $c['parts']) : 'Nothing right now' }}</span>
                 @if($c['note'])
@@ -331,18 +457,53 @@
                 <span class="pd-pill-count">{{ $waiting->count() }}</span>
                 <a href="{{ route('professional.priority.index') }}" class="pd-card-link">View all</a>
             </div>
+            @php
+                /*
+                 * What each kind of waiting thing looks like, and what colour
+                 * its urgency is. The row used to print the priority as bare
+                 * coloured text with no mark beside it, so five rows read as
+                 * five identical lines and the reference's at-a-glance scan
+                 * was not possible.
+                 */
+                $pdKindIcon = [
+                    'Agreement'  => ['file',   'c-blue'],
+                    'Request'    => ['inbox',  'c-purple'],
+                    'Staffing'   => ['users',  'c-orange'],
+                    'Bid'        => ['tag',    'c-cyan'],
+                    'Package'    => ['box',    'c-indigo'],
+                    'Scheduling' => ['alert',  'c-orange'],
+                    'Payment'    => ['dollar', 'c-green'],
+                ];
+                /*
+                 * Through the theme's own variables, not raw hex.
+                 *
+                 * A first pass wrote #b91c1c straight into the chip, which is
+                 * a red chosen to be read on white. On the dark theme it sat
+                 * at 2.7 to 1 against the card behind it, below the 4.5 a
+                 * small label needs, so the urgency tag was the hardest thing
+                 * on the page to read on the half of it that is dark. The
+                 * variables already resolve to a different value per theme;
+                 * the hex is only the fallback if one is ever missing.
+                 */
+                $pdTones = [
+                    'urgent' => ['High',     'var(--bad-text, #b91c1c)',       'rgba(239,68,68,0.14)'],
+                    'soon'   => ['Due soon', 'var(--warn-text, #b45309)',      'rgba(245,158,11,0.16)'],
+                    'new'    => ['New',      'var(--info-text, #1d4ed8)',      'rgba(37,99,235,0.14)'],
+                ];
+            @endphp
             <div class="pd-attn">
                 @forelse($waiting->take(5) as $item)
                     @php
-                        $pdTone = ['urgent' => ['High', '#ef4444'], 'soon' => ['Due soon', '#f59e0b'],
-                                   'new' => ['New', '#2563eb']][$item['tone']] ?? ['Open', '#64748b'];
+                        $pdTone = $pdTones[$item['tone']] ?? ['Open', 'var(--text-secondary, #475569)', 'rgba(100,116,139,0.18)'];
+                        [$pdIcoName, $pdIcoTone] = $pdKindIcon[$item['kind']] ?? ['bolt', 'c-blue'];
                     @endphp
                     <div class="pd-attn-row" style="border-left-color: {{ $pdTone[1] }};">
+                        <span class="pd-attn-ico {{ $pdIcoTone }}">@include('professional._pd-icon', ['name' => $pdIcoName])</span>
                         <div>
                             <b>{{ $item['title'] }}</b>
                             @if($item['subject'])<span>{{ $item['subject'] }}</span>@endif
                         </div>
-                        <span class="pd-attn-pri" style="color: {{ $pdTone[1] }};">{{ $pdTone[0] }}</span>
+                        <span class="pd-attn-pri" style="color: {{ $pdTone[1] }}; background: {{ $pdTone[2] }};">{{ $pdTone[0] }}</span>
                         <a class="pd-attn-go" href="{{ $item['url'] }}">{{ $item['cta'] }}</a>
                     </div>
                 @empty
@@ -358,7 +519,17 @@
                     <span class="pd-card-title">Do this first</span>
                 </div>
                 @if($nextBest)
-                    <div class="pd-next">
+                    @php
+                        $pdNextTone = $pdTones[$nextBest['tone']] ?? ['Open', 'var(--text-secondary, #475569)', 'rgba(100,116,139,0.18)'];
+                    @endphp
+                    <div class="pd-next {{ $nextBest['tone'] === 'urgent' ? 'hot' : '' }}">
+                        {{-- The reference marks this card with the priority
+                             and names where the item came from, so somebody
+                             can tell why this one is first. --}}
+                        <div class="pd-next-top">
+                            <span class="pd-next-chip" style="color: {{ $pdNextTone[1] }}; background: {{ $pdNextTone[2] }};">{{ $pdNextTone[0] }} priority</span>
+                            <span class="pd-next-src">Source: {{ $nextBest['kind'] }}</span>
+                        </div>
                         <b>{{ $nextBest['title'] }}</b>
                         @if($nextBest['subject'])<span>{{ $nextBest['subject'] }}</span>@endif
                         @if($nextBest['when'])<i>{{ $nextBest['when'] }}</i>@endif
@@ -377,9 +548,21 @@
                     <span class="pd-card-title">Since you were last here</span>
                 </div>
                 @if($sinceLast)
+                    @php
+                        $pdNewIcon = [
+                            'New requests'    => ['inbox', 'c-purple'],
+                            'Bids you placed' => ['tag',   'c-cyan'],
+                            'Messages'        => ['chat',  'c-blue'],
+                            'Reviews'         => ['star',  'c-orange'],
+                        ];
+                    @endphp
                     <div class="pd-new">
                         @foreach($sinceLast as $row)
-                            <div><b>{{ $row['count'] }}</b><span>{{ $row['label'] }}</span></div>
+                            @php [$pdN, $pdT] = $pdNewIcon[$row['label']] ?? ['bolt', 'c-blue']; @endphp
+                            <div>
+                                <span class="pd-new-ico {{ $pdT }}">@include('professional._pd-icon', ['name' => $pdN])</span>
+                                <span class="pd-new-txt"><b>{{ $row['count'] }}</b><span>{{ $row['label'] }}</span></span>
+                            </div>
                         @endforeach
                     </div>
                 @else
@@ -411,10 +594,19 @@
                 <div class="pd-goal">
                     <b>${{ number_format($goal['earned'], 2) }}</b>
                     <span>of ${{ number_format($goal['target'], 2) }}</span>
+                    <span style="margin-left:auto;font-weight:800;color:var(--text-primary);">{{ $goal['percent'] }}%</span>
                 </div>
-                <div class="pd-setup-bar"><i style="width: {{ $goal['percent'] }}%;"></i></div>
+                {{-- Green when the month is keeping up, amber when it is not.
+                     A single blue bar said the same thing at 10% and at 90%. --}}
+                <div class="pd-goalbar {{ $goal['off'] < 0 ? 'behind' : '' }}"><i style="width: {{ $goal['percent'] }}%;"></i></div>
+                <div class="pd-goal-pace">
+                    <span class="off {{ $goal['off'] >= 0 ? 'ahead' : '' }}">
+                        ${{ number_format(abs($goal['off']), 2) }} {{ $goal['off'] >= 0 ? 'ahead of pace' : 'behind pace' }}
+                    </span>
+                    <span class="el">{{ $goal['elapsed'] }}% of the month gone ({{ $goal['day'] }} of {{ $goal['days'] }} days)</span>
+                </div>
                 <p class="pd-goal-note">
-                    {{ $goal['percent'] }}% of the way there, counting what has been earned after fees.
+                    Counting work completed this month, after fees.
                 </p>
             </div>
         @else
@@ -436,10 +628,15 @@
                 <div class="pd-card-h">
                     <span class="pd-card-title">When your work falls</span>
                 </div>
-                @php $pdMax = collect($busiest)->max('count') ?: 1; @endphp
+                @php
+                    $pdMax = collect($busiest)->max('count') ?: 1;
+                    // A month in the top half of their own year is part of
+                    // the season; the rest are the quiet months behind it.
+                    $pdPeak = $pdMax / 2;
+                @endphp
                 <div class="pd-months">
                     @foreach ($busiest as $m)
-                        <div class="pd-month" title="{{ $m['count'] }} {{ \Illuminate\Support\Str::plural('booking', $m['count']) }}">
+                        <div class="pd-month {{ $m['count'] >= $pdPeak && $m['count'] > 0 ? 'peak' : '' }}" title="{{ $m['count'] }} {{ \Illuminate\Support\Str::plural('booking', $m['count']) }}">
                             <i style="height: {{ max(3, round($m['count'] / $pdMax * 100)) }}%;"></i>
                             <span>{{ $m['label'] }}</span>
                         </div>
@@ -496,10 +693,25 @@
                 <thead><tr><th>Event / Client</th><th>Date</th><th>Amount</th><th>Status</th></tr></thead>
                 <tbody>
                     @forelse($recentBookings as $__b)
+                        @php
+                            /*
+                             * One class for every status printed green, so a
+                             * cancelled booking wore the colour that means it
+                             * went well. Worked out here, before the row is
+                             * drawn, because the thumb carries it too: every
+                             * thumb was the same blue whatever had happened.
+                             */
+                            [$__tone, $__thumb] = match ($__b->status) {
+                                'confirmed', 'completed' => ['st-confirmed', 't-on'],
+                                'cancelled', 'declined'  => ['st-off', 't-off'],
+                                'requested', 'pending'   => ['st-waiting', 't-wait'],
+                                default                  => ['st-quiet', 't-idle'],
+                            };
+                        @endphp
                         <tr>
                             <td>
                                 <div class="pd-g-event">
-                                    <span class="pd-g-thumb"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>
+                                    <span class="pd-g-thumb {{ $__thumb }}"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>
                                     <div>
                                         <div class="pd-g-name">{{ $__b->event?->title ?? 'Untitled event' }}</div>
                                         <div class="pd-g-client">{{ $__b->client?->name ?? 'Client removed' }}</div>
@@ -508,17 +720,6 @@
                             </td>
                             <td class="pd-g-date">{{ $__b->event?->starts_at?->format('M d, Y') ?? 'No date set' }}</td>
                             <td class="pd-g-budget">${{ number_format((float) $__b->price, 2) }}</td>
-                            @php
-                                // One class for every status printed green, so
-                                // a cancelled booking wore the colour that
-                                // means it went well.
-                                $__tone = match ($__b->status) {
-                                    'confirmed', 'completed'  => 'st-confirmed',
-                                    'cancelled', 'declined'   => 'st-off',
-                                    'requested', 'pending'    => 'st-waiting',
-                                    default                   => 'st-quiet',
-                                };
-                            @endphp
                             <td><span class="pd-g-status {{ $__tone }}">{{ ucfirst($__b->status) }}</span></td>
                         </tr>
                     @empty
@@ -538,11 +739,26 @@
             </div>
             <div class="pd-sch-list">
                 @forelse($todaySchedule as $__t)
+                    @php
+                        /*
+                         * How long the job runs, rather than the finish time.
+                         * The row printed the start and the end a few pixels
+                         * apart in the same format, which reads as two times
+                         * and answers neither "when" nor "how long" clearly.
+                         */
+                        $__from = $__t->event?->starts_at;
+                        $__to   = $__t->event?->ends_at;
+                        $__mins = $__from && $__to ? max(0, $__from->diffInMinutes($__to)) : null;
+                        $__len  = $__mins === null ? null
+                            : ($__mins >= 60
+                                ? round($__mins / 60, ($__mins % 60 === 0 ? 0 : 1)) . ' hr'
+                                : $__mins . ' min');
+                    @endphp
                     <div class="pd-sch-row">
-                        <span class="pd-sch-ico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg></span>
-                        <span class="pd-sch-time">{{ $__t->event?->starts_at?->format('g:i A') ?? '' }}</span>
+                        <span class="pd-sch-dot {{ $__from && $__from->isPast() ? 'done' : '' }}"></span>
+                        <span class="pd-sch-time">{{ $__from?->format('g:i A') ?? '' }}</span>
                         <span class="pd-sch-body"><span class="pd-sch-name">{{ $__t->event?->title ?? 'Untitled event' }}</span></span>
-                        <span class="pd-sch-dur">{{ $__t->event?->ends_at?->format('g:i A') ?? '' }}</span>
+                        @if($__len)<span class="pd-sch-dur">{{ $__len }}</span>@endif
                     </div>
                 @empty
                     <p style="font-size:12px;color:var(--text-muted);margin:0;padding:4px 0;">Nothing booked for today.</p>
@@ -568,8 +784,23 @@
                 <span class="pd-card-title">Bid Intelligence</span>
                 <a href="{{ route('professional.bid-intelligence.index') }}" class="pd-card-link">View Full Pipeline <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg></a>
             </div>
+            @php
+                /*
+                 * The ring, from the same counts the legend prints. Each
+                 * status takes the share of the circle its own count is
+                 * worth, so the two halves of this card can never disagree.
+                 */
+                $pdAt = 0.0;
+                $pdStops = [];
+                foreach ($bidBreakdown as $__seg) {
+                    $pdTo = $bidTotal > 0 ? $pdAt + ($__seg['count'] / $bidTotal * 100) : 0;
+                    $pdStops[] = $__seg['color'].' '.round($pdAt, 2).'% '.round($pdTo, 2).'%';
+                    $pdAt = $pdTo;
+                }
+                $pdRing = $pdStops ? 'conic-gradient('.implode(', ', $pdStops).')' : null;
+            @endphp
             <div class="pd-bid-body">
-                <div class="pd-donut"><div class="pd-donut-c"><b>{{ $bidTotal }}</b><span>{{ $bidTotal === 1 ? 'Bid' : 'Bids' }}</span></div></div>
+                <div class="pd-donut" @if($pdRing) style="background: {{ $pdRing }};" @endif><div class="pd-donut-c"><b>{{ $bidTotal }}</b><span>{{ $bidTotal === 1 ? 'Bid' : 'Bids' }}</span></div></div>
                 <div class="pd-bid-legend">
                     @forelse($bidBreakdown as $__row)
                         <div class="pd-bid-leg">
@@ -610,20 +841,38 @@
                 <span class="pd-card-ico c-green"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="17 1 21 5 17 9"/><path d="M3 11V9a4 4 0 0 1 4-4h14"/><polyline points="7 23 3 19 7 15"/><path d="M21 13v2a4 4 0 0 1-4 4H3"/></svg></span>
                 <span class="pd-card-title">Finance Hub</span>
             </div>
-            <div class="pd-fin-grid">
-                {{-- Three boxes, because three are the ones anything stands
-                     behind. "Secure Payment Held", "Taxes Owed" and
-                     "Est. Profit (MTD)" were $7,850, $1,250 and $6,450 typed
-                     into the page: there is no escrow balance, no tax figure
-                     and no cost side to profit from anywhere in the system. --}}
-                <div class="pd-fin-box"><div class="k">Available Balance</div><div class="v">${{ number_format($stats['available_balance'] ?? 0, 2) }}</div></div>
-                <div class="pd-fin-box"><div class="k">Pending Payout</div><div class="v">${{ number_format($stats['pending_payout'] ?? 0, 2) }}</div></div>
-                <div class="pd-fin-box"><div class="k">Earned This Month</div><div class="v green">${{ number_format($stats['this_month_earnings'] ?? 0, 2) }}</div></div>
-                {{-- The fourth is the first two added together: what is theirs
-                     once the work already agreed has settled. Khadijah's
-                     screen calls it a forecast; it is addition, and it is
-                     labelled as such rather than as a prediction. --}}
-                <div class="pd-fin-box"><div class="k">Yours once everything settles</div><div class="v">${{ number_format($cash['forecast'], 2) }}</div></div>
+            {{-- The headline, then what it is made of.
+
+                 Four boxes of equal weight stood here, so the figure that
+                 answers "what am I owed in total" looked exactly like the
+                 three it is made from. The reference leads with the total and
+                 breaks it down underneath, which is the same four numbers
+                 read in the order somebody actually asks them.
+
+                 The total is addition, not a prediction: the balance they can
+                 withdraw now plus the work already agreed. "Secure Payment
+                 Held", "Taxes Owed" and "Est. Profit (MTD)" were $7,850,
+                 $1,250 and $6,450 typed into the page, and are not here,
+                 because there is no escrow balance, no tax figure and no cost
+                 side to profit anywhere in the system. --}}
+            <div class="pd-fin-lead">
+                <div class="k">Yours once everything settles</div>
+                <div class="v">${{ number_format($cash['forecast'], 2) }}</div>
+                <div class="s">Available now plus work already agreed, after fees.</div>
+            </div>
+            <div class="pd-fin-split">
+                <div class="pd-fin-cell">
+                    <span class="ic c-green">@include('professional._pd-icon', ['name' => 'wallet'])</span>
+                    <span class="tx"><b>${{ number_format($stats['available_balance'] ?? 0, 2) }}</b><span>Available balance</span></span>
+                </div>
+                <div class="pd-fin-cell">
+                    <span class="ic c-orange">@include('professional._pd-icon', ['name' => 'clock'])</span>
+                    <span class="tx"><b>${{ number_format($stats['pending_payout'] ?? 0, 2) }}</b><span>Pending payout</span></span>
+                </div>
+                <div class="pd-fin-cell">
+                    <span class="ic c-blue">@include('professional._pd-icon', ['name' => 'trend'])</span>
+                    <span class="tx"><b>${{ number_format($stats['this_month_earnings'] ?? 0, 2) }}</b><span>Earned this month</span></span>
+                </div>
             </div>
             <div class="pd-fin-actions">
                 <a href="{{ route('professional.transactions.index') }}" class="pd-fin-btn"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Invoices</a>

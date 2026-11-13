@@ -137,6 +137,34 @@ final class DisplayTimezone
         return $at->copy()->setTimezone($user ? self::forUser($user) : self::current())->format('Y-m-d\TH:i');
     }
 
+    /**
+     * The pair of UTC instants that bound one day on the platform's clock.
+     *
+     * whereDate('starts_at', today) compares a LOCAL calendar date against a
+     * column stored in UTC, so a gig at nine in the evening Eastern is written
+     * as two in the morning the next day and drops off today's schedule onto
+     * tomorrow's. On a marketplace whose work is almost entirely evening work,
+     * that is most of the day's jobs.
+     *
+     * Returned as a half-open range, [start, end), so a job at exactly
+     * midnight belongs to one day rather than to both.
+     *
+     * @return array{0: Carbon, 1: Carbon}
+     */
+    public static function dayWindow(Carbon|string|null $localDay = null, ?User $user = null): array
+    {
+        $zone = $user ? self::forUser($user) : self::current();
+
+        $start = $localDay instanceof Carbon
+            ? $localDay->copy()->setTimezone($zone)->startOfDay()
+            : Carbon::parse($localDay ?: 'today', $zone)->startOfDay();
+
+        return [
+            $start->copy()->utc(),
+            $start->copy()->addDay()->utc(),
+        ];
+    }
+
     public static function platformDefault(): string
     {
         $configured = (string) config('app.display_timezone', self::FALLBACK);

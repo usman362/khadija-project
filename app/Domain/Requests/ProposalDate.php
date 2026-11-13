@@ -78,11 +78,21 @@ final class ProposalDate
 
         $day = self::dayOf($bid);
 
-        // Already committed elsewhere that day outranks anything they said.
+        /*
+         * Already committed elsewhere that day outranks anything they said.
+         *
+         * The day is bounded by UTC instants rather than matched with
+         * whereDate: starts_at is stored in UTC, so an evening job sits on
+         * the next UTC date and a clash with an afternoon one went unseen.
+         */
+        // On the professional's own clock, not on whoever happens to be
+        // signed in: this asks whether THEY are already working that day.
+        [$from, $to] = \App\Support\DisplayTimezone::dayWindow($day ?? $date, $bid->supplier);
+
         $busy = Booking::where('supplier_id', $bid->supplier_id)
             ->where('event_id', '!=', $bid->event_id)
             ->whereIn('status', ['confirmed', 'completed'])
-            ->whereHas('event', fn ($q) => $q->whereDate('starts_at', $day ?? $date->toDateString()))
+            ->whereHas('event', fn ($q) => $q->where('starts_at', '>=', $from)->where('starts_at', '<', $to))
             ->exists();
 
         if ($busy) {
