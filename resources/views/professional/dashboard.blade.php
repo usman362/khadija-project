@@ -178,20 +178,29 @@
         border-left: 3px solid var(--border-color); padding: 10px 0 10px 11px;
         border-bottom: 1px solid var(--border-color); }
     .pd-attn-row:last-child { border-bottom: 0; }
+    /* Named, never `.pd-attn-row span`.
+       `.pd-attn-row span` is (0,1,1) and beats any class-only rule on a span
+       inside it, which is (0,1,0). It silently took over the icon tile and
+       the urgency chip: the tile lost its `display:flex` and so stopped
+       centring its drawing, which sat in the top left corner instead, and
+       both lost their colour and their size to a muted 11.5px. The exact
+       same trap cost a morning on the Leads page, where `.lc-who span` beat
+       `.lc-av` and left grey initials hanging outside their circle. Describe
+       the one thing you mean. */
     .pd-attn-row b { display: block; font-size: 13px; font-weight: 700; color: var(--text-primary); line-height: 1.3; }
-    .pd-attn-row span { display: block; font-size: 11.5px; color: var(--text-muted); }
+    .pd-attn-sub { display: block; font-size: 11.5px; color: var(--text-muted); }
     .pd-attn-pri { font-size: 11px; font-weight: 800; white-space: nowrap; }
     .pd-attn-go { font-size: 11.5px; font-weight: 700; padding: 7px 12px; border-radius: 8px;
         background: var(--accent-blue, #2563eb); color: #fff; text-decoration: none; white-space: nowrap; }
     .pd-quiet { font-size: 12.5px; color: var(--text-muted); margin: 4px 0 0; }
     .pd-next b { display: block; font-size: 14px; font-weight: 800; color: var(--text-primary); }
-    .pd-next span { display: block; font-size: 12.5px; color: var(--text-secondary, var(--text-muted)); margin-top: 3px; }
+    .pd-next-sub { display: block; font-size: 12.5px; color: var(--text-secondary, var(--text-muted)); margin-top: 3px; }
     .pd-next i { display: block; font-style: normal; font-size: 11.5px; color: var(--text-muted); margin-top: 3px; }
     .pd-next a { display: inline-block; margin-top: 11px; font-size: 12.5px; font-weight: 700; padding: 9px 16px;
         border-radius: 9px; background: var(--accent-blue, #2563eb); color: #fff; text-decoration: none; }
     .pd-new { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 11px; }
     .pd-new b { display: block; font-size: 19px; font-weight: 800; color: var(--text-primary); line-height: 1.1; }
-    .pd-new span { font-size: 11px; color: var(--text-muted); }
+    .pd-new-label { font-size: 11px; color: var(--text-muted); }
     @media (max-width: 1100px) { .pd-sum { grid-template-columns: repeat(2, minmax(0,1fr)); }
         .pd-row-attn { grid-template-columns: 1fr; } }
     @media (max-width: 620px) { .pd-attn-row { grid-template-columns: 1fr; } }
@@ -298,7 +307,7 @@
     /* Needs your attention: an icon per row, and the priority as a chip. */
     .pd-attn-row { grid-template-columns: 30px minmax(0,1fr) auto auto; }
     .pd-attn-ico { width: 30px; height: 30px; border-radius: 9px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-    .pd-attn-ico svg { width: 15px; height: 15px; }
+    .pd-attn-ico svg { width: 17px; height: 17px; }
     .pd-attn-pri { padding: 3px 9px; border-radius: 7px; font-size: 10px; }
 
     /* Do this first: the reference marks it, and says where it came from. */
@@ -508,7 +517,7 @@
                         <span class="pd-attn-ico {{ $pdIcoTone }}">@include('professional._pd-icon', ['name' => $pdIcoName])</span>
                         <div>
                             <b>{{ $item['title'] }}</b>
-                            @if($item['subject'])<span>{{ $item['subject'] }}</span>@endif
+                            @if($item['subject'])<span class="pd-attn-sub">{{ $item['subject'] }}</span>@endif
                         </div>
                         <span class="pd-attn-pri" style="color: {{ $pdTone[1] }}; background: {{ $pdTone[2] }};">{{ $pdTone[0] }}</span>
                         <a class="pd-attn-go" href="{{ $item['url'] }}">{{ $item['cta'] }}</a>
@@ -538,7 +547,7 @@
                             <span class="pd-next-src">Source: {{ $nextBest['kind'] }}</span>
                         </div>
                         <b>{{ $nextBest['title'] }}</b>
-                        @if($nextBest['subject'])<span>{{ $nextBest['subject'] }}</span>@endif
+                        @if($nextBest['subject'])<span class="pd-next-sub">{{ $nextBest['subject'] }}</span>@endif
                         @if($nextBest['when'])<i>{{ $nextBest['when'] }}</i>@endif
                         <a href="{{ $nextBest['url'] }}">{{ $nextBest['cta'] }}</a>
                     </div>
@@ -568,7 +577,7 @@
                             @php [$pdN, $pdT] = $pdNewIcon[$row['label']] ?? ['bolt', 'c-blue']; @endphp
                             <div>
                                 <span class="pd-new-ico {{ $pdT }}">@include('professional._pd-icon', ['name' => $pdN])</span>
-                                <span class="pd-new-txt"><b>{{ $row['count'] }}</b><span>{{ $row['label'] }}</span></span>
+                                <span class="pd-new-txt"><b>{{ $row['count'] }}</b><span class="pd-new-label">{{ $row['label'] }}</span></span>
                             </div>
                         @endforeach
                     </div>
