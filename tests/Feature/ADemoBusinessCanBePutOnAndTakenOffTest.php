@@ -148,6 +148,40 @@ class ADemoBusinessCanBePutOnAndTakenOffTest extends TestCase
         $this->assertCount(0, $feed['related']);
     }
 
+    /**
+     * It publishes nothing, charges nothing and mails nobody.
+     *
+     * Publishing a request is an event on this platform, not a flag.
+     * Event::created records a posting fee on the client's ledger and mails
+     * them that their request is live, and setting is_published afterwards
+     * mails every professional whose services match. The first run of this
+     * command on production charged forty posting fees and then died on an
+     * SMTP 550, because the demonstration client's address does not receive
+     * mail. A demonstration business must have no public life at all.
+     */
+    public function test_it_publishes_nothing_and_charges_nothing(): void
+    {
+        $before = \App\Models\LedgerEntry::count();
+
+        $this->artisan('demo:business', [
+            'professional' => $this->pro->email,
+            '--client'     => $this->client->email,
+            '--force'      => true,
+        ])->assertSuccessful();
+
+        $ours = Event::where('description', 'like', '%'.DemoBusiness::MARK.'%');
+
+        $this->assertGreaterThan(20, (clone $ours)->count());
+        $this->assertSame(0, (clone $ours)->where('is_published', true)->count());
+        $this->assertSame(0, (clone $ours)->whereNotNull('published_at')->count());
+
+        $this->assertSame(
+            $before,
+            \App\Models\LedgerEntry::count(),
+            'A demonstration request must not put a posting fee on anybody.',
+        );
+    }
+
     /** Taking it off takes exactly what was put on, and nothing else. */
     public function test_removing_it_leaves_real_rows_alone(): void
     {

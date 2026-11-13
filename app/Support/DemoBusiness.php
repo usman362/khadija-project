@@ -455,22 +455,32 @@ final class DemoBusiness
                 'created_by'   => $client->id,
                 'supplier_id'  => $pro->id,
                 'category_id'  => $service->id,
-                'status'       => $starts->isPast() ? 'completed' : 'published',
+                'status'       => $starts->isPast() ? 'completed' : 'pending',
                 /*
-                 * Awarded, which is what keeps this safe on a live site.
+                 * Never published, and this is not a detail.
                  *
-                 * supplier_id is set, so RequestLifecycle reads every one of
-                 * these as AWARDED and the Opportunity Feed, which asks for
-                 * `supplier_id is null`, cannot return them. The bidding
-                 * board shows open work only. So the whole business history
-                 * is visible to exactly two accounts: the demonstration
-                 * client who posted it and the professional who did it.
+                 * Publishing a request is an EVENT on the live platform, not
+                 * a flag. Event::created fires announcePublication the moment
+                 * published_at is set, which records a posting fee on the
+                 * client's money ledger and emails them that their request is
+                 * live; setting is_published later fires EventNotifier and
+                 * mails every professional whose services match. A first run
+                 * of this on production charged forty posting fees and died
+                 * on an SMTP 550 halfway through, because the demonstration
+                 * client's address does not receive mail.
                  *
-                 * That is also what it honestly is. These are jobs already
-                 * given to somebody, not requests looking for a bid.
+                 * None of that is wanted here and none of it is needed. These
+                 * are jobs already awarded to this professional, not requests
+                 * looking for a bid, so they never had a public life. Left
+                 * unpublished they also cannot reach the bidding board, the
+                 * Opportunity Feed or anybody's search, which is what makes
+                 * the whole thing safe to run on a live site.
+                 *
+                 * The dashboard reads bookings and their dates. It has never
+                 * asked whether the request behind one was ever advertised.
                  */
-                'is_published' => true,
-                'published_at' => $starts->copy()->subWeeks(5),
+                'is_published' => false,
+                'published_at' => null,
                 'starts_at'    => $starts,
                 'ends_at'      => $starts->copy()->addHours($hours),
                 'location'     => $city.', '.$state,
@@ -531,6 +541,18 @@ final class DemoBusiness
                 ->where('note', 'like', '%'.self::MARK.'%')->delete(),
             'packages' => Package::where('user_id', $pro->id)
                 ->where('description', 'like', '%'.self::MARK.'%')->delete(),
+            /*
+             * Posting fees an earlier version of this caused.
+             *
+             * It used to create these events published, and publishing
+             * records a platform fee on the client's ledger. A ledger is
+             * append-only for real money; a fee for a demonstration request
+             * that is about to stop existing is not real money, and leaving
+             * it would show the client charges for events they no longer
+             * have. Scoped to these events, so nothing else on the ledger is
+             * touched.
+             */
+            'ledger'   => \App\Models\LedgerEntry::whereIn('event_id', $events)->delete(),
             'events'   => Event::whereIn('id', $events)->delete(),
         ];
     }

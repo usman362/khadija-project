@@ -5,6 +5,8 @@ namespace App\Console\Commands;
 use App\Models\User;
 use App\Support\DemoBusiness;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Notification;
 
 /**
  * Give ONE named professional account a business, so the dashboard can be
@@ -42,6 +44,20 @@ class BuildDemoBusiness extends Command
 
     public function handle(): int
     {
+        /*
+         * Nothing this command does may reach anybody's inbox.
+         *
+         * A first run on production died on an SMTP 550 after Event::created
+         * tried to mail the demonstration client that their request was live.
+         * The cause is fixed where it belongs — this no longer publishes
+         * anything — but a demonstration build has no business sending mail
+         * by any route, including ones added later, so both are stopped here
+         * as well. The command runs once and exits, so swapping them for the
+         * process costs nothing.
+         */
+        Notification::fake();
+        Mail::fake();
+
         $pro = User::where('email', $this->argument('professional'))->first();
 
         if (! $pro) {
