@@ -12,6 +12,50 @@ code.
 
 ## 2026-11-14
 
+### The Availability page was unreadable once it stopped crashing
+With the error gone the page could finally be looked at, and four things on
+it were wrong.
+
+**It said its own name twice.** The blue banner across the top already prints
+the page title. The page printed it again underneath, in a heading of its own,
+with a sentence of explanation beside it. That sentence now sits under the
+title in the banner, where every other page puts it, and the heading is gone.
+
+**A booked day looked like an empty one.** Days already taken by a gig are
+drawn blue, and they are also locked, because a day with a gig on it is not a
+question anyone is being asked. The rule that dimmed locked days was dimming
+them too: the five booked days in November were the faintest squares on the
+grid. Only past days are dimmed now. A booked day is solid blue.
+
+**Nothing in the grid had a background.** The day squares, the date boxes, the
+little tags and the chips were all written to use a colour named `--bg-page`.
+That name belongs to the client side of the site. This is a professional page,
+and on the professional side that name has never been defined, so every one of
+those surfaces was simply drawing nothing. Unanswered days had no square to
+speak of. They have one now, and the green and red day numbers were swapped
+for the pair of shades that are already kept for light and dark, so they read
+on both.
+
+**The service list was the page.** The professional on the live site offers
+241 services and has priced one of them, so the bottom of this page was 241
+rows, 240 of which said "No price yet" and nothing else. Nobody can read that,
+and the two numbers worth knowing were buried in it. Priced services keep the
+table, where their figures are worth four columns. The unpriced ones are now
+named as small chips, two dozen of them, with a count for the rest and a link
+to the page where prices are set. The page went from an endless scroll to two
+screens.
+
+**Links were invisible.** No colour was ever set for the links inside these
+cards, so the browser used its own, a dark blue that cannot be read on a dark
+background. They now use the blue the rest of the site keeps for this.
+
+Checked by opening the page in both the light and dark themes and at phone
+width. Live: not yet. Needs the usual pull on the server.
+
+---
+
+## 2026-11-14
+
 ### The Availability page was a 500, and four calendars were on the wrong clock
 Ali saw the error himself: opening Availability on the live site returned
 Internal Server Error, every time, for every professional. The page asked the
